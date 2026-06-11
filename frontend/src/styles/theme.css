@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* ── NeuraClaw design tokens ──────────────────────────────────────────
+   Dark-first. Deep ink surfaces, single warm amber accent ("claw"),
+   Space Grotesk display over Inter UI. Every surface inherits these. */
+
+@theme {
+  --color-ink-950: oklch(16% 0.012 260);
+  --color-ink-900: oklch(20% 0.014 260);
+  --color-ink-850: oklch(23% 0.015 260);
+  --color-ink-800: oklch(27% 0.016 260);
+  --color-ink-700: oklch(34% 0.017 260);
+  --color-ink-500: oklch(52% 0.015 260);
+  --color-ink-300: oklch(72% 0.012 260);
+  --color-ink-100: oklch(92% 0.006 260);
+
+  --color-claw-600: oklch(62% 0.17 65);
+  --color-claw-500: oklch(72% 0.17 70);
+  --color-claw-400: oklch(80% 0.15 75);
+
+  --color-ok: oklch(72% 0.17 150);
+  --color-warn: oklch(78% 0.16 85);
+  --color-danger: oklch(63% 0.21 25);
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --radius-card: 0.75rem;
+  --radius-ctl: 0.5rem;
+
+  --shadow-raise: 0 1px 0 0 oklch(100% 0 0 / 4%) inset, 0 8px 24px -12px oklch(0% 0 0 / 60%);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-ink-950 text-ink-100 font-sans antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: var(--color-claw-600);
+  color: var(--color-ink-950);
+}
+
+/* thin scrollbars that match surfaces */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-700) transparent;
+}

@@ -1,0 +1,32 @@
+# NeuraClaw V3 configuration.
+# Copy to config.yaml and adjust. API keys go in .env, never here.
+
+providers:
+  nim:
+    base_url: https://integrate.api.nvidia.com/v1
+    api_key_env: NVIDIA_API_KEY
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+  ollama:
+    base_url: http://localhost:11434/v1
+    api_key_env: ""          # Ollama needs no key; literal "ollama" is sent
+
+# Model roles. Each role is a failover chain of "provider/model" refs,
+# tried in order. Subsystems request roles, never concrete models.
+roles:
+  primary:
+    - openrouter/anthropic/claude-sonnet-4.6
+    - nim/meta/llama-3.3-70b-instruct
+  cheap:
+    - nim/meta/llama-3.1-8b-instruct
+  local:
+    - ollama/qwen2.5
+
+# Models known to NOT support tool calling. Router refuses tool-bearing
+# requests to these instead of failing silently.
+no_tools_models: []
+
+server:
+  host: 127.0.0.1
+  port: 8090
