@@ -60,6 +60,8 @@ async def extract_from_exchange(
     for c in candidates:
         if c.confidence < MIN_CONFIDENCE or c.type not in store.MEMORY_TYPES:
             continue
+        if not _plausible(c.content):
+            continue
         memory_id = await store.add_memory(
             db,
             type=c.type,
@@ -72,6 +74,12 @@ async def extract_from_exchange(
     if stored:
         log.info("extracted %d memories from session %s", stored, session_id)
     return stored
+
+
+def _plausible(content: str) -> bool:
+    """Reject small-model garbage: must be a third-person sentence, not a fragment."""
+    words = content.split()
+    return len(words) >= 4 and words[0].lower() in ("user", "the", "user's")
 
 
 def _parse_candidates(text: str) -> list[Candidate]:

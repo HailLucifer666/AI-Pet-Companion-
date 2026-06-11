@@ -89,3 +89,9 @@ def test_extractor_tolerates_garbage():
     assert extractor._parse_candidates("no json here") == []
     assert extractor._parse_candidates('[{"bad": true}]') == []
     assert extractor._parse_candidates('{"not": "an array"}') == []
+
+
+def test_plausibility_gate_rejects_fragments():
+    assert not extractor._plausible("NEURACLAW LIVE")
+    assert not extractor._plausible("User")
+    assert extractor._plausible("User prefers terse replies in chat")
