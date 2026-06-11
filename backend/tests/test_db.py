@@ -21,7 +21,7 @@ async def test_sqlite_vec_extension_loads(db):
 
 async def test_migrations_apply_once(db):
     applied = await migrate(db, MIGRATIONS_DIR)
-    assert applied == [1]
+    assert applied == list(range(1, len(applied) + 1))  # contiguous from 001
     # Second run is a no-op.
     assert await migrate(db, MIGRATIONS_DIR) == []
 

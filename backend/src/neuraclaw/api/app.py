@@ -5,9 +5,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from ..config import DB_PATH, FRONTEND_DIST, MIGRATIONS_DIR, load_config
+from ..config import DB_PATH, FRONTEND_DIST, MIGRATIONS_DIR, WORKSPACE_DIR, load_config
 from ..db import migrate, open_db
 from ..providers import Router
+from ..tools import build_registry
 from .routes import api_router
 
 
@@ -16,9 +17,11 @@ async def lifespan(app: FastAPI):
     config = load_config()
     db = await open_db(DB_PATH)
     await migrate(db, MIGRATIONS_DIR)
+    WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
     app.state.config = config
     app.state.db = db
     app.state.router = Router(config, db)
+    app.state.registry = build_registry(config)
     yield
     await db.close()
 

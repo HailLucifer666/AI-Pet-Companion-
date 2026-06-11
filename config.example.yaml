@@ -30,3 +30,13 @@ no_tools_models: []
 server:
   host: 127.0.0.1
   port: 8090
+
+trust:
+  # Highest tool risk run without asking: 0=READ, 1=WRITE (workspace-scoped),
+  # 2=EXECUTE (shell), 3=NETWORK_SENSITIVE. Approval flow arrives in Phase 2.
+  max_auto_risk: 1
+
+agent:
+  max_steps: 20            # tool-call loop budget per turn
+  history_messages: 40     # recent messages kept in context
+  extract_memories: true   # cheap-model memory extraction after each turn

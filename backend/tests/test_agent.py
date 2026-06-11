@@ -1,0 +1,127 @@
+"""Agent loop tests with a scripted fake provider."""
+
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
+
+from neuraclaw.config import MIGRATIONS_DIR, Config
+from neuraclaw.core import agent
+from neuraclaw.db import migrate, open_db
+from neuraclaw.providers.base import ChatResponse, Delta, ToolCall
+from neuraclaw.tools import build_registry
+
+
+class ScriptedRouter:
+    """Yields pre-scripted responses, one per chat_stream call."""
+
+    def __init__(self, responses: list[ChatResponse]):
+        self.responses = list(responses)
+        self.calls: list[list[dict]] = []
+
+    async def chat_stream(self, role, messages, *, tools=None):
+        self.calls.append(messages)
+        resp = self.responses.pop(0)
+        for chunk in resp.text.split(" "):
+            if chunk:
+                yield Delta(text=chunk + " ")
+        yield Delta(done=True, response=resp)
+
+
+async def fake_embed(texts: list[str]) -> list[list[float]]:
+    return [[0.0] * 384 for _ in texts]
+
+
+@pytest.fixture
+async def db(tmp_path: Path):
+    conn = await open_db(tmp_path / "test.db")
+    await migrate(conn, MIGRATIONS_DIR)
+    await conn.execute("INSERT INTO sessions (id) VALUES ('s1')")
+    await conn.execute(
+        "INSERT INTO messages (session_id, role, content) VALUES ('s1', 'user', 'hello')"
+    )
+    await conn.commit()
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
+        yield conn
+    await conn.close()
+
+
+def make_config() -> Config:
+    return Config.model_validate({"agent": {"extract_memories": False}})
+
+
+async def collect(gen):
+    return [e async for e in gen]
+
+
+async def test_plain_text_turn(db, tmp_path):
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="hi there friend")])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hello",
+        )
+    )
+    assert events[-1].type == "done"
+    assert "hi there friend" in events[-1].text
+    # Assistant reply persisted.
+    cur = await db.execute(
+        "SELECT content FROM messages WHERE session_id='s1' AND role='assistant'"
+    )
+    rows = await cur.fetchall()
+    assert len(rows) == 1
+
+
+async def test_tool_call_roundtrip(db, tmp_path):
+    config = make_config()
+    tool_call = ToolCall(id="c1", name="write_file",
+                         arguments_json='{"path": "x.txt", "content": "data"}')
+    router = ScriptedRouter([
+        ChatResponse(text="", tool_calls=[tool_call]),
+        ChatResponse(text="wrote the file"),
+    ])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="write x.txt",
+        )
+    )
+    types = [e.type for e in events]
+    assert "tool_start" in types and "tool_end" in types
+    assert events[-1].type == "done"
+    # Second model call saw the tool result message.
+    assert any(m.get("role") == "tool" for m in router.calls[1])
+
+
+async def test_step_budget_exhaustion(db, tmp_path):
+    config = Config.model_validate(
+        {"agent": {"max_steps": 2, "extract_memories": False}}
+    )
+    tc = ToolCall(id="c", name="list_dir", arguments_json="{}")
+    router = ScriptedRouter([
+        ChatResponse(text="", tool_calls=[tc]),
+        ChatResponse(text="", tool_calls=[tc]),
+    ])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="loop forever",
+        )
+    )
+    assert events[-1].type == "error"
+    assert "2 steps" in events[-1].text
+
+
+async def test_system_prompt_contains_soul(db, tmp_path):
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="ok")])
+    await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hello",
+        )
+    )
+    system = router.calls[0][0]
+    assert system["role"] == "system"
+    assert "NeuraClaw" in system["content"]

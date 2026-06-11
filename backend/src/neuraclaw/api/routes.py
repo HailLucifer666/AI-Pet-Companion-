@@ -1,6 +1,8 @@
-"""API routes. Phase 0: health + bare streaming chat (no tools yet)."""
+"""API routes: health, chat (agent loop over SSE), sessions, memory, notes, profile."""
 
+import asyncio
 import json
+import logging
 import uuid
 
 from fastapi import APIRouter, HTTPException, Request
@@ -8,9 +10,11 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from .. import __version__
+from ..core import agent
 from ..db.connection import vec_version
-from ..providers import ProviderError
+from ..memory import extractor, store
 
+log = logging.getLogger(__name__)
 api_router = APIRouter()
 
 
@@ -24,6 +28,31 @@ async def health(request: Request):
 async def models(request: Request):
     config = request.app.state.config
     return {"roles": config.roles}
+
+
+@api_router.get("/settings")
+async def settings(request: Request):
+    """Provider/key status for the settings surface. Never returns key values."""
+    import os
+
+    config = request.app.state.config
+    providers = {
+        name: {
+            "base_url": pc.base_url,
+            "key_env": pc.api_key_env or None,
+            "key_present": bool(pc.api_key_env and os.environ.get(pc.api_key_env))
+            or not pc.api_key_env,
+        }
+        for name, pc in config.providers.items()
+    }
+    return {
+        "providers": providers,
+        "roles": config.roles,
+        "trust": {"max_auto_risk": config.trust.max_auto_risk},
+    }
+
+
+# ── Chat ──────────────────────────────────────────────────────────────
 
 
 class ChatRequest(BaseModel):
@@ -40,6 +69,7 @@ def _sse(event: dict) -> str:
 async def chat(req: ChatRequest, request: Request):
     db = request.app.state.db
     router = request.app.state.router
+    registry = request.app.state.registry
     config = request.app.state.config
 
     if req.role not in config.roles:
@@ -61,35 +91,57 @@ async def chat(req: ChatRequest, request: Request):
     )
     await db.commit()
 
-    cur = await db.execute(
-        "SELECT role, content FROM messages WHERE session_id = ? ORDER BY id", (session_id,)
-    )
-    history = [{"role": r["role"], "content": r["content"]} for r in await cur.fetchall()]
-
     async def stream():
         yield _sse({"type": "session", "session_id": session_id})
-        full_text = []
-        try:
-            async for delta in router.chat_stream(req.role, history):
-                if delta.text:
-                    full_text.append(delta.text)
-                    yield _sse({"type": "delta", "text": delta.text})
-        except ProviderError as e:
-            yield _sse({"type": "error", "message": str(e)})
-            return
-        text = "".join(full_text)
-        await db.execute(
-            "INSERT INTO messages (session_id, role, content) VALUES (?, 'assistant', ?)",
-            (session_id, text),
-        )
-        await db.commit()
-        yield _sse({"type": "done"})
+        final_text = ""
+        async for event in agent.run_turn(
+            db=db,
+            router=router,
+            registry=registry,
+            config=config,
+            session_id=session_id,
+            user_text=req.message,
+            role=req.role,
+        ):
+            if event.type == "delta":
+                yield _sse({"type": "delta", "text": event.text})
+            elif event.type == "tool_start":
+                yield _sse({"type": "tool_start", "tool": event.tool, "detail": event.detail})
+            elif event.type == "tool_end":
+                yield _sse(
+                    {"type": "tool_end", "tool": event.tool, "detail": event.detail,
+                     "ok": event.ok}
+                )
+            elif event.type == "done":
+                final_text = event.text
+                yield _sse({"type": "done"})
+            elif event.type == "error":
+                yield _sse({"type": "error", "message": event.text})
+
+        if final_text and config.agent.extract_memories:
+            task = asyncio.create_task(
+                extractor.extract_from_exchange(
+                    db, router,
+                    session_id=session_id,
+                    user_text=req.message,
+                    assistant_text=final_text,
+                )
+            )
+            task.add_done_callback(_log_extraction_failure)
 
     return StreamingResponse(
         stream(),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+def _log_extraction_failure(task: asyncio.Task) -> None:
+    if not task.cancelled() and task.exception():
+        log.error("memory extraction task failed", exc_info=task.exception())
+
+
+# ── Sessions ──────────────────────────────────────────────────────────
 
 
 @api_router.get("/sessions")
@@ -104,7 +156,161 @@ async def list_sessions(request: Request):
 @api_router.get("/sessions/{session_id}/messages")
 async def session_messages(session_id: str, request: Request):
     cur = await request.app.state.db.execute(
-        "SELECT id, role, content, created_at FROM messages WHERE session_id = ? ORDER BY id",
+        "SELECT id, role, content, tool_calls_json, created_at FROM messages"
+        " WHERE session_id = ? ORDER BY id",
         (session_id,),
     )
     return {"messages": [dict(r) for r in await cur.fetchall()]}
+
+
+@api_router.delete("/sessions/{session_id}")
+async def archive_session(session_id: str, request: Request):
+    cur = await request.app.state.db.execute(
+        "UPDATE sessions SET archived = 1 WHERE id = ?", (session_id,)
+    )
+    await request.app.state.db.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(404, "No such session")
+    return {"ok": True}
+
+
+# ── Memory ────────────────────────────────────────────────────────────
+
+
+class MemoryCreate(BaseModel):
+    type: str
+    content: str = Field(min_length=2, max_length=500)
+
+
+class MemoryUpdate(BaseModel):
+    content: str = Field(min_length=2, max_length=500)
+
+
+@api_router.get("/memory")
+async def list_memory(request: Request, q: str = "", type: str | None = None):
+    if q.strip():
+        memories = await store.search_memories(request.app.state.db, q, top_k=50)
+        if type:
+            memories = [m for m in memories if m.type == type]
+    else:
+        memories = await store.list_memories(request.app.state.db, type=type)
+    return {"memories": [m.__dict__ for m in memories]}
+
+
+@api_router.post("/memory")
+async def create_memory(body: MemoryCreate, request: Request):
+    if body.type not in store.MEMORY_TYPES:
+        raise HTTPException(400, f"type must be one of {store.MEMORY_TYPES}")
+    memory_id = await store.add_memory(
+        request.app.state.db, type=body.type, content=body.content
+    )
+    return {"id": memory_id, "deduplicated": memory_id is None}
+
+
+@api_router.put("/memory/{memory_id}")
+async def edit_memory(memory_id: int, body: MemoryUpdate, request: Request):
+    ok = await store.update_memory(request.app.state.db, memory_id, body.content)
+    if not ok:
+        raise HTTPException(404, "No such memory")
+    return {"ok": True}
+
+
+@api_router.delete("/memory/{memory_id}")
+async def delete_memory(memory_id: int, request: Request):
+    ok = await store.forget_memory(request.app.state.db, memory_id)
+    if not ok:
+        raise HTTPException(404, "No such memory")
+    return {"ok": True}
+
+
+# ── Profile ───────────────────────────────────────────────────────────
+
+
+class ProfileEntry(BaseModel):
+    key: str = Field(min_length=1, max_length=60)
+    value: str = Field(max_length=500)
+
+
+@api_router.get("/profile")
+async def get_profile(request: Request):
+    cur = await request.app.state.db.execute(
+        "SELECT key, value, updated_at FROM user_profile ORDER BY key"
+    )
+    return {"profile": [dict(r) for r in await cur.fetchall()]}
+
+
+@api_router.put("/profile")
+async def set_profile(body: ProfileEntry, request: Request):
+    db = request.app.state.db
+    if body.value.strip():
+        await db.execute(
+            "INSERT INTO user_profile (key, value) VALUES (?, ?)"
+            " ON CONFLICT(key) DO UPDATE SET value = excluded.value,"
+            " updated_at = datetime('now')",
+            (body.key, body.value),
+        )
+    else:
+        await db.execute("DELETE FROM user_profile WHERE key = ?", (body.key,))
+    await db.commit()
+    return {"ok": True}
+
+
+# ── Notes ─────────────────────────────────────────────────────────────
+
+
+class NoteBody(BaseModel):
+    title: str = Field(max_length=200)
+    content_md: str = Field(default="", max_length=100_000)
+
+
+@api_router.get("/notes")
+async def list_notes(request: Request, q: str = ""):
+    db = request.app.state.db
+    if q.strip():
+        terms = " OR ".join(
+            f'"{t.replace(chr(34), chr(34) * 2)}"' for t in q.split() if t.strip()
+        )
+        cur = await db.execute(
+            "SELECT n.id, n.title, n.content_md, n.created_at, n.updated_at"
+            " FROM notes_fts f JOIN notes n ON n.id = f.rowid"
+            " WHERE notes_fts MATCH ? ORDER BY rank LIMIT 100",
+            (terms,),
+        )
+    else:
+        cur = await db.execute(
+            "SELECT id, title, content_md, created_at, updated_at FROM notes"
+            " ORDER BY updated_at DESC LIMIT 200"
+        )
+    return {"notes": [dict(r) for r in await cur.fetchall()]}
+
+
+@api_router.post("/notes")
+async def create_note(body: NoteBody, request: Request):
+    cur = await request.app.state.db.execute(
+        "INSERT INTO notes (title, content_md) VALUES (?, ?)",
+        (body.title, body.content_md),
+    )
+    await request.app.state.db.commit()
+    return {"id": cur.lastrowid}
+
+
+@api_router.put("/notes/{note_id}")
+async def update_note(note_id: int, body: NoteBody, request: Request):
+    cur = await request.app.state.db.execute(
+        "UPDATE notes SET title = ?, content_md = ?, updated_at = datetime('now')"
+        " WHERE id = ?",
+        (body.title, body.content_md, note_id),
+    )
+    await request.app.state.db.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(404, "No such note")
+    return {"ok": True}
+
+
+@api_router.delete("/notes/{note_id}")
+async def delete_note(note_id: int, request: Request):
+    cur = await request.app.state.db.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+    await request.app.state.db.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(404, "No such note")
+    return {"ok": True}
