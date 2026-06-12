@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Eye, Pencil, Plus, StickyNote, Trash2 } from "lucide-react";
 import { api, queryKeys, type Note } from "../../lib/api";
-import { Button, EmptyState, IconButton, Input } from "../../components/ui";
+import { useUndoableDelete } from "../../lib/useUndoableDelete";
+import { Button, EmptyState, IconButton, Input, Skeleton } from "../../components/ui";
 
 function Editor({ note, onSaved }: { note: Note; onSaved: () => void }) {
   const [title, setTitle] = useState(note.title);
@@ -68,7 +70,7 @@ export function NotesView() {
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
   const [activeId, setActiveId] = useState<number | null>(null);
-  const { data } = useQuery({ queryKey: queryKeys.notes(q), queryFn: () => api.notes(q) });
+  const { data, isLoading } = useQuery({ queryKey: queryKeys.notes(q), queryFn: () => api.notes(q) });
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["notes"] });
 
   const create = useMutation({
@@ -78,13 +80,22 @@ export function NotesView() {
       setActiveId(res.id);
     },
   });
-  const remove = useMutation({
-    mutationFn: (id: number) => api.deleteNote(id),
-    onSuccess: (_d, id) => {
+  const removeNote = useUndoableDelete<Note>({
+    remove: (n) =>
+      queryClient.setQueriesData<{ notes: Note[] }>({ queryKey: ["notes"] }, (old) =>
+        old ? { notes: old.notes.filter((x) => x.id !== n.id) } : old,
+      ),
+    restore: invalidate,
+    commit: async (n) => {
+      await api.deleteNote(n.id);
       invalidate();
-      if (id === activeId) setActiveId(null);
     },
+    message: (n) => `Deleted "${n.title || "Untitled"}"`,
   });
+  function onDelete(n: Note) {
+    removeNote(n);
+    if (n.id === activeId) setActiveId(null);
+  }
 
   const active = data?.notes.find((n) => n.id === activeId) ?? null;
 
@@ -96,35 +107,46 @@ export function NotesView() {
           <IconButton icon={Plus} label="New note" onClick={() => create.mutate()} />
         </div>
         <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
-          {data?.notes.map((n) => (
-            <div
-              key={n.id}
-              className={[
-                "group cursor-pointer rounded-ctl px-2.5 py-2",
-                n.id === activeId ? "bg-ink-800" : "hover:bg-ink-850",
-              ].join(" ")}
-              onClick={() => setActiveId(n.id)}
-            >
-              <div className="flex items-center gap-2">
-                <span className="min-w-0 flex-1 truncate text-sm text-ink-100">
-                  {n.title || "Untitled"}
-                </span>
-                <button
-                  aria-label="Delete note"
-                  className="hidden text-ink-500 hover:text-danger group-hover:block"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    remove.mutate(n.id);
-                  }}
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
-              </div>
-              <p className="truncate text-xs text-ink-500">
-                {n.content_md.slice(0, 80) || "Empty"}
-              </p>
+          {isLoading ? (
+            <div className="space-y-1.5 px-1 pt-1">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
             </div>
-          ))}
+          ) : (
+            data?.notes.map((n, i) => (
+              <motion.div
+                key={n.id}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.18, delay: Math.min(i * 0.025, 0.3), ease: [0.16, 1, 0.3, 1] }}
+                className={[
+                  "group cursor-pointer rounded-ctl px-2.5 py-2 transition-colors",
+                  n.id === activeId ? "bg-ink-800" : "hover:bg-ink-850",
+                ].join(" ")}
+                onClick={() => setActiveId(n.id)}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-sm text-ink-100">
+                    {n.title || "Untitled"}
+                  </span>
+                  <button
+                    aria-label="Delete note"
+                    className="hidden text-ink-500 hover:text-danger group-hover:block"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(n);
+                    }}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+                <p className="truncate text-xs text-ink-500">
+                  {n.content_md.slice(0, 80) || "Empty"}
+                </p>
+              </motion.div>
+            ))
+          )}
         </div>
       </aside>
       {active ? (

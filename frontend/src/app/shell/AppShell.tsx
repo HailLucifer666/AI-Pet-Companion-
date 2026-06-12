@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import {
   BookOpen,
   Brain,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { api, queryKeys } from "../../lib/api";
-import { StatusDot } from "../../components/ui";
+import { StatusDot, Tooltip } from "../../components/ui";
 
 interface Surface {
   to: string;
@@ -37,27 +38,29 @@ const surfaces: Surface[] = [
 
 function RailLink({ to, label, icon: Icon }: Surface) {
   return (
-    <NavLink
-      to={to}
-      title={label}
-      className={({ isActive }) =>
-        [
-          "group relative flex size-11 items-center justify-center rounded-ctl transition-colors",
-          isActive
-            ? "bg-claw-600/15 text-claw-400"
-            : "text-ink-500 hover:bg-ink-800 hover:text-ink-100",
-        ].join(" ")
-      }
-    >
-      {({ isActive }) => (
-        <>
-          {isActive && (
-            <span className="absolute left-0 h-6 w-0.5 rounded-full bg-claw-500" aria-hidden />
-          )}
-          <Icon className="size-5" strokeWidth={1.75} />
-        </>
-      )}
-    </NavLink>
+    <Tooltip label={label} side="right">
+      <NavLink
+        to={to}
+        className={({ isActive }) =>
+          [
+            "group relative flex size-11 items-center justify-center rounded-ctl",
+            "transition-[transform,background-color,color] duration-150 ease-out-expo active:scale-90",
+            isActive
+              ? "bg-claw-600/15 text-claw-400"
+              : "text-ink-500 hover:bg-ink-800 hover:text-ink-100",
+          ].join(" ")
+        }
+      >
+        {({ isActive }) => (
+          <>
+            {isActive && (
+              <span className="absolute left-0 h-6 w-0.5 rounded-full bg-claw-500" aria-hidden />
+            )}
+            <Icon className="size-5" strokeWidth={1.75} />
+          </>
+        )}
+      </NavLink>
+    </Tooltip>
   );
 }
 
@@ -78,12 +81,13 @@ function StatusStrip() {
 }
 
 export function AppShell() {
+  const location = useLocation();
   return (
     <div className="flex h-dvh flex-col">
       <div className="flex min-h-0 flex-1">
-        <nav className="flex w-16 flex-col items-center gap-1 border-r border-ink-800 bg-ink-900 py-3">
+        <nav className="flex w-16 flex-col items-center gap-1 border-r border-ink-800 bg-ink-900/80 py-3 backdrop-blur-sm">
           <div
-            className="mb-3 flex size-10 items-center justify-center rounded-card bg-claw-600 font-display text-lg font-bold text-ink-950"
+            className="mb-3 flex size-10 items-center justify-center rounded-card bg-claw-600 font-display text-lg font-bold text-ink-950 glow-accent"
             title="NeuraClaw"
           >
             N
@@ -97,8 +101,19 @@ export function AppShell() {
           )}
           <RailLink to="/settings" label="Settings" icon={Settings} />
         </nav>
-        <main className="min-w-0 flex-1 overflow-auto">
-          <Outlet />
+        <main className="min-w-0 flex-1 overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="h-full overflow-auto"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
       <StatusStrip />

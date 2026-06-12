@@ -1,47 +1,89 @@
 @import "tailwindcss";
 
-/* ── NeuraClaw design tokens ──────────────────────────────────────────
-   Dark-first. Deep ink surfaces, single warm amber accent ("claw"),
-   Space Grotesk display over Inter UI. Every surface inherits these. */
+/* ── NeuraClaw design system — "Bioluminescent Terminal" ──────────────
+   A dark instrument panel something alive inhabits. Deep layered ink
+   surfaces with subtle radial atmosphere; one warm ember accent ("claw")
+   that *means* the creature — its glow intensity tracks agent activity
+   via --activity (0→1, set live by Synapse in 0.2b). Space Grotesk for
+   moments, Inter for the instrument. Tokens only — no hardcoded colors. */
 
 @theme {
-  --color-ink-950: oklch(16% 0.012 260);
-  --color-ink-900: oklch(20% 0.014 260);
-  --color-ink-850: oklch(23% 0.015 260);
-  --color-ink-800: oklch(27% 0.016 260);
-  --color-ink-700: oklch(34% 0.017 260);
-  --color-ink-500: oklch(52% 0.015 260);
-  --color-ink-300: oklch(72% 0.012 260);
-  --color-ink-100: oklch(92% 0.006 260);
+  /* Ink — deep, near-neutral with a faint cool cast. OKLch for even steps. */
+  --color-ink-950: oklch(15% 0.014 264);
+  --color-ink-900: oklch(19% 0.016 264);
+  --color-ink-850: oklch(22% 0.017 264);
+  --color-ink-800: oklch(26% 0.018 264);
+  --color-ink-700: oklch(33% 0.019 264);
+  --color-ink-500: oklch(52% 0.016 264);
+  --color-ink-300: oklch(72% 0.012 264);
+  --color-ink-100: oklch(93% 0.006 264);
 
-  --color-claw-600: oklch(62% 0.17 65);
-  --color-claw-500: oklch(72% 0.17 70);
-  --color-claw-400: oklch(80% 0.15 75);
+  /* Claw — the living ember. Warm amber, the one accent that means *it*. */
+  --color-claw-700: oklch(54% 0.16 62);
+  --color-claw-600: oklch(63% 0.18 65);
+  --color-claw-500: oklch(73% 0.18 72);
+  --color-claw-400: oklch(82% 0.15 78);
+  --color-claw-300: oklch(89% 0.10 84);
 
-  --color-ok: oklch(72% 0.17 150);
-  --color-warn: oklch(78% 0.16 85);
-  --color-danger: oklch(63% 0.21 25);
+  /* Semantic */
+  --color-ok: oklch(74% 0.17 152);
+  --color-warn: oklch(80% 0.16 85);
+  --color-danger: oklch(64% 0.21 25);
 
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
 
-  --radius-card: 0.75rem;
   --radius-ctl: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-overlay: 0.875rem;
 
-  --shadow-raise: 0 1px 0 0 oklch(100% 0 0 / 4%) inset, 0 8px 24px -12px oklch(0% 0 0 / 60%);
+  /* Elevation — every surface declares its plane. Inner top-highlight +
+     tiered ambient shadow give real depth instead of a flat single plane. */
+  --shadow-raise: 0 1px 0 0 oklch(100% 0 0 / 5%) inset, 0 8px 24px -14px oklch(0% 0 0 / 70%);
+  --shadow-overlay:
+    0 1px 0 0 oklch(100% 0 0 / 7%) inset,
+    0 24px 64px -28px oklch(0% 0 0 / 85%),
+    0 8px 20px -16px oklch(0% 0 0 / 60%);
+  /* Accent glow — strength scales with --activity (idle 0 → working 1). */
+  --shadow-glow:
+    0 0 0 1px oklch(73% 0.18 72 / calc(0.18 + 0.22 * var(--activity, 0))),
+    0 0 28px -6px oklch(73% 0.18 72 / calc(0.10 + 0.40 * var(--activity, 0)));
+
+  /* Motion — one vocabulary. 150 quick / 300 standard / 500 expressive. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-pulse-glow: pulse-glow 2.6s ease-in-out infinite;
+  --animate-caret: caret 1.1s steps(1) infinite;
+  --animate-pop-in: pop-in 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-toast-in: toast-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-toast-out: toast-out 160ms ease-in forwards;
 }
 
+/* Motion tokens (plain vars — used in inline transitions + framer config). */
 :root {
   color-scheme: dark;
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+  --dur-slow: 500ms;
+  --ease-bio: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Live activity level, 0 (asleep/idle) → 1 (working). Set by Synapse. */
+  --activity: 0;
 }
 
+/* Page plane — deep ink with a faint ember aurora bleeding from the rail
+   side, plus a vignette so content floats above atmosphere, not on a slab. */
 body {
   @apply bg-ink-950 text-ink-100 font-sans antialiased;
+  background-image:
+    radial-gradient(120% 80% at 0% 0%, oklch(73% 0.18 72 / 6%) 0%, transparent 42%),
+    radial-gradient(100% 90% at 100% 100%, oklch(60% 0.10 264 / 10%) 0%, transparent 55%);
+  background-attachment: fixed;
 }
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
 }
 
 ::selection {
@@ -49,8 +91,75 @@ h1, h2, h3 {
   color: var(--color-ink-950);
 }
 
-/* thin scrollbars that match surfaces */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-ink-700) transparent;
+}
+
+/* ── Elevation utility classes — semantic planes the surfaces build on. ── */
+@utility surface-raised {
+  background:
+    linear-gradient(oklch(100% 0 0 / 2.5%), oklch(0% 0 0 / 0%)),
+    var(--color-ink-900);
+  border: 1px solid oklch(100% 0 0 / 6%);
+  box-shadow: var(--shadow-raise);
+}
+
+@utility surface-overlay {
+  background:
+    linear-gradient(oklch(100% 0 0 / 3.5%), oklch(0% 0 0 / 0%)),
+    var(--color-ink-850);
+  border: 1px solid oklch(100% 0 0 / 9%);
+  box-shadow: var(--shadow-overlay);
+}
+
+/* Accent ring whose glow tracks live agent activity. */
+@utility glow-accent {
+  box-shadow: var(--shadow-glow);
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -150% 0; }
+  100% { background-position: 150% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes caret {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-2px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(16px) scale(0.98); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(16px); }
+}
+
+/* ── Accessibility: honor reduced-motion everywhere (WCAG 2.2). ────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

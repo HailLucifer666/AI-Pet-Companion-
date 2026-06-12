@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "motion/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -13,9 +14,19 @@ import {
   Trash2,
   Wrench,
 } from "lucide-react";
-import { api, queryKeys } from "../../lib/api";
+import { api, queryKeys, type SessionSummary } from "../../lib/api";
 import { streamSSE } from "../../lib/sse";
-import { Badge, Button, EmptyState, IconButton, Spinner, Textarea } from "../../components/ui";
+import { useUndoableDelete } from "../../lib/useUndoableDelete";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  IconButton,
+  Select,
+  Skeleton,
+  Spinner,
+  Textarea,
+} from "../../components/ui";
 
 /* ── Stream state ────────────────────────────────────────────────── */
 
@@ -81,11 +92,29 @@ function UserBubble({ text }: { text: string }) {
   );
 }
 
-function AssistantBlock({ text, tools }: { text: string; tools?: ToolActivity[] }) {
+function AssistantBlock({
+  text,
+  tools,
+  streaming,
+}: {
+  text: string;
+  tools?: ToolActivity[];
+  streaming?: boolean;
+}) {
   return (
     <div className="max-w-[92%] space-y-2">
       {tools?.map((t, i) => <ToolRow key={i} activity={t} />)}
-      {text && <Body text={text} />}
+      {text && (
+        <div>
+          <Body text={text} />
+          {streaming && (
+            <span
+              aria-hidden
+              className="ml-0.5 inline-block h-4 w-[3px] translate-y-0.5 rounded-[1px] bg-claw-500 align-middle animate-caret"
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -95,46 +124,70 @@ function AssistantBlock({ text, tools }: { text: string; tools?: ToolActivity[] 
 function SessionList({ activeId }: { activeId?: string }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data } = useQuery({ queryKey: queryKeys.sessions, queryFn: api.sessions });
-  const archive = useMutation({
-    mutationFn: api.archiveSession,
-    onSuccess: (_d, id) => {
+  const { data, isLoading } = useQuery({ queryKey: queryKeys.sessions, queryFn: api.sessions });
+
+  const archive = useUndoableDelete<SessionSummary>({
+    remove: (s) =>
+      queryClient.setQueryData<{ sessions: SessionSummary[] }>(queryKeys.sessions, (old) =>
+        old ? { sessions: old.sessions.filter((x) => x.id !== s.id) } : old,
+      ),
+    restore: () => queryClient.invalidateQueries({ queryKey: queryKeys.sessions }),
+    commit: async (s) => {
+      await api.archiveSession(s.id);
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions });
-      if (id === activeId) navigate("/chat");
     },
+    message: () => "Session archived",
   });
+
+  function onArchive(s: SessionSummary) {
+    archive(s);
+    if (s.id === activeId) navigate("/chat");
+  }
+
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-ink-800 bg-ink-900/50">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-ink-800 bg-ink-900/40">
       <div className="flex items-center justify-between p-3">
         <h2 className="font-display text-sm font-medium text-ink-300">Sessions</h2>
         <IconButton icon={Plus} label="New session" onClick={() => navigate("/chat")} />
       </div>
       <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
-        {data?.sessions.map((s) => (
-          <div
-            key={s.id}
-            className={[
-              "group flex cursor-pointer items-center gap-2 rounded-ctl px-2.5 py-2 text-sm",
-              s.id === activeId
-                ? "bg-ink-800 text-ink-100"
-                : "text-ink-300 hover:bg-ink-850 hover:text-ink-100",
-            ].join(" ")}
-            onClick={() => navigate(`/chat/${s.id}`)}
-          >
-            <span className="min-w-0 flex-1 truncate">{s.title || "Untitled"}</span>
-            <button
-              aria-label="Archive session"
-              className="hidden text-ink-500 hover:text-danger group-hover:block"
-              onClick={(e) => {
-                e.stopPropagation();
-                archive.mutate(s.id);
-              }}
-            >
-              <Trash2 className="size-3.5" />
-            </button>
+        {isLoading ? (
+          <div className="space-y-1.5 px-1 pt-1">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-9 w-full" />
+            ))}
           </div>
-        ))}
-        {data && data.sessions.length === 0 && (
+        ) : (
+          data?.sessions.map((s, i) => (
+            <motion.div
+              key={s.id}
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.18, delay: Math.min(i * 0.025, 0.3), ease: [0.16, 1, 0.3, 1] }}
+              className={[
+                "group flex cursor-pointer items-center gap-2 rounded-ctl px-2.5 py-2 text-sm",
+                "transition-colors duration-150",
+                s.id === activeId
+                  ? "bg-ink-800 text-ink-100"
+                  : "text-ink-300 hover:bg-ink-850 hover:text-ink-100",
+              ].join(" ")}
+              onClick={() => navigate(`/chat/${s.id}`)}
+            >
+              <span className="min-w-0 flex-1 truncate">{s.title || "Untitled"}</span>
+              <button
+                aria-label="Archive session"
+                className="hidden text-ink-500 hover:text-danger group-hover:block"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArchive(s);
+                }}
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            </motion.div>
+          ))
+        )}
+        {!isLoading && data && data.sessions.length === 0 && (
           <p className="px-2.5 py-4 text-xs text-ink-500">No sessions yet.</p>
         )}
       </div>
@@ -155,7 +208,7 @@ export function ChatView() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { data: models } = useQuery({ queryKey: queryKeys.models, queryFn: api.models });
-  const { data: history } = useQuery({
+  const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: queryKeys.sessionMessages(sessionId ?? ""),
     queryFn: () => api.sessionMessages(sessionId!),
     enabled: !!sessionId,
@@ -236,7 +289,14 @@ export function ChatView() {
       <SessionList activeId={sessionId} />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="min-h-0 flex-1 overflow-auto">
-          {visibleMessages.length === 0 && !stream.running && !stream.text ? (
+          {sessionId && historyLoading ? (
+            <div className="mx-auto flex max-w-3xl flex-col gap-4 px-6 py-6">
+              <Skeleton className="ml-auto h-14 w-1/2" />
+              <Skeleton className="h-24 w-3/4" />
+              <Skeleton className="ml-auto h-10 w-2/5" />
+              <Skeleton className="h-16 w-2/3" />
+            </div>
+          ) : visibleMessages.length === 0 && !stream.running && !stream.text ? (
             <EmptyState
               icon={MessageSquare}
               title="Talk to NeuraClaw"
@@ -252,7 +312,7 @@ export function ChatView() {
                 ),
               )}
               {(stream.text || stream.tools.length > 0) && (
-                <AssistantBlock text={stream.text} tools={stream.tools} />
+                <AssistantBlock text={stream.text} tools={stream.tools} streaming={stream.running} />
               )}
               {stream.running && !stream.text && stream.tools.length === 0 && (
                 <Spinner className="ml-1" />
@@ -268,18 +328,13 @@ export function ChatView() {
         </div>
         <div className="border-t border-ink-800 bg-ink-900/40 p-4">
           <div className="mx-auto flex max-w-3xl items-end gap-2">
-            <select
-              aria-label="Model role"
-              className="h-9 rounded-ctl border border-ink-700 bg-ink-900 px-2 text-xs text-ink-300 focus:border-claw-600 focus:outline-none"
+            <Select
+              ariaLabel="Model role"
               value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              {roles.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+              onValueChange={setRole}
+              options={roles.map((r) => ({ value: r, label: r }))}
+              className="w-28 shrink-0"
+            />
             <Textarea
               rows={Math.min(6, Math.max(1, input.split("\n").length))}
               placeholder="Message… (Enter to send, Shift+Enter for newline)"

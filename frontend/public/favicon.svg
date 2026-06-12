@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="ember" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="oklch(89% 0.10 84)"/>
+      <stop offset="55%" stop-color="oklch(73% 0.18 72)"/>
+      <stop offset="100%" stop-color="oklch(54% 0.16 62)"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="oklch(15% 0.014 264)"/>
+  <g fill="none" stroke="url(#ember)" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)">
+    <!-- three claw strokes converging on an ember core -->
+    <path d="M20 44 C 24 30, 28 22, 32 16"/>
+    <path d="M32 46 C 33 32, 33 24, 33 16"/>
+    <path d="M44 44 C 40 30, 37 23, 33 17"/>
+  </g>
+  <circle cx="32" cy="46" r="4.5" fill="url(#ember)" filter="url(#glow)"/>
+</svg>

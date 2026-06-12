@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Brain, Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import { api, queryKeys, type Memory, type MemoryType } from "../../lib/api";
+import { useUndoableDelete } from "../../lib/useUndoableDelete";
 import {
   Badge,
   Button,
@@ -9,11 +10,25 @@ import {
   EmptyState,
   IconButton,
   Input,
-  Spinner,
+  Select,
+  Skeleton,
   Textarea,
 } from "../../components/ui";
 
-const TYPES: MemoryType[] = ["identity", "preference", "project", "event", "fact"];
+// Radix Select forbids empty-string item values, so "all" is a sentinel
+// mapped back to "" (no filter) at the call site.
+const ALL_TYPES = "all";
+const TYPE_FILTER_OPTIONS = [
+  { value: ALL_TYPES, label: "all types" },
+  ...(["identity", "preference", "project", "event", "fact"] as const).map((t) => ({
+    value: t,
+    label: t,
+  })),
+];
+const TYPE_OPTIONS = (["identity", "preference", "project", "event", "fact"] as const).map((t) => ({
+  value: t,
+  label: t,
+}));
 
 const typeTone: Record<MemoryType, "accent" | "ok" | "warn" | "neutral" | "danger"> = {
   identity: "accent",
@@ -35,10 +50,21 @@ function MemoryRow({ memory }: { memory: Memory }) {
       invalidate();
     },
   });
-  const remove = useMutation({ mutationFn: () => api.deleteMemory(memory.id), onSuccess: invalidate });
+  const forget = useUndoableDelete<Memory>({
+    remove: (m) =>
+      queryClient.setQueriesData<{ memories: Memory[] }>({ queryKey: ["memory"] }, (old) =>
+        old ? { memories: old.memories.filter((x) => x.id !== m.id) } : old,
+      ),
+    restore: invalidate,
+    commit: async (m) => {
+      await api.deleteMemory(m.id);
+      invalidate();
+    },
+    message: () => "Memory forgotten",
+  });
 
   return (
-    <div className="group flex items-start gap-3 rounded-ctl px-3 py-2.5 hover:bg-ink-900">
+    <div className="group flex items-start gap-3 rounded-ctl px-3 py-2.5 transition-colors hover:bg-ink-900">
       <Badge tone={typeTone[memory.type]}>{memory.type}</Badge>
       {editing ? (
         <div className="flex min-w-0 flex-1 items-start gap-2">
@@ -55,7 +81,7 @@ function MemoryRow({ memory }: { memory: Memory }) {
               icon={Trash2}
               label="Forget"
               className="hover:text-danger"
-              onClick={() => remove.mutate()}
+              onClick={() => forget(memory)}
             />
           </span>
         </>
@@ -150,19 +176,13 @@ export function MemoryView() {
             onChange={(e) => setQ(e.target.value)}
             className="max-w-xs"
           />
-          <select
-            aria-label="Filter by type"
-            className="rounded-ctl border border-ink-700 bg-ink-900 px-2 text-xs text-ink-300 focus:border-claw-600 focus:outline-none"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <option value="">all types</option>
-            {TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+          <Select
+            ariaLabel="Filter by type"
+            value={type || ALL_TYPES}
+            onValueChange={(v) => setType(v === ALL_TYPES ? "" : v)}
+            options={TYPE_FILTER_OPTIONS}
+            className="w-32"
+          />
         </div>
         <form
           className="mb-4 flex gap-2"
@@ -171,18 +191,13 @@ export function MemoryView() {
             if (newContent.trim()) create.mutate();
           }}
         >
-          <select
-            aria-label="New memory type"
-            className="rounded-ctl border border-ink-700 bg-ink-900 px-2 text-xs text-ink-300 focus:border-claw-600 focus:outline-none"
+          <Select
+            ariaLabel="New memory type"
             value={newType}
-            onChange={(e) => setNewType(e.target.value as MemoryType)}
-          >
-            {TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            onValueChange={(v) => setNewType(v as MemoryType)}
+            options={TYPE_OPTIONS}
+            className="w-32"
+          />
           <Input
             placeholder="Add a memory the agent should keep…"
             value={newContent}
@@ -194,8 +209,10 @@ export function MemoryView() {
         </form>
         <div className="min-h-0 flex-1 overflow-auto rounded-card border border-ink-800">
           {isLoading ? (
-            <div className="flex h-32 items-center justify-center">
-              <Spinner />
+            <div className="space-y-2 p-3">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
             </div>
           ) : data && data.memories.length > 0 ? (
             <div className="divide-y divide-ink-850">
