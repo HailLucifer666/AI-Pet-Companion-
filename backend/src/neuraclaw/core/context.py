@@ -7,6 +7,7 @@ import aiosqlite
 
 from ..config import SOUL_PATH, AgentConfig
 from ..memory import store
+from ..skillsys import loader
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +39,14 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
         parts.append(
             "## Memories\n"
             + "\n".join(f"- ({m.type}) {m.content}" for m in memories[:24])
+        )
+
+    skills = await loader.active_index(db)
+    if skills:
+        parts.append(
+            "## Skills\n"
+            "Saved playbooks. Call `use_skill(name)` to load one before applying it.\n"
+            + "\n".join(f"- {s['name']}: {s['description']}" for s in skills[:40])
         )
 
     parts.append(

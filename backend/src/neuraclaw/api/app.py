@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from ..config import DB_PATH, FRONTEND_DIST, MIGRATIONS_DIR, WORKSPACE_DIR, load_config
@@ -30,5 +31,19 @@ def create_app() -> FastAPI:
     app = FastAPI(title="NeuraClaw V3", lifespan=lifespan)
     app.include_router(api_router, prefix="/api")
     if FRONTEND_DIST.exists():
-        app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+        app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+
+        # SPA fallback: client-side routes (/chat, /memory, ...) must serve
+        # index.html, not 404 — the React router takes it from there.
+        @app.get("/{path:path}", include_in_schema=False)
+        async def spa(path: str):
+            candidate = (FRONTEND_DIST / path).resolve()
+            if (
+                path
+                and candidate.is_file()
+                and FRONTEND_DIST.resolve() in candidate.parents
+            ):
+                return FileResponse(candidate)
+            return FileResponse(FRONTEND_DIST / "index.html")
+
     return app
