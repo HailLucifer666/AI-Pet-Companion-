@@ -120,3 +120,22 @@ async def test_clawback_floors_at_zero_and_keeps_stage(db):
     await _set_xp(db, xp_value=3, stage=1)
     result = await xp.claw_back(db, "memory_formed")  # -5 floored to 0
     assert result["xp"] == 0
+
+
+async def test_memory_layer_awards_and_claws_back_xp(db):
+    """End-to-end: store.add_memory awards memory_formed; forget claws it back."""
+    from unittest.mock import patch
+
+    from neuraclaw.memory import store
+
+    async def fake_embed(texts):
+        return [[0.0] * 384 for _ in texts]
+
+    await xp.ensure_pet(db, name="Claw")
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
+        mid = await store.add_memory(db, type="fact", content="a durable fact for wiring")
+    assert mid is not None
+    assert (await xp.get_pet(db))["xp"] == 5
+
+    assert await store.forget_memory(db, mid)
+    assert (await xp.get_pet(db))["xp"] == 0

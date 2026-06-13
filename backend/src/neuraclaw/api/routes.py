@@ -14,6 +14,7 @@ from ..core import agent
 from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
 from ..memory import extractor, store
+from ..pet import xp
 
 log = logging.getLogger(__name__)
 api_router = APIRouter()
@@ -59,6 +60,60 @@ async def settings(request: Request):
         "providers": providers,
         "roles": config.roles,
         "trust": {"max_auto_risk": config.trust.max_auto_risk},
+    }
+
+
+# ── Pet / Den ─────────────────────────────────────────────────────────
+
+
+async def _detect_brain(config) -> dict:
+    """Best-effort: is there a mind for the companion? (local Ollama or a cloud key)"""
+    import os
+
+    import httpx
+
+    ollama = False
+    try:
+        async with httpx.AsyncClient(timeout=1.0) as client:
+            resp = await client.get("http://localhost:11434/api/tags")
+            ollama = resp.status_code == 200
+    except (httpx.HTTPError, OSError):
+        ollama = False  # Ollama not running — expected, not an error
+    cloud_keys = any(
+        pc.api_key_env and os.environ.get(pc.api_key_env)
+        for pc in config.providers.values()
+    )
+    return {"ollama": ollama, "cloud_keys": cloud_keys}
+
+
+@api_router.get("/pet")
+async def get_pet(request: Request):
+    """The companion, or null before hatch (first-run signal), plus brain detection."""
+    pet = await xp.get_pet(request.app.state.db)
+    brain = await _detect_brain(request.app.state.config)
+    return {"pet": pet, "brain": brain}
+
+
+@api_router.get("/den")
+async def den(request: Request):
+    """Den digest: pet, recent light (xp_events), and what's grown."""
+    db = request.app.state.db
+    pet = await xp.get_pet(db)
+    cur = await db.execute(
+        "SELECT type, amount, ref, created_at FROM xp_events ORDER BY id DESC LIMIT 20"
+    )
+    recent_xp = [dict(r) for r in await cur.fetchall()]
+    cur = await db.execute(
+        "SELECT COUNT(*) AS n FROM memories WHERE superseded_by IS NULL"
+    )
+    memory_count = (await cur.fetchone())["n"]
+    cur = await db.execute("SELECT COUNT(*) AS n FROM skills WHERE status = 'active'")
+    skill_count = (await cur.fetchone())["n"]
+    return {
+        "pet": pet,
+        "recent_xp": recent_xp,
+        "memory_count": memory_count,
+        "skill_count": skill_count,
     }
 
 

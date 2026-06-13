@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import aiosqlite
 
 from ..core.synapse import synapse
+from ..pet import xp as pet_xp
 from . import embedder
 
 log = logging.getLogger(__name__)
@@ -77,6 +78,7 @@ async def add_memory(
     )
     await db.commit()
     synapse.publish("memory.formed", memory_id=memory_id, memory_type=type)
+    await pet_xp.award(db, "memory_formed", ref=str(memory_id))
     return memory_id
 
 
@@ -87,6 +89,7 @@ async def forget_memory(db: aiosqlite.Connection, memory_id: int) -> bool:
     deleted = cur.rowcount > 0
     if deleted:
         synapse.publish("memory.forgotten", memory_id=memory_id)
+        await pet_xp.claw_back(db, "memory_formed", ref=str(memory_id))
     return deleted
 
 
