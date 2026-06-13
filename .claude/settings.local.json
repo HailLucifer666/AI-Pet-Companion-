@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(touch \"d:/NeuraClaw v1/.access_test\")",
+      "Bash(rm \"d:/NeuraClaw v1/.access_test\")",
+      "Bash(grep -rln \"synapse\" backend/)",
+      "Bash(ls frontend/src/state/ frontend/src/components/creature/ frontend/src/lib/synapse.ts)",
+      "Bash(ls backend/tests/test_synapse.py)",
+      "Bash(./.venv/Scripts/python.exe -m pytest backend/tests/test_synapse.py -q)"
+    ]
+  }
+}
