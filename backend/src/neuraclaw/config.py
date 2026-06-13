@@ -45,6 +45,11 @@ class AgentConfig(BaseModel):
     extract_memories: bool = True
 
 
+class PetConfig(BaseModel):
+    # Charm never blocks work: flip true to unlock every stage-gated capability now.
+    ignore_ladder: bool = False
+
+
 class Config(BaseModel):
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
     roles: dict[str, list[str]] = Field(default_factory=dict)
@@ -52,6 +57,7 @@ class Config(BaseModel):
     server: ServerConfig = Field(default_factory=ServerConfig)
     trust: TrustConfig = Field(default_factory=TrustConfig)
     agent: AgentConfig = Field(default_factory=AgentConfig)
+    pet: PetConfig = Field(default_factory=PetConfig)
 
 
 def _config_path() -> Path:

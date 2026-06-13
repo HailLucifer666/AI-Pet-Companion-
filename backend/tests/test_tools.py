@@ -93,6 +93,37 @@ async def test_invocations_are_audited(ctx):
     assert [r["tool_name"] for r in rows] == ["list_dir"]
 
 
+async def test_growth_ladder_refuses_web_below_stage(ctx):
+    """Stage-1 pet → web tools locked with a growth message (no network call)."""
+    from neuraclaw.pet import xp
+
+    await xp.ensure_pet(ctx.db, name="Claw")  # stage 1
+    registry = make_registry()
+    result = await registry.dispatch(ctx, "web_search", '{"query": "anything"}')
+    assert not result.ok
+    assert "grown" in result.content.lower()
+
+
+async def test_growth_ladder_override_unlocks(ctx):
+    """pet.ignore_ladder bypasses the gate (charm never blocks work)."""
+    from neuraclaw.pet import xp
+    from neuraclaw.tools.registry import ToolContext
+
+    await xp.ensure_pet(ctx.db, name="Claw")  # still stage 1
+    config = Config.model_validate({"pet": {"ignore_ladder": True}})
+    registry = build_registry(config)
+
+    async def stub(params, _ctx) -> str:  # avoid a real DuckDuckGo call
+        return "stubbed results"
+
+    registry.tools["web_search"].func = stub
+    over_ctx = ToolContext(
+        db=ctx.db, config=config, router=None, session_id="s1", workspace=ctx.workspace
+    )
+    result = await registry.dispatch(over_ctx, "web_search", '{"query": "anything"}')
+    assert result.ok and result.content == "stubbed results"
+
+
 async def test_duplicate_registration_rejected():
     registry = Registry()
 

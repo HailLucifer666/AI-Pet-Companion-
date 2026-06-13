@@ -17,6 +17,7 @@ import aiosqlite
 from pydantic import BaseModel, ValidationError
 
 from ..config import Config
+from ..pet import ladder, xp as pet_xp
 from ..providers import Router
 
 log = logging.getLogger(__name__)
@@ -96,6 +97,14 @@ class Registry:
                 " and ask them to do it manually or adjust trust settings.",
                 ok=False,
             )
+        # Growth ladder: some abilities unlock as the companion matures. Only the
+        # gated tools touch the DB; the config override unlocks everything.
+        need = ladder.min_stage_for(name)
+        if need > 1 and not ctx.config.pet.ignore_ladder:
+            pet = await pet_xp.get_pet(ctx.db)
+            stage = pet["stage"] if pet else 1
+            if stage < need:
+                return ToolResult(name, ladder.locked_message(name), ok=False)
         try:
             params = tool.params_model.model_validate_json(arguments_json or "{}")
         except ValidationError as e:
