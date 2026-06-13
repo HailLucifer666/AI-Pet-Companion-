@@ -77,7 +77,13 @@ export const useWorldStore = create<WorldStore>((set) => ({
   setStage: (stage) =>
     set(() => ({ stage: Math.min(4, Math.max(1, stage)) as 1 | 2 | 3 | 4 })),
 
-  tickIdle: () => set((state) => ({ lumen: scheduleIdle(state.lumen, Date.now(), idleRnd, reduced) })),
+  tickIdle: () =>
+    set((state) => {
+      const now = Date.now();
+      const h = new Date(now).getHours();
+      const night = h < 6 || h >= 21; // the user's quiet hours
+      return { lumen: scheduleIdle(state.lumen, now, idleRnd, reduced, night) };
+    }),
 }));
 
 function toWorldEvent(ev: SSEEvent): WorldEvent | null {

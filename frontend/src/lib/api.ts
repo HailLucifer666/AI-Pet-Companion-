@@ -78,6 +78,19 @@ export interface PetResponse {
   brain: Brain;
 }
 
+export type WeatherCategory = "clear" | "cloudy" | "overcast" | "fog" | "rain" | "snow" | "storm";
+
+/** Real current weather for the Grove's sky (best-effort; `available:false` → the
+ *  sky falls back to clear + the real-clock day/night cycle). */
+export interface Weather {
+  available: boolean;
+  category?: WeatherCategory;
+  cloud_cover?: number; // 0..100
+  is_day?: boolean;
+  temp_c?: number;
+  city?: string | null;
+}
+
 export interface HatchBody {
   creature_name: string;
   user_name: string;
@@ -119,6 +132,8 @@ export const api = {
   pet: () => get<PetResponse>("/pet"),
   hatch: (body: HatchBody) => request<{ pet: Pet }>("POST", "/hatch", body),
 
+  weather: () => get<Weather>("/weather"),
+
   sessions: () => get<{ sessions: SessionSummary[] }>("/sessions"),
   sessionMessages: (id: string) =>
     get<{ messages: Message[] }>(`/sessions/${encodeURIComponent(id)}/messages`),
@@ -153,6 +168,7 @@ export const queryKeys = {
   models: ["models"] as const,
   settings: ["settings"] as const,
   pet: ["pet"] as const,
+  weather: ["weather"] as const,
   sessions: ["sessions"] as const,
   sessionMessages: (id: string) => ["sessions", id, "messages"] as const,
   memory: (q: string, type: string) => ["memory", q, type] as const,

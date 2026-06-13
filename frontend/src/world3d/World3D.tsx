@@ -5,18 +5,23 @@
  *  cinematic idle. Reduced-motion snaps and renders on demand. The whole three.js
  *  stack is lazy-loaded with the Den, never in the main bundle. */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
 import { Vector3 } from "three";
-import { WORLD } from "./palette";
 import { Island } from "./Island";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
 import { Places3D } from "./Places3D";
 import { Particles3D } from "./Particles3D";
 import { Postfx } from "./Postfx";
+import { Atmosphere } from "./Atmosphere";
+import { Clouds3D } from "./Clouds3D";
+import { Rain3D } from "./Rain3D";
+import { useWeather } from "./useWeather";
+import { fxFor } from "./weather";
+import { localHour } from "./daylight";
 import { petPos } from "./petPosition";
 
 interface ControlsLike {
@@ -110,6 +115,15 @@ function CameraRig({ reduced }: { reduced: boolean }) {
 
 export function World3D() {
   const reduced = useReducedMotion() ?? false;
+  const weather = useWeather();
+  const fx = fxFor(weather);
+
+  // The sky tracks the real local clock; re-read each minute.
+  const [hour, setHour] = useState(() => localHour(new Date()));
+  useEffect(() => {
+    const id = setInterval(() => setHour(localHour(new Date())), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <Canvas
@@ -119,36 +133,16 @@ export function World3D() {
       camera={{ position: [14, 11, 14], fov: 42, near: 0.1, far: 140 }}
       gl={{ antialias: true }}
     >
-      <color attach="background" args={[WORLD.sky]} />
-      {/* Fog ends before the sea's far reaches, so the endless water dissolves
-          into the sky — no visible horizon edge, at any angle or zoom. */}
-      <fog attach="fog" args={[WORLD.fog, 34, 90]} />
-
-      <hemisphereLight color={WORLD.sky} groundColor={0x232a1c} intensity={0.85} />
-      <ambientLight color={WORLD.ambient} intensity={0.5} />
-      <directionalLight
-        color={WORLD.sun}
-        intensity={1.45}
-        position={[18, 26, 10]}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={-22}
-        shadow-camera-right={22}
-        shadow-camera-top={22}
-        shadow-camera-bottom={-22}
-        shadow-camera-near={1}
-        shadow-camera-far={80}
-        shadow-bias={-0.0004}
-      />
-      {/* Cool back-rim — lifts the low-poly silhouettes out of the indigo fog. */}
-      <directionalLight color={WORLD.rim} intensity={0.55} position={[-14, 7, -16]} />
+      {/* Sky, light + fog — driven by real time of day × real weather. */}
+      <Atmosphere hour={hour} fx={fx} reduced={reduced} />
 
       <Island />
       <Lumenform3D />
       <Crystals3D />
       <Places3D />
       <Particles3D />
+      <Clouds3D amount={fx.clouds} reduced={reduced} />
+      <Rain3D rain={fx.rain} lightning={fx.lightning} reduced={reduced} />
 
       <CameraRig reduced={reduced} />
       <OrbitControls

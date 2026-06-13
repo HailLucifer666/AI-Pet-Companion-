@@ -16,6 +16,7 @@ from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
 from ..memory import extractor, store
 from ..pet import hatch as hatch_svc, xp
+from ..weather import fetch_weather
 
 log = logging.getLogger(__name__)
 api_router = APIRouter()
@@ -34,6 +35,12 @@ async def events():
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@api_router.get("/weather")
+async def weather():
+    """Real current weather for the Grove's sky (best-effort, cached, keyless)."""
+    return await fetch_weather()
 
 
 @api_router.get("/models")

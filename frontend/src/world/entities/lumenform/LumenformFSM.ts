@@ -94,6 +94,7 @@ export function scheduleIdle(
   now: number,
   rnd: () => number,
   reduced: boolean,
+  night = false,
 ): LumenformState {
   if (reduced) return state;
   if (state.mode === "work") return state;
@@ -110,6 +111,10 @@ export function scheduleIdle(
   if (idleMs < 6000) return state;
 
   const roll = rnd();
+  // In the user's quiet hours the companion settles down and naps sooner.
+  if (night && idleMs > 15_000 && roll < 0.7) {
+    return withGesture({ ...state, since: now }, "nap", now);
+  }
   if (idleMs > 60_000 && roll < 0.5) {
     return withGesture({ ...state, since: now }, "nap", now);
   }

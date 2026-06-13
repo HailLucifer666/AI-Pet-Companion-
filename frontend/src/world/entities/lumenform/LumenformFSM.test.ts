@@ -87,4 +87,11 @@ describe("scheduleIdle — a small private life", () => {
     const s = at({ since: 0 });
     expect(scheduleIdle(s, 3000, () => 0, false)).toBe(s);
   });
+
+  it("naps sooner in the user's quiet hours (night bias)", () => {
+    const s = at({ since: 0 });
+    // scheduleIdle(state, now, rnd, reduced, night)
+    expect(scheduleIdle(s, 20_000, () => 0.6, false, false).gesture).not.toBe("nap"); // daytime
+    expect(scheduleIdle(s, 20_000, () => 0.6, false, true).gesture).toBe("nap"); // night
+  });
 });
