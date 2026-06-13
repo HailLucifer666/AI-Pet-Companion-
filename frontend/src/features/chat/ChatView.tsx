@@ -121,8 +121,13 @@ function AssistantBlock({
 
 /* ── Session sidebar ─────────────────────────────────────────────── */
 
-function SessionList({ activeId }: { activeId?: string }) {
-  const navigate = useNavigate();
+function SessionList({
+  activeId,
+  onOpen,
+}: {
+  activeId?: string;
+  onOpen: (id?: string) => void;
+}) {
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: queryKeys.sessions, queryFn: api.sessions });
 
@@ -141,14 +146,14 @@ function SessionList({ activeId }: { activeId?: string }) {
 
   function onArchive(s: SessionSummary) {
     archive(s);
-    if (s.id === activeId) navigate("/chat");
+    if (s.id === activeId) onOpen();
   }
 
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-ink-800 bg-ink-900/40">
       <div className="flex items-center justify-between p-3">
         <h2 className="font-display text-sm font-medium text-ink-300">Sessions</h2>
-        <IconButton icon={Plus} label="New session" onClick={() => navigate("/chat")} />
+        <IconButton icon={Plus} label="New session" onClick={() => onOpen()} />
       </div>
       <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
         {isLoading ? (
@@ -171,7 +176,7 @@ function SessionList({ activeId }: { activeId?: string }) {
                   ? "bg-ink-800 text-ink-100"
                   : "text-ink-300 hover:bg-ink-850 hover:text-ink-100",
               ].join(" ")}
-              onClick={() => navigate(`/chat/${s.id}`)}
+              onClick={() => onOpen(s.id)}
             >
               <span className="min-w-0 flex-1 truncate">{s.title || "Untitled"}</span>
               <button
@@ -197,11 +202,17 @@ function SessionList({ activeId }: { activeId?: string }) {
 
 /* ── Main view ───────────────────────────────────────────────────── */
 
-export function ChatView() {
-  const { sessionId } = useParams();
+export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
+  const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  // Embedded (in the Den's diegetic overlay) we keep the active session in local
+  // state instead of the URL, so the world stays mounted behind the pane.
+  const [localSession, setLocalSession] = useState<string | undefined>(undefined);
+  const sessionId = embedded ? localSession : params.sessionId;
+  const goToSession = (id?: string) =>
+    embedded ? setLocalSession(id) : navigate(id ? `/chat/${id}` : "/chat");
   const [input, setInput] = useState("");
   const [role, setRole] = useState("primary");
   const [stream, setStream] = useState<StreamState>(idleStream);
@@ -283,7 +294,7 @@ export function ChatView() {
           queryKey: queryKeys.sessionMessages(newSessionId),
         });
         setStream(idleStream);
-        if (newSessionId !== sessionId) navigate(`/chat/${newSessionId}`);
+        if (newSessionId !== sessionId) goToSession(newSessionId);
       }
     }
   }
@@ -299,7 +310,7 @@ export function ChatView() {
 
   return (
     <div className="flex h-full">
-      <SessionList activeId={sessionId} />
+      <SessionList activeId={sessionId} onOpen={goToSession} />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="min-h-0 flex-1 overflow-auto">
           {sessionId && historyLoading ? (

@@ -13,6 +13,25 @@ export const PLACES: Record<Exclude<Place, "wander">, { nx: number; ny: number }
   pool: { nx: 0.5, ny: 0.9 },
 };
 
+/** Navigable Places — a spot in the Grove that opens a surface diegetically.
+ *  Coords are normalized; the hotspot DOM buttons sit at the same fractions, so
+ *  clicking the Hollow opens Chat "at the fire". The rail still reaches every
+ *  surface directly — this is the scenic route, not the only one. */
+export interface NavPlace {
+  id: string;
+  label: string;
+  sub: string;
+  route: string;
+  nx: number;
+  ny: number;
+}
+
+export const NAV_PLACES: NavPlace[] = [
+  { id: "hollow", label: "The Hollow", sub: "talk by the fire", route: "/chat", nx: 0.5, ny: 0.72 },
+  { id: "garden", label: "Memory Garden", sub: "what it remembers", route: "/memory", nx: 0.27, ny: 0.64 },
+  { id: "workbench", label: "The Workbench", sub: "notes & making", route: "/notes", nx: 0.76, ny: 0.62 },
+];
+
 export function resolvePlace(
   place: Place,
   w: number,
