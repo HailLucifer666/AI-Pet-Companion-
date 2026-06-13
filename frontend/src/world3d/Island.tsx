@@ -16,12 +16,13 @@ const MAX_R = ISLAND_MAX_R;
 const FLOOR = -1.5;
 
 const POOL = { x: 5.5, z: 3.5, r: 2.0 };
+const MEADOW_R = 4.5; // open clearing in the middle — where the pet roams, no trees
 // Keep scatter off the pool and the three Place markers (placeDefs coords).
 const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
   { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
-  { x: -6, z: -3, r: 1.8 }, // hollow
-  { x: 5.5, z: -4, r: 1.8 }, // garden
-  { x: -5, z: 4.5, r: 1.8 }, // workbench
+  { x: -5, z: -2.5, r: 1.8 }, // hollow
+  { x: 4.5, z: -3.3, r: 1.8 }, // garden
+  { x: -4, z: 3.8, r: 1.8 }, // workbench
 ];
 
 function colorForHeight(y: number): THREE.Color {
@@ -74,21 +75,26 @@ function clearOf(x: number, z: number): boolean {
   return CLEAR_ZONES.every((c) => Math.hypot(x - c.x, z - c.z) > c.r);
 }
 
+const TREE_GAP = 1.6; // min spacing so pines read as scattered, never a wall
+
 function scatter(): { trees: Placement[]; rocks: Placement[] } {
   const r = mulberry32(0x9e07);
   const trees: Placement[] = [];
   const rocks: Placement[] = [];
-  for (let i = 0; i < 1200 && (trees.length < 70 || rocks.length < 45); i++) {
+  for (let i = 0; i < 2000 && (trees.length < 38 || rocks.length < 30); i++) {
     const ang = r() * Math.PI * 2;
     const rad = Math.sqrt(r()) * MAX_R * 0.92;
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     const y = islandHeight(x, z, MAX_R);
     if (!clearOf(x, z)) continue;
-    if (y > 0.7 && y < 2.9 && trees.length < 70) {
-      trees.push({ x, y: y - 0.1, z, scale: 0.7 + r() * 0.9, rot: r() * Math.PI * 2 });
-    } else if (y > 0.25 && y < 3.6 && rocks.length < 45) {
-      rocks.push({ x, y, z, scale: 0.5 + r() * 0.9, rot: r() * Math.PI * 2 });
+    // Trees ring the open meadow, spaced apart; rocks may sit closer in.
+    if (rad > MEADOW_R && y > 0.7 && y < 2.2 && trees.length < 38) {
+      if (trees.every((t) => Math.hypot(x - t.x, z - t.z) > TREE_GAP)) {
+        trees.push({ x, y: y - 0.1, z, scale: 0.6 + r() * 0.55, rot: r() * Math.PI * 2 });
+      }
+    } else if (y > 0.25 && y < 3.2 && rocks.length < 30) {
+      rocks.push({ x, y, z, scale: 0.45 + r() * 0.8, rot: r() * Math.PI * 2 });
     }
   }
   return { trees, rocks };
@@ -127,9 +133,9 @@ function Scatter() {
   useLayoutEffect(() => {
     trees.forEach((t, i) => {
       const s = t.scale;
-      if (trunk.current) setInstance(trunk.current, i, t.x, t.y + 0.4 * s, t.z, s, t.rot);
-      if (low.current) setInstance(low.current, i, t.x, t.y + 1.15 * s, t.z, s, t.rot);
-      if (high.current) setInstance(high.current, i, t.x, t.y + 1.85 * s, t.z, s, t.rot);
+      if (trunk.current) setInstance(trunk.current, i, t.x, t.y + 0.33 * s, t.z, s, t.rot);
+      if (low.current) setInstance(low.current, i, t.x, t.y + 0.86 * s, t.z, s, t.rot);
+      if (high.current) setInstance(high.current, i, t.x, t.y + 1.42 * s, t.z, s, t.rot);
     });
     rocks.forEach((rk, i) => {
       if (rock.current) setInstance(rock.current, i, rk.x, rk.y, rk.z, rk.scale, rk.rot);
@@ -142,15 +148,15 @@ function Scatter() {
   return (
     <group>
       <instancedMesh ref={trunk} args={[undefined, undefined, trees.length]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.08, 0.13, 0.8, 5]} />
+        <cylinderGeometry args={[0.07, 0.11, 0.66, 5]} />
         <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
       </instancedMesh>
       <instancedMesh ref={low} args={[undefined, undefined, trees.length]} castShadow>
-        <coneGeometry args={[0.55, 1.3, 6]} />
+        <coneGeometry args={[0.5, 1.04, 6]} />
         <meshStandardMaterial color={WORLD.pine} flatShading roughness={1} />
       </instancedMesh>
       <instancedMesh ref={high} args={[undefined, undefined, trees.length]} castShadow>
-        <coneGeometry args={[0.38, 0.95, 6]} />
+        <coneGeometry args={[0.32, 0.74, 6]} />
         <meshStandardMaterial color={WORLD.pineHi} flatShading roughness={1} />
       </instancedMesh>
       <instancedMesh ref={rock} args={[undefined, undefined, rocks.length]} castShadow receiveShadow>

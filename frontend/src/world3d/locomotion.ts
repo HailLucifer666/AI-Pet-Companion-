@@ -25,8 +25,8 @@ export interface Velocity {
  *  next to the fire / bench / pool rather than inside them, and are spread out so
  *  roaming has real range. Heights are land-verified. `wander` is seed-resolved. */
 const ANCHORS: Record<Exclude<Place, "wander">, Vec2> = {
-  home: { x: -4.6, z: -2.2 }, // its resting spot near the Hollow's fire
-  workbench: { x: -4.0, z: 3.7 }, // beside the Workbench marker
+  home: { x: -3.8, z: -1.8 }, // its resting spot near the Hollow's fire
+  workbench: { x: -3.2, z: 3.0 }, // beside the Workbench marker
   pool: { x: 4.4, z: 2.9 }, // at the inland pool's edge
 };
 

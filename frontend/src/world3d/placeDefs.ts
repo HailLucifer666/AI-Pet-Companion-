@@ -20,7 +20,7 @@ function on(x: number, z: number): [number, number, number] {
 }
 
 export const PLACES_3D: Place3D[] = [
-  { id: "hollow", label: "The Hollow", sub: "talk by the fire", route: "/chat", kind: "hollow", pos: on(-6, -3) },
-  { id: "garden", label: "Memory Garden", sub: "what it remembers", route: "/memory", kind: "garden", pos: on(5.5, -4) },
-  { id: "workbench", label: "The Workbench", sub: "notes & making", route: "/notes", kind: "workbench", pos: on(-5, 4.5) },
+  { id: "hollow", label: "The Hollow", sub: "talk by the fire", route: "/chat", kind: "hollow", pos: on(-5, -2.5) },
+  { id: "garden", label: "Memory Garden", sub: "what it remembers", route: "/memory", kind: "garden", pos: on(4.5, -3.3) },
+  { id: "workbench", label: "The Workbench", sub: "notes & making", route: "/notes", kind: "workbench", pos: on(-4, 3.8) },
 ];

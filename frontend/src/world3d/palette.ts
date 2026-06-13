@@ -21,10 +21,15 @@ export const WORLD = {
   snow: 0xe9f0f2,
 
   trunk: 0x6b4a2f,
-  pine: 0x3f7d44,
-  pineHi: 0x569a55,
+  pine: 0x4f9a58,
+  pineHi: 0x6cbb6c,
 
   // The ember accent (matches the UI's --color-claw) for the companion/crystals.
   ember: 0xe2a04a,
   emberHi: 0xf6dba6,
+
+  // Cool back-rim light — separates silhouettes from the indigo fog.
+  rim: 0x8b7bd6,
+  // Cool accent for the minority of drifting motes (warm uses emberHi).
+  mote: 0x9fd8e6,
 } as const;
