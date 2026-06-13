@@ -59,6 +59,7 @@ export interface Palette {
   claw400: number;
   claw300: number;
   ok: number;
+  warn: number;
 }
 
 /** Snapshot the live palette. Re-read after a theme change. Fallbacks approximate
@@ -75,5 +76,6 @@ export function readPalette(): Palette {
     claw400: readToken("--color-claw-400", 0xf0c074),
     claw300: readToken("--color-claw-300", 0xf6dba6),
     ok: readToken("--color-ok", 0x4cc38a),
+    warn: readToken("--color-warn", 0xe0b341),
   };
 }
