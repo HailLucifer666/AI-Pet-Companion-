@@ -6,12 +6,12 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
-import { islandHeight } from "./terrain";
+import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { WORLD } from "./palette";
 
 const SIZE = 22;
 const SEG = 60;
-const MAX_R = 10;
+const MAX_R = ISLAND_MAX_R;
 const FLOOR = -1.5;
 
 function colorForHeight(y: number): THREE.Color {

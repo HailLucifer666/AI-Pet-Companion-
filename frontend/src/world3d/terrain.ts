@@ -61,3 +61,4 @@ export function islandHeight(x: number, z: number, maxR: number): number {
 }
 
 export const WATER_LEVEL = 0;
+export const ISLAND_MAX_R = 10; // shared by terrain mesh + anything placed on it

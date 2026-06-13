@@ -8,6 +8,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
 import { WORLD } from "./palette";
 import { Island } from "./Island";
+import { Lumenform3D } from "./Lumenform3D";
 
 export function World3D() {
   const reduced = useReducedMotion() ?? false;
@@ -42,6 +43,7 @@ export function World3D() {
       />
 
       <Island />
+      <Lumenform3D />
 
       <OrbitControls
         makeDefault
