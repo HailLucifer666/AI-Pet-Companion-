@@ -1,15 +1,15 @@
-/** World3D — the 3D Grove's canvas: dusk sky + fog, a warm sun casting soft
- *  shadows, and a camera that *follows the companion* as it roams (you can still
- *  drag to orbit / scroll to zoom — the rig just keeps the pet framed). When the
- *  pet settles and you stop touching the view, the camera drifts slowly for a
- *  cinematic idle. Reduced-motion snaps and renders on demand. The whole three.js
- *  stack is lazy-loaded with the Den, never in the main bundle. */
+/** World3D — the 3D Grove's canvas: sky + fog, a warm sun casting soft shadows,
+ *  and a camera that *follows the companion* as it roams. Left-drag slides the
+ *  world like a map, right-drag rotates, scroll eases the zoom — and once you let
+ *  go, the camera holds your framing briefly then glides back to the pet on its
+ *  own. When idle it drifts in a slow cinematic orbit. Reduced-motion snaps and
+ *  renders on demand. The whole three.js stack is lazy-loaded with the Den. */
 
 import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
-import { Vector3 } from "three";
+import { MOUSE, Vector3 } from "three";
 import { Island } from "./Island";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
@@ -74,6 +74,8 @@ function CameraRig({ reduced }: { reduced: boolean }) {
   const lastInput = useRef(0);
   const elapsed = useRef(0);
   const inited = useRef(false);
+  const interacting = useRef(false); // user is dragging (pan or rotate) right now
+  const panHoldUntil = useRef(0); // after a drag, hold their framing before re-following
 
   // Own the wheel: ease zoom instead of OrbitControls' hard dolly steps.
   useEffect(() => {
@@ -87,17 +89,24 @@ function CameraRig({ reduced }: { reduced: boolean }) {
     return () => el.removeEventListener("wheel", onWheel);
   }, [gl]);
 
-  // Orbit interaction also backs the idle drift off.
+  // Drag (pan or rotate) releases the follow so it never fights the user; on
+  // release we hold their framing, then the follow eases back to the pet.
   useEffect(() => {
     if (!controls) return;
-    const stamp = () => {
+    const onStart = () => {
+      interacting.current = true;
       lastInput.current = elapsed.current;
     };
-    controls.addEventListener("start", stamp);
-    controls.addEventListener("end", stamp);
+    const onEnd = () => {
+      interacting.current = false;
+      panHoldUntil.current = elapsed.current + MANUAL_HOLD;
+      lastInput.current = elapsed.current;
+    };
+    controls.addEventListener("start", onStart);
+    controls.addEventListener("end", onEnd);
     return () => {
-      controls.removeEventListener("start", stamp);
-      controls.removeEventListener("end", stamp);
+      controls.removeEventListener("start", onStart);
+      controls.removeEventListener("end", onEnd);
     };
   }, [controls]);
 
@@ -133,24 +142,32 @@ function CameraRig({ reduced }: { reduced: boolean }) {
       inited.current = true;
     }
 
-    const k = reduced ? 1 : 1 - Math.exp(-FOLLOW_RATE * dt);
-    followed.current.lerp(want.current, k);
+    // Follow only when the user isn't dragging and the post-drag hold has passed —
+    // otherwise they own the view (left-drag pans / right-drag rotates the target).
+    const following = !interacting.current && t > panHoldUntil.current;
+    if (following) {
+      const k = reduced ? 1 : 1 - Math.exp(-FOLLOW_RATE * dt);
+      followed.current.lerp(want.current, k);
+      // Pan camera + target by the same delta → framing holds at your angle/zoom.
+      const dx = followed.current.x - controls.target.x;
+      const dy = followed.current.y - controls.target.y;
+      const dz = followed.current.z - controls.target.z;
+      controls.target.x += dx;
+      controls.target.y += dy;
+      controls.target.z += dz;
+      camera.position.x += dx;
+      camera.position.y += dy;
+      camera.position.z += dz;
+    } else {
+      // User dragged the view — keep the follow point where they left it so the
+      // eventual re-follow glides from here instead of snapping.
+      followed.current.copy(controls.target);
+    }
 
-    // Pan camera + target by the same delta → framing holds at your angle/zoom.
-    const dx = followed.current.x - controls.target.x;
-    const dy = followed.current.y - controls.target.y;
-    const dz = followed.current.z - controls.target.z;
-    controls.target.x += dx;
-    controls.target.y += dy;
-    controls.target.z += dz;
-    camera.position.x += dx;
-    camera.position.y += dy;
-    camera.position.z += dz;
-
-    // Autonomous distance once the user's manual zoom has had its moment.
+    // Autonomous distance — only while following, once the manual zoom's moment passed.
     const working = useWorldStore.getState().lumen.mode === "work";
     const moving = moved > 0.01;
-    if (t > manualUntil.current) {
+    if (following && t > manualUntil.current) {
       const auto = autoDistance(working, moving);
       const ak = reduced ? 1 : 1 - Math.exp(-AUTO_RATE * dt);
       targetDist.current += (auto - targetDist.current) * ak;
@@ -163,8 +180,8 @@ function CameraRig({ reduced }: { reduced: boolean }) {
     const newDist = curDist + (clampD(targetDist.current) - curDist) * zk;
     offset.current.setLength(newDist);
 
-    // Idle cinematic orbit: settled pet + hands off → drift the offset slowly.
-    if (!reduced && moved < 0.005 && t - lastInput.current > IDLE_AFTER) {
+    // Idle cinematic orbit: following + settled pet + hands off → drift slowly.
+    if (following && !reduced && moved < 0.005 && t - lastInput.current > IDLE_AFTER) {
       const a = IDLE_DRIFT * dt;
       const cos = Math.cos(a);
       const sin = Math.sin(a);
@@ -215,10 +232,12 @@ export function World3D() {
       <CameraRig reduced={reduced} />
       <OrbitControls
         makeDefault
-        enablePan={false}
         enableZoom={false}
         enableDamping
         dampingFactor={0.06}
+        screenSpacePanning={false}
+        panSpeed={1}
+        mouseButtons={{ LEFT: MOUSE.PAN, RIGHT: MOUSE.ROTATE }}
         minDistance={8}
         maxDistance={26}
         minPolarAngle={0.6}
