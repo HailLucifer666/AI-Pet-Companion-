@@ -1,18 +1,28 @@
 /** Island — the low-poly Grove. A faceted terrain mesh (per-face flat colors,
- *  banded by height), a translucent water plane, and deterministically scattered
- *  low-poly pines and rocks. Geometry is built once in useMemo; same island every
- *  launch (heights from the pure terrain module). */
+ *  banded by height), a translucent sea, an inland pool, and deterministically
+ *  scattered pines and rocks. The scatter is drawn with InstancedMesh — four draw
+ *  calls for the whole forest — so the larger island still holds frame-rate on
+ *  low-end GPUs. Geometry is built once; same island every launch. */
 
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { WORLD } from "./palette";
 
-const SIZE = 22;
-const SEG = 60;
+const SIZE = 36;
+const SEG = 96;
 const MAX_R = ISLAND_MAX_R;
 const FLOOR = -1.5;
+
+const POOL = { x: 5.5, z: 3.5, r: 2.0 };
+// Keep scatter off the pool and the three Place markers (placeDefs coords).
+const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
+  { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
+  { x: -6, z: -3, r: 1.8 }, // hollow
+  { x: 5.5, z: -4, r: 1.8 }, // garden
+  { x: -5, z: 4.5, r: 1.8 }, // workbench
+];
 
 function colorForHeight(y: number): THREE.Color {
   let hex: number;
@@ -53,33 +63,139 @@ function buildTerrain(): THREE.BufferGeometry {
 }
 
 interface Placement {
-  pos: [number, number, number];
+  x: number;
+  y: number;
+  z: number;
   scale: number;
   rot: number;
+}
+
+function clearOf(x: number, z: number): boolean {
+  return CLEAR_ZONES.every((c) => Math.hypot(x - c.x, z - c.z) > c.r);
 }
 
 function scatter(): { trees: Placement[]; rocks: Placement[] } {
   const r = mulberry32(0x9e07);
   const trees: Placement[] = [];
   const rocks: Placement[] = [];
-  for (let i = 0; i < 320 && (trees.length < 30 || rocks.length < 20); i++) {
+  for (let i = 0; i < 1200 && (trees.length < 70 || rocks.length < 45); i++) {
     const ang = r() * Math.PI * 2;
-    const rad = Math.sqrt(r()) * MAX_R * 0.9;
+    const rad = Math.sqrt(r()) * MAX_R * 0.92;
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     const y = islandHeight(x, z, MAX_R);
-    if (y > 0.7 && y < 2.9 && trees.length < 30) {
-      trees.push({ pos: [x, y - 0.1, z], scale: 0.7 + r() * 0.8, rot: r() * Math.PI * 2 });
-    } else if (y > 0.25 && y < 3.6 && rocks.length < 20) {
-      rocks.push({ pos: [x, y, z], scale: 0.5 + r() * 0.9, rot: r() * Math.PI * 2 });
+    if (!clearOf(x, z)) continue;
+    if (y > 0.7 && y < 2.9 && trees.length < 70) {
+      trees.push({ x, y: y - 0.1, z, scale: 0.7 + r() * 0.9, rot: r() * Math.PI * 2 });
+    } else if (y > 0.25 && y < 3.6 && rocks.length < 45) {
+      rocks.push({ x, y, z, scale: 0.5 + r() * 0.9, rot: r() * Math.PI * 2 });
     }
   }
   return { trees, rocks };
 }
 
+// Shared temporaries for composing instance matrices (created once).
+const M = new THREE.Matrix4();
+const P = new THREE.Vector3();
+const Q = new THREE.Quaternion();
+const S = new THREE.Vector3();
+const YAXIS = new THREE.Vector3(0, 1, 0);
+
+function setInstance(
+  mesh: THREE.InstancedMesh,
+  i: number,
+  x: number,
+  y: number,
+  z: number,
+  s: number,
+  rot: number,
+): void {
+  P.set(x, y, z);
+  Q.setFromAxisAngle(YAXIS, rot);
+  S.set(s, s, s);
+  M.compose(P, Q, S);
+  mesh.setMatrixAt(i, M);
+}
+
+function Scatter() {
+  const { trees, rocks } = useMemo(scatter, []);
+  const trunk = useRef<THREE.InstancedMesh>(null);
+  const low = useRef<THREE.InstancedMesh>(null);
+  const high = useRef<THREE.InstancedMesh>(null);
+  const rock = useRef<THREE.InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    trees.forEach((t, i) => {
+      const s = t.scale;
+      if (trunk.current) setInstance(trunk.current, i, t.x, t.y + 0.4 * s, t.z, s, t.rot);
+      if (low.current) setInstance(low.current, i, t.x, t.y + 1.15 * s, t.z, s, t.rot);
+      if (high.current) setInstance(high.current, i, t.x, t.y + 1.85 * s, t.z, s, t.rot);
+    });
+    rocks.forEach((rk, i) => {
+      if (rock.current) setInstance(rock.current, i, rk.x, rk.y, rk.z, rk.scale, rk.rot);
+    });
+    for (const ref of [trunk, low, high, rock]) {
+      if (ref.current) ref.current.instanceMatrix.needsUpdate = true;
+    }
+  }, [trees, rocks]);
+
+  return (
+    <group>
+      <instancedMesh ref={trunk} args={[undefined, undefined, trees.length]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.08, 0.13, 0.8, 5]} />
+        <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
+      </instancedMesh>
+      <instancedMesh ref={low} args={[undefined, undefined, trees.length]} castShadow>
+        <coneGeometry args={[0.55, 1.3, 6]} />
+        <meshStandardMaterial color={WORLD.pine} flatShading roughness={1} />
+      </instancedMesh>
+      <instancedMesh ref={high} args={[undefined, undefined, trees.length]} castShadow>
+        <coneGeometry args={[0.38, 0.95, 6]} />
+        <meshStandardMaterial color={WORLD.pineHi} flatShading roughness={1} />
+      </instancedMesh>
+      <instancedMesh ref={rock} args={[undefined, undefined, rocks.length]} castShadow receiveShadow>
+        <icosahedronGeometry args={[0.45, 0]} />
+        <meshStandardMaterial color={WORLD.rock} flatShading roughness={1} />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/** A small inland pool: a translucent surface over a darker "deep" disc (reads as
+ *  depth), ringed by rocks and a few reeds. Sits in a natural low spot on land. */
+function Pool() {
+  const surface = islandHeight(POOL.x, POOL.z, MAX_R) + 0.12;
+  const rim = useMemo(() => {
+    const r = mulberry32(0x500c);
+    return Array.from({ length: 11 }, (_, i) => {
+      const a = (i / 11) * Math.PI * 2;
+      const rad = POOL.r + 0.15;
+      return { x: Math.cos(a) * rad, z: Math.sin(a) * rad, s: 0.28 + r() * 0.3, rot: r() * Math.PI * 2 };
+    });
+  }, []);
+
+  return (
+    <group position={[POOL.x, 0, POOL.z]}>
+      <mesh rotation-x={-Math.PI / 2} position-y={surface - 0.22}>
+        <circleGeometry args={[POOL.r - 0.1, 20]} />
+        <meshStandardMaterial color={WORLD.waterDeep} roughness={0.5} flatShading />
+      </mesh>
+      <mesh rotation-x={-Math.PI / 2} position-y={surface} receiveShadow>
+        <circleGeometry args={[POOL.r, 22]} />
+        <meshStandardMaterial color={WORLD.water} transparent opacity={0.78} roughness={0.3} metalness={0.15} />
+      </mesh>
+      {rim.map((s, i) => (
+        <mesh key={i} position={[s.x, surface, s.z]} scale={s.s} rotation-y={s.rot} castShadow receiveShadow>
+          <icosahedronGeometry args={[0.45, 0]} />
+          <meshStandardMaterial color={WORLD.rock} flatShading roughness={1} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 export function Island() {
   const terrain = useMemo(buildTerrain, []);
-  const { trees, rocks } = useMemo(scatter, []);
 
   return (
     <group>
@@ -87,42 +203,14 @@ export function Island() {
         <meshStandardMaterial vertexColors flatShading roughness={0.95} metalness={0} />
       </mesh>
 
-      {/* Water — sits at sea level, gently translucent. */}
+      {/* The surrounding sea, at sea level. */}
       <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
-        <planeGeometry args={[44, 44]} />
-        <meshStandardMaterial
-          color={WORLD.water}
-          transparent
-          opacity={0.82}
-          roughness={0.4}
-          metalness={0.1}
-          flatShading
-        />
+        <planeGeometry args={[76, 76]} />
+        <meshStandardMaterial color={WORLD.water} transparent opacity={0.82} roughness={0.4} metalness={0.1} flatShading />
       </mesh>
 
-      {trees.map((t, i) => (
-        <group key={`t${i}`} position={t.pos} scale={t.scale} rotation-y={t.rot}>
-          <mesh castShadow position-y={0.4}>
-            <cylinderGeometry args={[0.08, 0.13, 0.8, 5]} />
-            <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
-          </mesh>
-          <mesh castShadow position-y={1.15}>
-            <coneGeometry args={[0.55, 1.3, 6]} />
-            <meshStandardMaterial color={WORLD.pine} flatShading roughness={1} />
-          </mesh>
-          <mesh castShadow position-y={1.85}>
-            <coneGeometry args={[0.38, 0.95, 6]} />
-            <meshStandardMaterial color={WORLD.pineHi} flatShading roughness={1} />
-          </mesh>
-        </group>
-      ))}
-
-      {rocks.map((rk, i) => (
-        <mesh key={`r${i}`} position={rk.pos} scale={rk.scale} rotation-y={rk.rot} castShadow receiveShadow>
-          <icosahedronGeometry args={[0.45, 0]} />
-          <meshStandardMaterial color={WORLD.rock} flatShading roughness={1} />
-        </mesh>
-      ))}
+      <Pool />
+      <Scatter />
     </group>
   );
 }

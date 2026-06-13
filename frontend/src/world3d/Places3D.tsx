@@ -24,11 +24,25 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
             </mesh>
           );
         })}
-        <mesh position-y={0.32}>
-          <coneGeometry args={[0.22, 0.55, 5]} />
-          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hovered ? 2.2 : 1.2} flatShading />
+        {/* crossed logs */}
+        <mesh position-y={0.12} rotation={[Math.PI / 2, 0, 0.5]} castShadow>
+          <cylinderGeometry args={[0.06, 0.06, 0.8, 5]} />
+          <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
         </mesh>
-        <pointLight color={WORLD.ember} intensity={hovered ? 5 : 3} distance={5.5} decay={2} position={[0, 0.4, 0]} />
+        <mesh position-y={0.12} rotation={[Math.PI / 2, 0, -0.5]} castShadow>
+          <cylinderGeometry args={[0.06, 0.06, 0.8, 5]} />
+          <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
+        </mesh>
+        {/* flame */}
+        <mesh position-y={0.34}>
+          <coneGeometry args={[0.2, 0.6, 5]} />
+          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hovered ? 2.4 : 1.5} flatShading />
+        </mesh>
+        <mesh position-y={0.5}>
+          <coneGeometry args={[0.1, 0.3, 5]} />
+          <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={hovered ? 2.6 : 1.8} flatShading />
+        </mesh>
+        <pointLight color={WORLD.ember} intensity={hovered ? 6 : 4} distance={7} decay={2} position={[0, 0.5, 0]} />
       </group>
     );
   }

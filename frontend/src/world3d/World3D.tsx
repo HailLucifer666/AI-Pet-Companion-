@@ -41,7 +41,7 @@ export function World3D() {
       gl={{ antialias: true }}
     >
       <color attach="background" args={[WORLD.sky]} />
-      <fog attach="fog" args={[WORLD.fog, 26, 78]} />
+      <fog attach="fog" args={[WORLD.fog, 40, 105]} />
 
       <hemisphereLight color={WORLD.sky} groundColor={0x141414} intensity={0.7} />
       <ambientLight color={WORLD.ambient} intensity={0.35} />
@@ -74,8 +74,8 @@ export function World3D() {
         dampingFactor={0.08}
         autoRotate={!reduced}
         autoRotateSpeed={0.35}
-        minDistance={10}
-        maxDistance={34}
+        minDistance={9}
+        maxDistance={48}
         minPolarAngle={0.45}
         maxPolarAngle={1.32}
         target={[0, 1, 0]}

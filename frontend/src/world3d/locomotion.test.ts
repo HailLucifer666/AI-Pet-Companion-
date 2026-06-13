@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { placeTarget, stepToward, WALK_SPEED } from "./locomotion";
+import { arrive, placeTarget, WALK_SPEED } from "./locomotion";
 import { ISLAND_MAX_R } from "./terrain";
 
 describe("placeTarget", () => {
@@ -17,34 +17,38 @@ describe("placeTarget", () => {
     const a = placeTarget("wander", 42);
     expect(placeTarget("wander", 42)).toEqual(a); // same seed → same spot
     expect(placeTarget("wander", 43)).not.toEqual(a); // different seed → different spot
-    expect(Math.hypot(a.x, a.z)).toBeLessThan(ISLAND_MAX_R - 4); // mid radius, not the rim
+    expect(Math.hypot(a.x, a.z)).toBeLessThanOrEqual(6); // mid radius, never past the rim
   });
 });
 
-describe("stepToward", () => {
-  it("advances toward the target by speed * dt", () => {
-    const s = stepToward({ x: 0, z: 0 }, { x: 10, z: 0 }, 0.5, 2, 0);
-    expect(s.moving).toBe(true);
-    expect(s.x).toBeCloseTo(1); // 2 u/s * 0.5 s
-    expect(s.z).toBeCloseTo(0);
+describe("arrive", () => {
+  it("heads toward the target at full speed when far", () => {
+    const v = arrive({ x: 0, z: 0 }, { x: 10, z: 0 }, 2);
+    expect(Math.hypot(v.vx, v.vz)).toBeCloseTo(2); // full speed
+    expect(v.vx).toBeCloseTo(2); // pointing +x
+    expect(v.vz).toBeCloseTo(0);
+    expect(v.dist).toBeCloseTo(10);
   });
 
-  it("faces its travel direction (+Z heading = 0, +X heading = PI/2)", () => {
-    expect(stepToward({ x: 0, z: 0 }, { x: 0, z: 5 }, 0.1, WALK_SPEED, 9).heading).toBeCloseTo(0);
-    expect(stepToward({ x: 0, z: 0 }, { x: 5, z: 0 }, 0.1, WALK_SPEED, 9).heading).toBeCloseTo(Math.PI / 2);
+  it("eases down as it nears the target (arrival), not a hard stop", () => {
+    const far = arrive({ x: 0, z: 0 }, { x: 10, z: 0 }, 2);
+    const near = arrive({ x: 9.2, z: 0 }, { x: 10, z: 0 }, 2); // 0.8 away, inside decel
+    const farSpeed = Math.hypot(far.vx, far.vz);
+    const nearSpeed = Math.hypot(near.vx, near.vz);
+    expect(nearSpeed).toBeLessThan(farSpeed);
+    expect(nearSpeed).toBeGreaterThan(0);
   });
 
-  it("snaps and stops on arrival, keeping the previous heading", () => {
-    const s = stepToward({ x: 1.0, z: 1.0 }, { x: 1.02, z: 1.0 }, 1, WALK_SPEED, 1.234);
-    expect(s.moving).toBe(false);
-    expect(s.x).toBe(1.02);
-    expect(s.heading).toBe(1.234); // idle pet doesn't spin
+  it("is at rest on arrival", () => {
+    const v = arrive({ x: 5, z: 5 }, { x: 5, z: 5 }, WALK_SPEED);
+    expect(v.vx).toBe(0);
+    expect(v.vz).toBe(0);
   });
 
-  it("never overshoots: a big dt clamps to the target", () => {
-    const s = stepToward({ x: 0, z: 0 }, { x: 1, z: 0 }, 100, WALK_SPEED, 0);
-    expect(s.x).toBe(1);
-    expect(s.z).toBe(0);
-    expect(s.moving).toBe(true);
+  it("velocity direction matches the bearing to the target", () => {
+    const v = arrive({ x: 0, z: 0 }, { x: 0, z: 5 }, WALK_SPEED); // +z
+    expect(Math.atan2(v.vx, v.vz)).toBeCloseTo(0);
+    const v2 = arrive({ x: 0, z: 0 }, { x: 5, z: 0 }, WALK_SPEED); // +x
+    expect(Math.atan2(v2.vx, v2.vz)).toBeCloseTo(Math.PI / 2);
   });
 });
