@@ -5,6 +5,19 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        // Keep Pixi in its own async "world" chunk — loaded only when the Den
+        // opens, never in the main bundle.
+        manualChunks(id) {
+          if (id.includes("node_modules/pixi.js") || id.includes("node_modules/@pixi")) {
+            return "world";
+          }
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

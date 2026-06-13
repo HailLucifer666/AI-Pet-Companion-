@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api, queryKeys } from "./lib/api";
@@ -15,9 +16,19 @@ import {
   ResearchStub,
   SkillsStub,
   TasksStub,
-  DenStub,
 } from "./features/stubs";
 import { Styleguide } from "./features/styleguide/Styleguide";
+
+// The world (Pixi) is heavy — lazy-load it so it never touches the main bundle.
+const DenView = lazy(() => import("./features/den/DenView"));
+
+function DenLoading() {
+  return (
+    <div className="flex h-full items-center justify-center bg-ink-950">
+      <Spinner />
+    </div>
+  );
+}
 
 function Shell() {
   return (
@@ -35,7 +46,14 @@ function Shell() {
         <Route path="/memory" element={<MemoryView />} />
         <Route path="/skills" element={<SkillsStub />} />
         <Route path="/settings" element={<SettingsView />} />
-        <Route path="/den" element={<DenStub />} />
+        <Route
+          path="/den"
+          element={
+            <Suspense fallback={<DenLoading />}>
+              <DenView />
+            </Suspense>
+          }
+        />
         {import.meta.env.DEV && <Route path="/styleguide" element={<Styleguide />} />}
         <Route path="*" element={<Navigate to="/chat" replace />} />
       </Route>
