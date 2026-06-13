@@ -120,7 +120,9 @@ export function World3D() {
       gl={{ antialias: true }}
     >
       <color attach="background" args={[WORLD.sky]} />
-      <fog attach="fog" args={[WORLD.fog, 40, 105]} />
+      {/* Fog ends before the sea's far reaches, so the endless water dissolves
+          into the sky — no visible horizon edge, at any angle or zoom. */}
+      <fog attach="fog" args={[WORLD.fog, 34, 90]} />
 
       <hemisphereLight color={WORLD.sky} groundColor={0x232a1c} intensity={0.85} />
       <ambientLight color={WORLD.ambient} intensity={0.5} />

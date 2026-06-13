@@ -209,9 +209,10 @@ export function Island() {
         <meshStandardMaterial vertexColors flatShading roughness={0.95} metalness={0} />
       </mesh>
 
-      {/* The surrounding sea, at sea level. */}
+      {/* The surrounding sea — vast enough that its edge is always far beyond the
+          fog, so the world never shows a hard cut at any camera angle. */}
       <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
-        <planeGeometry args={[76, 76]} />
+        <planeGeometry args={[320, 320]} />
         <meshStandardMaterial color={WORLD.water} transparent opacity={0.82} roughness={0.4} metalness={0.1} flatShading />
       </mesh>
 
