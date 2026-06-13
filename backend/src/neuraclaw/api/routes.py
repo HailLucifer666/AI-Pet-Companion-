@@ -10,11 +10,12 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from .. import __version__
+from ..config import SOUL_PATH
 from ..core import agent
 from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
 from ..memory import extractor, store
-from ..pet import xp
+from ..pet import hatch as hatch_svc, xp
 
 log = logging.getLogger(__name__)
 api_router = APIRouter()
@@ -117,6 +118,32 @@ async def den(request: Request):
     }
 
 
+class HatchRequest(BaseModel):
+    creature_name: str = Field(min_length=1, max_length=40)
+    user_name: str = Field(default="", max_length=40)
+    voice: str = Field(default="warm", max_length=20)
+    focus: str = Field(default="", max_length=500)
+    boundaries: str = Field(default="", max_length=500)
+
+
+@api_router.post("/hatch")
+async def hatch(body: HatchRequest, request: Request):
+    """First-run ritual: birth the companion. 409 if already hatched."""
+    db = request.app.state.db
+    if await xp.get_pet(db) is not None:
+        raise HTTPException(409, "Already hatched")
+    pet = await hatch_svc.hatch(
+        db,
+        SOUL_PATH,
+        creature_name=body.creature_name,
+        user_name=body.user_name,
+        voice=body.voice,
+        focus=body.focus,
+        boundaries=body.boundaries,
+    )
+    return {"pet": pet}
+
+
 # ── Chat ──────────────────────────────────────────────────────────────
 
 
@@ -178,9 +205,12 @@ async def chat(req: ChatRequest, request: Request):
                     {"type": "tool_end", "tool": event.tool, "detail": event.detail,
                      "ok": event.ok}
                 )
+                if event.ok:
+                    await xp.award(db, "tool_ok", ref=event.tool)
             elif event.type == "done":
                 final_text = event.text
                 yield _sse({"type": "done"})
+                await xp.award(db, "conversation", ref=session_id)
             elif event.type == "error":
                 yield _sse({"type": "error", "message": event.text})
 

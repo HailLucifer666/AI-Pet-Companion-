@@ -139,3 +139,40 @@ async def test_memory_layer_awards_and_claws_back_xp(db):
 
     assert await store.forget_memory(db, mid)
     assert (await xp.get_pet(db))["xp"] == 0
+
+
+async def test_hatch_creates_pet_regenerates_soul_seeds_memories(db, tmp_path):
+    from unittest.mock import patch
+
+    from neuraclaw.pet import hatch
+
+    def fake_vector(text: str) -> list[float]:
+        vec = [0.0] * 384
+        for word in text.lower().split():
+            vec[hash(word) % 384] += 1.0
+        norm = sum(x * x for x in vec) ** 0.5 or 1.0
+        return [x / norm for x in vec]
+
+    async def fake_embed(texts):
+        return [fake_vector(t) for t in texts]
+
+    soul = tmp_path / "SOUL.md"
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
+        pet = await hatch.hatch(
+            db,
+            soul,
+            creature_name="Ember",
+            user_name="Arghya",
+            voice="warm",
+            focus="shipping NeuraClaw",
+            boundaries="never email without asking",
+        )
+
+    assert pet["name"] == "Ember"
+    assert pet["user_name"] == "Arghya"
+    text = soul.read_text(encoding="utf-8")
+    assert "Ember" in text and "Arghya" in text and "never email without asking" in text
+    # Four distinct seeded memories form → 4 × 5 XP.
+    assert pet["xp"] >= 15
+    cur = await db.execute("SELECT COUNT(*) FROM memories")
+    assert (await cur.fetchone())[0] >= 3
