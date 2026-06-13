@@ -11,7 +11,13 @@ export default defineConfig({
         // Keep Pixi in its own async "world" chunk — loaded only when the Den
         // opens, never in the main bundle.
         manualChunks(id) {
-          if (id.includes("node_modules/pixi.js") || id.includes("node_modules/@pixi")) {
+          // The 3D stack (three + react-three) loads with the Den, never in main.
+          if (
+            id.includes("node_modules/three") ||
+            id.includes("node_modules/@react-three") ||
+            id.includes("node_modules/pixi.js") ||
+            id.includes("node_modules/@pixi")
+          ) {
             return "world";
           }
         },

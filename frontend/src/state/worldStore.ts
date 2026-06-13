@@ -21,7 +21,7 @@ import {
   type LumenformState,
   type WorldEvent,
 } from "../world/entities/lumenform/LumenformFSM";
-import { makeCrystalSeed, MAX_CRYSTALS, type CrystalSeed } from "../world/entities/CrystalField";
+import { makeCrystalSeed, MAX_CRYSTALS, type CrystalSeed } from "../world/entities/crystalSeed";
 
 const reduced =
   typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
