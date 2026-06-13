@@ -9,6 +9,7 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { Palette } from "../engine/TokenBridge";
 import { mulberry32, range } from "../engine/rng";
 import { TIER_SETTINGS, type Tier } from "../engine/FpsDegrader";
+import { PLACES } from "../places";
 
 const SEED = 0xc1a5fe; // fixed identity of this place
 const MAX_FIREFLIES = TIER_SETTINGS.high.fireflies;
@@ -36,6 +37,7 @@ export class GroveEnvironment {
   private moon = new Container();
   private mushrooms = new Graphics();
   private pool = new Graphics();
+  private workbench = new Graphics();
   private fireGlow = new Container();
   private flames: Graphics[] = [];
   private fireflies: Firefly[] = [];
@@ -54,7 +56,7 @@ export class GroveEnvironment {
 
     sky.addChild(this.sky, this.moon, this.vignette);
     far.addChild(this.mushrooms);
-    mid.addChild(this.pool, this.fireGlow);
+    mid.addChild(this.pool, this.workbench, this.fireGlow);
 
     this.buildMoon();
     this.buildFire();
@@ -125,7 +127,24 @@ export class GroveEnvironment {
 
     this.drawMushrooms(w, h);
     this.drawPool(w, h);
+    this.drawWorkbench(w, h);
     this.placeFireflies();
+  }
+
+  private drawWorkbench(w: number, h: number): void {
+    const { ink850, ink800, claw600 } = this.palette;
+    const x = PLACES.workbench.nx * w;
+    const y = PLACES.workbench.ny * h;
+    this.workbench
+      .clear()
+      .circle(x, y - 6, 26)
+      .fill({ color: claw600, alpha: 0.08 }) // a worklight where it tends
+      .roundRect(x - 22, y - 10, 44, 12, 3)
+      .fill({ color: ink850, alpha: 0.95 })
+      .roundRect(x - 18, y - 2, 6, 12, 2)
+      .fill({ color: ink800, alpha: 0.9 })
+      .roundRect(x + 12, y - 2, 6, 12, 2)
+      .fill({ color: ink800, alpha: 0.9 });
   }
 
   private drawMushrooms(w: number, h: number): void {

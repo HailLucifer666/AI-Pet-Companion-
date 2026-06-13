@@ -20,6 +20,7 @@ import { api, queryKeys } from "../../lib/api";
 import { StatusDot, Tooltip } from "../../components/ui";
 import { Creature } from "../../components/creature/Creature";
 import { useCreatureStore, connect, disconnectSynapse } from "../../state/creatureStore";
+import { connect as connectWorld, disconnectWorld } from "../../state/worldStore";
 
 interface Surface {
   to: string;
@@ -91,7 +92,11 @@ export function AppShell() {
 
   useEffect(() => {
     connect();
-    return () => disconnectSynapse();
+    connectWorld(); // keep the world's state live even when the Den is closed
+    return () => {
+      disconnectSynapse();
+      disconnectWorld();
+    };
   }, []);
 
   return (
