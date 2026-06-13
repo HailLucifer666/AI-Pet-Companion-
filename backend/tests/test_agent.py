@@ -124,4 +124,9 @@ async def test_system_prompt_contains_soul(db, tmp_path):
     )
     system = router.calls[0][0]
     assert system["role"] == "system"
-    assert "NeuraClaw" in system["content"]
+    # The system prompt embeds SOUL.md verbatim. Assert against the live file
+    # (newline-normalized) rather than a brand literal, so persona rewrites of
+    # SOUL.md don't break this test — it verifies the soul is injected, not its wording.
+    soul = (Path(__file__).resolve().parents[2] / "SOUL.md").read_text(encoding="utf-8")
+    norm = lambda s: s.replace("\r\n", "\n").replace("\r", "\n").strip()
+    assert norm(soul) in norm(system["content"])
