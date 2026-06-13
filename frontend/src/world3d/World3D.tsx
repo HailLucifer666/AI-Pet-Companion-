@@ -10,6 +10,7 @@ import { WORLD } from "./palette";
 import { Island } from "./Island";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
+import { Places3D } from "./Places3D";
 
 export function World3D() {
   const reduced = useReducedMotion() ?? false;
@@ -46,6 +47,7 @@ export function World3D() {
       <Island />
       <Lumenform3D />
       <Crystals3D />
+      <Places3D />
 
       <OrbitControls
         makeDefault
