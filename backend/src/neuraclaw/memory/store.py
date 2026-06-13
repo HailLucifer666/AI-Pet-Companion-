@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import aiosqlite
 
+from ..core.synapse import synapse
 from . import embedder
 
 log = logging.getLogger(__name__)
@@ -75,6 +76,7 @@ async def add_memory(
         (memory_id, vec_json, embedder.MODEL_NAME),
     )
     await db.commit()
+    synapse.publish("memory.formed", memory_id=memory_id, memory_type=type)
     return memory_id
 
 
@@ -82,7 +84,10 @@ async def forget_memory(db: aiosqlite.Connection, memory_id: int) -> bool:
     cur = await db.execute("DELETE FROM memories WHERE id = ?", (memory_id,))
     await db.execute("DELETE FROM vec_memories WHERE memory_id = ?", (memory_id,))
     await db.commit()
-    return cur.rowcount > 0
+    deleted = cur.rowcount > 0
+    if deleted:
+        synapse.publish("memory.forgotten", memory_id=memory_id)
+    return deleted
 
 
 async def update_memory(db: aiosqlite.Connection, memory_id: int, content: str) -> bool:

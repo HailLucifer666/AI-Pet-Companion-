@@ -5,6 +5,7 @@ import re
 
 import aiosqlite
 
+from ..core.synapse import synapse
 from ..providers import ProviderError, Router
 from . import manager
 from .loader import parse_skill_md
@@ -85,4 +86,5 @@ async def reflect_on_turn(
     )
     await db.commit()
     log.info("skill draft proposed: %s (session %s)", doc.name, session_id)
+    synapse.publish("skill.drafted", name=doc.name)
     return doc.name

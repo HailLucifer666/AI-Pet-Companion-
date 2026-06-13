@@ -11,6 +11,7 @@ import {
   StickyNote,
   Telescope,
   Wrench,
+  Home,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { EmptyState } from "../components/ui";
@@ -99,5 +100,12 @@ export const SettingsStub = () => (
     icon={Settings}
     title="Settings"
     description="Providers, API keys, channels, scheduler. Minimal version arrives in Phase 1."
+  />
+);
+export const DenStub = () => (
+  <Stub
+    icon={Home}
+    title="Den"
+    description="Growth ladder and XP arrive in M-0.2d."
   />
 );

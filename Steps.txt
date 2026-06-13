@@ -1,0 +1,113 @@
+# M-0.2b — Synapse Event Bus + Creature Engine
+
+## Context
+
+Per [docs/BUILD-PLAN-v0.2.md](D:\NeuraClaw v1\docs\BUILD-PLAN-v0.2.md) (Rev 2), M-0.2a (design system) shipped at `bf3c80e`. M-0.2b is next: the **nervous system**. The agent's real activity (thinking, tool runs, memory formed, skill drafted) becomes a first-class event stream — backend in-process pub/sub ("Synapse") → `GET /api/events` SSE → every UI surface. The creature (layered SVG familiar) lives in the nav rail and reacts to real system events from **any** surface, proving Synapse drives it, not ChatView. This bus is also the delivery rail for 0.2c/0.2d (pet.stage, xp.awarded) and v0.3 proactive pings.
+
+Baselines that must not break: 31 pytest, 9 vitest, tsc strict clean, build < 300 kB gz.
+
+## Backend
+
+### 1. `backend/src/neuraclaw/core/synapse.py` (new)
+
+- `@dataclass SynapseEvent(type, payload)`.
+- `class Synapse(queue_capacity=64)`: `subscribe() -> asyncio.Queue`, `unsubscribe(q)` (removes + pushes `None` sentinel to wake consumer), `publish(type, **payload)` — synchronous fire-and-forget; early-return when no subscribers; on full queue `get_nowait()` (drop oldest) then `put_nowait()`. Never blocks publisher.
+- `async def sse_stream(synapse, *, heartbeat_s=25.0)` — standalone generator (testable without TestClient): `subscribe()`, loop `asyncio.wait_for(q.get(), heartbeat_s)`; `TimeoutError` → yield `": hb\n\n"` comment; `None` sentinel → return; else yield `data: {json}\n\n` where JSON = `{"type": event.type, **event.payload}`; `finally: unsubscribe`.
+- Module-level singleton `synapse = Synapse()` — chosen over `app.state` because `memory/store.py` and `skillsys/reflector.py` have no app/request access (called from background tasks). Import direction `memory/skillsys → core` matches existing layering, no cycles.
+- **Payload rule:** payload keys must never be `type` (would overwrite event type in JSON merge). Memory type travels as `memory_type`.
+
+### 2. Publishers (~12 lines total)
+
+- [core/agent.py](D:\NeuraClaw v1\backend\src\neuraclaw\core\agent.py) — `run_turn()` gains `synapse: Synapse | None = None` (existing 4 agent tests pass `None` implicitly, unaffected). Emits: `agent.thinking` (pre-loop), `agent.tool.start {tool}` / `agent.tool.end {tool, ok}` at existing yield sites, `agent.done` on done **and on every error return** (creature never sticks in working). All guarded `if synapse:`.
+- [api/routes.py](D:\NeuraClaw v1\backend\src\neuraclaw\api\routes.py) — chat endpoint passes `synapse=_synapse` (module singleton) into `run_turn`.
+- [memory/store.py](D:\NeuraClaw v1\backend\src\neuraclaw\memory\store.py) — `add_memory` publishes `memory.formed {memory_id, memory_type}` only on actual insert (not dedup); covers both extractor and manual API paths. `forget_memory` publishes `memory.forgotten {memory_id}` when row existed. Existing memory tests safe: zero subscribers → publish is no-op.
+- [skillsys/reflector.py](D:\NeuraClaw v1\backend\src\neuraclaw\skillsys\reflector.py) — `skill.drafted {name}` after draft write.
+- `xp.awarded` / `pet.levelup` / `pet.stage` reserved for 0.2d.
+
+### 3. `GET /api/events` route (routes.py)
+
+`StreamingResponse(sse_stream(_synapse), media_type="text/event-stream", headers={Cache-Control: no-cache, X-Accel-Buffering: no})` — same headers as chat. Live-only, no replay. Client disconnect → Starlette cancels generator task → `CancelledError` propagates (no bare `except Exception` in the generator) → `finally` unsubscribes. No `request.is_disconnected()` polling needed.
+
+### 4. `backend/tests/test_synapse.py` (new, +6 tests → 37)
+
+Fresh `Synapse()` per test (singleton untouched; no monkeypatch needed):
+1. fan-out to two subscribers
+2. slow subscriber: small `queue_capacity`, overfill → publisher doesn't block, oldest dropped, newest kept
+3. unsubscribed queue receives no further events
+4. unsubscribe sentinel exits `sse_stream` cleanly
+5. `sse_stream` yields published event as correct SSE `data:` line
+6. `sse_stream` heartbeat: `heartbeat_s=0.01` → yields `": hb\n\n"`
+
+## Frontend
+
+### 5. `frontend/src/lib/synapse.ts` (new)
+
+`connectSynapse(handler): () => void` — fetch `GET /api/events` + `ReadableStream` + reuse existing `SSEParser` from [lib/sse.ts](D:\NeuraClaw v1\frontend\src\lib\sse.ts) (heartbeat comments already skipped by parser — only `data:` lines parsed). Auto-reconnect loop, exponential backoff 1s→30s, reset on successful connect. Returns teardown (sets dead flag + aborts AbortController). Only calls `fetch` when invoked → safe eager import in vitest node env.
+
+### 6. `frontend/src/state/creatureStore.ts` (new)
+
+- **Pure exported reducer** `reduceCreature(state, event)` — node-env testable, no DOM.
+- State machine (priority): `sleeping(0) < idle(1) < curious(2, reserved 0.2d) < thinking(3) < working(4) < learning(5) < celebrating(6)`. Transient states (learning/celebrating) always yield to new events.
+
+| Event | Effect |
+|---|---|
+| `agent.thinking` | → thinking (if priority wins) |
+| `agent.tool.start` | → working |
+| `agent.tool.end` | → thinking (more steps may follow) |
+| `agent.done` | → idle (always) |
+| `memory.formed` | → learning + reaction `{kind:"ear-flick", seq+1}` |
+| `skill.drafted` | → celebrating + reaction `{kind:"hop-sparkle", seq+1}` |
+| `memory.forgotten` | no-op |
+
+- Store state: `{stage: 1-4, xp, state, reaction: {kind, seq} | null, lastEventAt}`. `seq` increments so identical reactions retrigger.
+- Timers live in store layer (not reducer): decay timer (learning 4s / celebrating 6s → idle, **only if still in that transient state** — must not stomp a newer thinking/working); sleep timer (30 min no events → sleeping), reset on each dispatch.
+- `--activity` CSS var written on dispatch (`document` guarded with `typeof document !== "undefined"` for node tests): sleeping/idle 0, thinking 0.4, learning 0.6, celebrating 0.8, working 1. Feeds existing `--shadow-glow` in theme.css.
+- StrictMode-safe connection: module-level **ref-count** (`connect()`/`disconnect()`), opens `connectSynapse` only at refs 0→1, closes at 1→0. Zustand pattern mirrors existing `useToastStore` in [components/ui.tsx](D:\NeuraClaw v1\frontend\src\components\ui.tsx).
+
+### 7. `frontend/src/components/creature/Creature.tsx` (new)
+
+- Props: `{stage: 1|2|3|4, state, reaction?, size=40}` (40→320px). ViewBox `-50 -50 100 100`.
+- Hand-built layered SVG, named `<g data-layer>` groups: `aura / body / tail / ears / eyes`. **Colors via CSS vars only** (`fill="var(--color-claw-500)"` etc.) — SVG attrs don't take Tailwind utilities; tokens stay single-sourced.
+- Stage = prop-switched path `d` values (one component, no per-stage components): 1 compact egg + nubs → 4 fuller silhouette + wider aura. Must read at 40px (body silhouette + eye glow carry it).
+- `motion` variants per state per layer (eyes closed when sleeping, ears forward when thinking, tail flick when working, aura opacity ≈ activity). Reactions retrigger via `key={reaction.seq}` remount.
+- `useReducedMotion` (from `motion/react`) → `StaticCreature`: no transforms, state communicated by eye/aura color only.
+
+### 8. Shell + routes + styleguide
+
+- [AppShell.tsx](D:\NeuraClaw v1\frontend\src\app\shell\AppShell.tsx): `useEffect` → `connect()`/cleanup `disconnect()` (the single connection owner). Ambient `CreatureWidget` (40px, store-subscribed) in rail between `flex-1` spacer and Styleguide/Settings, wrapped in Tooltip, `NavLink to="/den"`.
+- `/den` stub in `features/stubs.tsx` + route in [App.tsx](D:\NeuraClaw v1\frontend\src\App.tsx) ("Growth ladder and XP arrive in M-0.2d").
+- [Styleguide.tsx](D:\NeuraClaw v1\frontend\src\features\styleguide\Styleguide.tsx): two new Sections — gallery grid 4 stages × 5 states (sleeping/idle/thinking/working/celebrating, 64px) + live trigger buttons dispatching fake events into the real store (rail widget reacts simultaneously; doubles as reduced-motion verification surface).
+
+### 9. `frontend/src/state/creatureStore.test.ts` (new, +8 tests → 17)
+
+initial state · thinking maps · tool.start beats thinking · done resets idle · memory.formed → learning + ear-flick · seq increments on repeat · celebrating decays to idle (fake timers, 6s) · sleep after 30 min idle (fake timers).
+
+## Build order
+
+1. `synapse.py` + `test_synapse.py` → pytest 37 green
+2. `run_turn` synapse param + emits → agent tests still green
+3. store/reflector publishes → full pytest green
+4. `GET /api/events` route → smoke: `curl -N localhost:8090/api/events` during a chat
+5. `lib/synapse.ts` (no test — SSEParser already covered)
+6. `creatureStore.ts` + tests → vitest 17 green
+7. `Creature.tsx` — iterate visuals in styleguide (highest-effort step)
+8. AppShell widget + `/den` stub + styleguide gallery
+9. Gates + screenshots
+
+**Commits:** `feat(synapse): global agent event bus over SSE` (steps 1–4) · `feat(creature): vector familiar, live-state machine, semantic reactions, ambient widget` (steps 5–8).
+
+## Verification (binding, per BUILD-PLAN acceptance)
+
+1. `pytest` 37/37 · `npm test` 17/17 · `npm run lint` clean · `npm run build` clean, < 300 kB gz
+2. Live: open `/memory` (not chat), send chat from another tab → rail creature idle→thinking→working→idle — proves Synapse drives it
+3. POST /api/memory → ear-flick fires; `curl -N /api/events` shows `: hb` heartbeat
+4. Styleguide gallery: all stage×state cells render; trigger buttons animate rail widget
+5. Reduced-motion: static creature, state via eye/aura color
+6. Screenshot walk @1280 (styleguide + rail across surfaces) passes flagship bar
+
+## Risks
+
+- SSE JSON merge collision: payload key named `type` would shadow event type → convention: never; memory type = `memory_type` (caught in design review).
+- Decay timer stomping newer state → guard: only decay if still transient.
+- SVG cheap-looking at 40px → silhouette+eyes carry small size; iterate in gallery before commit.
+- StrictMode double-connect → ref-count tested by the mount/unmount/remount cycle in dev.

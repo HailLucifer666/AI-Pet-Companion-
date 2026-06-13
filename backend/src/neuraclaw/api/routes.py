@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 
 from .. import __version__
 from ..core import agent
+from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
 from ..memory import extractor, store
 
@@ -22,6 +23,15 @@ api_router = APIRouter()
 async def health(request: Request):
     vec = await vec_version(request.app.state.db)
     return {"status": "ok", "version": __version__, "sqlite_vec": vec}
+
+
+@api_router.get("/events")
+async def events():
+    return StreamingResponse(
+        sse_stream(_synapse),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @api_router.get("/models")
@@ -102,6 +112,7 @@ async def chat(req: ChatRequest, request: Request):
             session_id=session_id,
             user_text=req.message,
             role=req.role,
+            synapse=_synapse,
         ):
             if event.type == "delta":
                 yield _sse({"type": "delta", "text": event.text})

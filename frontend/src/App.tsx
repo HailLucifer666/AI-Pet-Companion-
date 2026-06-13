@@ -11,6 +11,7 @@ import {
   ResearchStub,
   SkillsStub,
   TasksStub,
+  DenStub,
 } from "./features/stubs";
 import { Styleguide } from "./features/styleguide/Styleguide";
 
@@ -30,6 +31,7 @@ export function App() {
         <Route path="/memory" element={<MemoryView />} />
         <Route path="/skills" element={<SkillsStub />} />
         <Route path="/settings" element={<SettingsView />} />
+        <Route path="/den" element={<DenStub />} />
         {import.meta.env.DEV && <Route path="/styleguide" element={<Styleguide />} />}
         <Route path="*" element={<Navigate to="/chat" replace />} />
       </Route>

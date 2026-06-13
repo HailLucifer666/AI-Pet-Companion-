@@ -13,6 +13,7 @@ from ..providers import ProviderError, Router, ToolsUnsupportedError
 from ..tools import Registry, ToolContext
 from ..tools.registry import args_summary
 from . import context
+from .synapse import Synapse
 
 log = logging.getLogger(__name__)
 
@@ -52,8 +53,13 @@ async def run_turn(
     session_id: str,
     user_text: str,
     role: str = "primary",
+    synapse: Synapse | None = None,
 ) -> AsyncIterator[AgentEvent]:
-    """Run one agent turn. The user message must already be persisted."""
+    """Run one agent turn. The user message must already be persisted.
+
+    When `synapse` is provided, the turn's lifecycle is mirrored onto the bus
+    so the whole UI (the creature, any surface) reacts to real activity.
+    """
     system = await context.build_system_prompt(db, user_text)
     history = await context.load_history(db, session_id, config.agent)
     messages: list[dict[str, Any]] = [{"role": "system", "content": system}, *history]
@@ -66,6 +72,9 @@ async def run_turn(
         workspace=WORKSPACE_DIR / session_id,
     )
     tools = registry.schemas()
+
+    if synapse:
+        synapse.publish("agent.thinking", session_id=session_id)
 
     for _step in range(config.agent.max_steps):
         response = None
@@ -81,10 +90,14 @@ async def run_turn(
             tools = None
             continue
         except ProviderError as e:
+            if synapse:
+                synapse.publish("agent.done", session_id=session_id)
             yield AgentEvent(type="error", text=str(e), ok=False)
             return
 
         if response is None:
+            if synapse:
+                synapse.publish("agent.done", session_id=session_id)
             yield AgentEvent(type="error", text="Provider returned no response", ok=False)
             return
 
@@ -92,6 +105,8 @@ async def run_turn(
             await _persist(
                 db, session_id, {"role": "assistant", "content": response.text}
             )
+            if synapse:
+                synapse.publish("agent.done", session_id=session_id)
             yield AgentEvent(type="done", text=response.text)
             return
 
@@ -111,10 +126,14 @@ async def run_turn(
         await _persist(db, session_id, assistant_msg)
 
         for tc in response.tool_calls:
+            if synapse:
+                synapse.publish("agent.tool.start", tool=tc.name)
             yield AgentEvent(
                 type="tool_start", tool=tc.name, detail=args_summary(tc.arguments_json)
             )
             result = await registry.dispatch(ctx, tc.name, tc.arguments_json)
+            if synapse:
+                synapse.publish("agent.tool.end", tool=tc.name, ok=result.ok)
             yield AgentEvent(
                 type="tool_end",
                 tool=tc.name,
@@ -129,6 +148,8 @@ async def run_turn(
             messages.append(tool_msg)
             await _persist(db, session_id, tool_msg)
 
+    if synapse:
+        synapse.publish("agent.done", session_id=session_id)
     yield AgentEvent(
         type="error",
         text=f"Stopped after {config.agent.max_steps} steps without a final answer.",

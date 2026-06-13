@@ -22,6 +22,8 @@ import {
   Tooltip,
   toast,
 } from "../../components/ui";
+import { Creature } from "../../components/creature/Creature";
+import { useCreatureStore } from "../../state/creatureStore";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -186,6 +188,42 @@ export function Styleguide() {
             description="This is how every unbuilt surface greets you — designed, not apologetic."
             action={<Button variant="ghost">Do something</Button>}
           />
+        </div>
+      </Section>
+
+      <Section title="Creature (Gallery)">
+        <div className="grid w-full grid-cols-4 gap-4 rounded-card border border-ink-800 bg-ink-950 p-6">
+          {[1, 2, 3, 4].map((stage) => (
+            <div key={stage} className="flex flex-col gap-4">
+              <div className="text-xs font-medium uppercase tracking-wider text-ink-500">Stage {stage}</div>
+              {["sleeping", "idle", "thinking", "working", "celebrating"].map((state) => (
+                <div key={state} className="flex items-center gap-3">
+                  <Creature stage={stage as any} state={state as any} size={48} />
+                  <span className="text-sm text-ink-400">{state}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Creature (Live Events)">
+        <div className="flex w-full flex-wrap gap-2 rounded-card border border-ink-800 bg-ink-950 p-4">
+          <Button variant="ghost" onClick={() => useCreatureStore.getState().dispatch({ type: "agent.thinking" } as any)}>
+            agent.thinking
+          </Button>
+          <Button variant="ghost" onClick={() => useCreatureStore.getState().dispatch({ type: "agent.tool.start", tool: "search" } as any)}>
+            agent.tool.start
+          </Button>
+          <Button variant="ghost" onClick={() => useCreatureStore.getState().dispatch({ type: "agent.done", text: "done" } as any)}>
+            agent.done
+          </Button>
+          <Button variant="ghost" onClick={() => useCreatureStore.getState().dispatch({ type: "memory.formed", memory_id: 1, memory_type: "fact" } as any)}>
+            memory.formed
+          </Button>
+          <Button variant="ghost" onClick={() => useCreatureStore.getState().dispatch({ type: "skill.drafted", name: "test" } as any)}>
+            skill.drafted
+          </Button>
         </div>
       </Section>
     </div>

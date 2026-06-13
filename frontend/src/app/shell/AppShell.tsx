@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
@@ -17,6 +18,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { api, queryKeys } from "../../lib/api";
 import { StatusDot, Tooltip } from "../../components/ui";
+import { Creature } from "../../components/creature/Creature";
+import { useCreatureStore, connect, disconnectSynapse } from "../../state/creatureStore";
 
 interface Surface {
   to: string;
@@ -82,6 +85,15 @@ function StatusStrip() {
 
 export function AppShell() {
   const location = useLocation();
+  const creatureStage = useCreatureStore((s) => s.stage);
+  const creatureState = useCreatureStore((s) => s.state);
+  const creatureReaction = useCreatureStore((s) => s.reaction);
+
+  useEffect(() => {
+    connect();
+    return () => disconnectSynapse();
+  }, []);
+
   return (
     <div className="flex h-dvh flex-col">
       <div className="flex min-h-0 flex-1">
@@ -96,6 +108,22 @@ export function AppShell() {
             <RailLink key={s.to} {...s} />
           ))}
           <div className="flex-1" />
+
+          <Tooltip label="Den" side="right">
+            <NavLink
+              to="/den"
+              className={({ isActive }) =>
+                [
+                  "group relative flex size-11 items-center justify-center rounded-ctl",
+                  "transition-colors duration-150 ease-out-expo active:scale-90",
+                  isActive ? "bg-claw-600/15" : "hover:bg-ink-800",
+                ].join(" ")
+              }
+            >
+              <Creature stage={creatureStage} state={creatureState} reaction={creatureReaction} size={40} />
+            </NavLink>
+          </Tooltip>
+
           {import.meta.env.DEV && (
             <RailLink to="/styleguide" label="Styleguide" icon={BookOpen} />
           )}
