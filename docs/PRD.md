@@ -1,12 +1,17 @@
 # NeuraClaw — Product Requirements Document
 
-**Version:** 1.0 · **Date:** 2026-06-13 · **Owner:** Arghya Chowdhury · **Status:** Approved direction, v0.2 in design
+**Version:** 2.0 · **Date:** 2026-06-13 · **Owner:** Arghya Chowdhury · **Status:** Approved direction — M-0.2b shipped; building The Mycelium (v0.3, world-first)
 
 ---
 
+> ## ⟡ v2.0 — THE MYCELIUM (supersedes where it conflicts below)
+> The companion no longer lives on a `/den` card — it lives **inside a world**. The pet is hatched into **The Mycelium**: a PixiJS WebGL living world that grows as the pet grows, where **every visual element maps to real computation** (a crystal = a real memory row, a light-pulse = a real Synapse event, light = XP). One continuous world across three altitudes — the Bioluminescent Grove → the Digital Wilderness → the Observatory — that the camera *expands* through as the pet reaches new stages. Productivity surfaces (Chat/Memory/Notes/…) become **Places** in the world and open as overlay panes; the rail stays the fast path.
+>
+> **This reframes §3.6 (Den) → the world, and re-points §7 (Roadmap) → the W-0…W-8 plan.** Full spec: [WORLD-BIBLE.md](WORLD-BIBLE.md) · [ARCHITECTURE-WORLD.md](ARCHITECTURE-WORLD.md) · [BUILD-PLAN-v0.3-WORLD.md](BUILD-PLAN-v0.3-WORLD.md). Binding principles unchanged: growth is earned (zero XP from affection/play), charm never blocks work, local-first, render only real data, flagship visual quality.
+
 ## 1. Vision
 
-**NeuraClaw is a creature you hatch, not a tool you install.**
+**NeuraClaw is a creature you hatch, not a tool you install — and it lives in a world you tend together.**
 
 A personal AI companion that lives on your machine: it hatches from an egg knowing your name, learns from every conversation, grows through visible life stages as it works for you, writes its own skills from experience, remembers what matters across months, and reaches out when something needs your attention. Wrapped around it is a full personal workspace — chat, research, notes, tasks, calendar, email — so the creature isn't a gimmick on top of a toy; it's the soul of a real daily-driver product.
 

@@ -7,6 +7,18 @@ Combines three ideas:
 - **Self-improving skills** — the agent writes and refines its own skill files (hermes-agent style)
 - **A full workspace UI** — chat, research, documents, notes, tasks, calendar, email (odysseus style, clean-room)
 
+Now evolving into **The Mycelium** — a PixiJS living world the companion inhabits, where every crystal is a real memory and every light-pulse a real event.
+
+## Docs
+| Doc | What |
+|---|---|
+| [AGENTS.md](AGENTS.md) | **Start here** — agent entry point, run/verify, guardrails, two-machine git sync |
+| [docs/PRD.md](docs/PRD.md) | Product source of truth (v2.0 — The Mycelium) |
+| [docs/WORLD-BIBLE.md](docs/WORLD-BIBLE.md) | The world: cosmology, realms, pet behavior, interaction laws, cinematics |
+| [docs/ARCHITECTURE-WORLD.md](docs/ARCHITECTURE-WORLD.md) | World engine architecture, contracts, perf, a11y |
+| [docs/BUILD-PLAN-v0.3-WORLD.md](docs/BUILD-PLAN-v0.3-WORLD.md) | The W-0…W-8 checkpoint roadmap |
+| [SOUL.md](SOUL.md) | The companion's identity template |
+
 ## Quick start
 
 1. `INSTALL.bat` — creates venv, installs deps, runs smoke tests, builds frontend
