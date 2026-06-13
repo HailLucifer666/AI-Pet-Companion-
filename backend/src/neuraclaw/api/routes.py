@@ -10,7 +10,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from .. import __version__
-from ..config import SOUL_PATH
+from ..config import REPO_ROOT, SOUL_PATH, write_env_keys
 from ..core import agent
 from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
@@ -62,6 +62,27 @@ async def settings(request: Request):
         "roles": config.roles,
         "trust": {"max_auto_risk": config.trust.max_auto_risk},
     }
+
+
+class KeysRequest(BaseModel):
+    # env-var name -> secret value (e.g. {"OPENROUTER_API_KEY": "sk-..."}).
+    keys: dict[str, str]
+
+
+@api_router.post("/settings/keys")
+async def set_keys(body: KeysRequest, request: Request):
+    """Write provider API keys to .env (live, no restart). Values are never echoed.
+
+    Returns only the names written and a fresh brain probe — never any value.
+    """
+    if not body.keys:
+        raise HTTPException(400, "no keys provided")
+    try:
+        names = write_env_keys(REPO_ROOT / ".env", body.keys)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    brain = await _detect_brain(request.app.state.config)
+    return {"ok": True, "set": names, "brain": brain}
 
 
 # ── Pet / Den ─────────────────────────────────────────────────────────

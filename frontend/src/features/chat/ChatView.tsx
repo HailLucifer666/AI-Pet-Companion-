@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import Markdown from "react-markdown";
@@ -200,12 +200,25 @@ function SessionList({ activeId }: { activeId?: string }) {
 export function ChatView() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const [input, setInput] = useState("");
   const [role, setRole] = useState("primary");
   const [stream, setStream] = useState<StreamState>(idleStream);
   const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const prefilled = useRef(false);
+
+  // A suggested prompt handed over from the hatch ritual lands here once.
+  useEffect(() => {
+    if (prefilled.current) return;
+    const prompt = (location.state as { prompt?: string } | null)?.prompt;
+    if (prompt) {
+      setInput(prompt);
+      prefilled.current = true;
+      window.history.replaceState({}, ""); // don't re-apply on back/refresh
+    }
+  }, [location.state]);
 
   const { data: models } = useQuery({ queryKey: queryKeys.models, queryFn: api.models });
   const { data: history, isLoading: historyLoading } = useQuery({

@@ -54,6 +54,38 @@ export interface Settings {
   trust: { max_auto_risk: number };
 }
 
+export interface Pet {
+  id: number;
+  name: string;
+  user_name: string;
+  voice: string;
+  stage: 1 | 2 | 3 | 4;
+  xp: number;
+  mood: string;
+  traits_json: string;
+  hatched_at: string;
+  last_seen_at: string;
+}
+
+/** Does the companion have a mind to think with? (local Ollama or a cloud key.) */
+export interface Brain {
+  ollama: boolean;
+  cloud_keys: boolean;
+}
+
+export interface PetResponse {
+  pet: Pet | null;
+  brain: Brain;
+}
+
+export interface HatchBody {
+  creature_name: string;
+  user_name: string;
+  voice: string;
+  focus: string;
+  boundaries: string;
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -81,6 +113,11 @@ export const api = {
   health: () => get<Health>("/health"),
   models: () => get<{ roles: Record<string, string[]> }>("/models"),
   settings: () => get<Settings>("/settings"),
+  setKeys: (keys: Record<string, string>) =>
+    request<{ ok: boolean; set: string[]; brain: Brain }>("POST", "/settings/keys", { keys }),
+
+  pet: () => get<PetResponse>("/pet"),
+  hatch: (body: HatchBody) => request<{ pet: Pet }>("POST", "/hatch", body),
 
   sessions: () => get<{ sessions: SessionSummary[] }>("/sessions"),
   sessionMessages: (id: string) =>
@@ -115,6 +152,7 @@ export const queryKeys = {
   health: ["health"] as const,
   models: ["models"] as const,
   settings: ["settings"] as const,
+  pet: ["pet"] as const,
   sessions: ["sessions"] as const,
   sessionMessages: (id: string) => ["sessions", id, "messages"] as const,
   memory: (q: string, type: string) => ["memory", q, type] as const,

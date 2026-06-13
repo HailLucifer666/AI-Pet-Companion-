@@ -1,6 +1,7 @@
 """Configuration: .env for secrets, config.yaml for everything else."""
 
 import os
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -76,3 +77,44 @@ def load_config() -> Config:
     path = _config_path()
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     return Config.model_validate(raw)
+
+
+ENV_KEY_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+
+
+def write_env_keys(env_path: Path, keys: dict[str, str]) -> list[str]:
+    """Merge secret keys into the .env file and live ``os.environ`` — no restart.
+
+    Security: values are never logged or returned. Key names are validated to
+    block .env injection, and a value may not span lines (no smuggling extra
+    assignments). Existing lines and comments are preserved. Returns the list of
+    env-var *names* written (names are not secret; values never leave here).
+    """
+    for name, raw in keys.items():
+        if not ENV_KEY_RE.match(name):
+            raise ValueError(f"invalid env var name: {name!r}")
+        if "\n" in raw or "\r" in raw:
+            raise ValueError("env value must not span multiple lines")
+        if not raw.strip():
+            raise ValueError("env value must not be empty")
+
+    lines = env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []
+    written: list[str] = []
+    for name, raw in keys.items():
+        value = raw.strip()
+        assignment = f"{name}={value}"
+        for i, line in enumerate(lines):
+            if not line.lstrip().startswith("#") and line.split("=", 1)[0].strip() == name:
+                lines[i] = assignment
+                break
+        else:
+            lines.append(assignment)
+        os.environ[name] = value  # live for this process (brain re-detect, providers)
+        written.append(name)
+
+    env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    try:
+        os.chmod(env_path, 0o600)  # best-effort; benign no-op on Windows
+    except OSError:
+        pass
+    return written
