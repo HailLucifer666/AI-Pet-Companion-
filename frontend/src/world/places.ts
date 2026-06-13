@@ -13,6 +13,25 @@ export const PLACES: Record<Exclude<Place, "wander">, { nx: number; ny: number }
   pool: { nx: 0.5, ny: 0.9 },
 };
 
+/** The Spore Gate — the luminous archway high in the Grove that fills with the
+ *  companion's XP and blooms open when it widens to a new stage (W-7). Mycelium
+ *  pulses from real events travel here. */
+export const SPORE_GATE = { nx: 0.5, ny: 0.3 };
+
+/** Where a Mycelium pulse originates, by the kind of event that fired it. */
+export type PulseOrigin = "workbench" | "garden" | "home";
+
+const GARDEN = { nx: 0.27, ny: 0.64 }; // the Memory Garden node (matches NAV_PLACES)
+
+export function originCoord(origin: PulseOrigin, w: number, h: number): { x: number; y: number } {
+  const p = origin === "garden" ? GARDEN : PLACES[origin];
+  return { x: p.nx * w, y: p.ny * h };
+}
+
+export function gateCoord(w: number, h: number): { x: number; y: number } {
+  return { x: SPORE_GATE.nx * w, y: SPORE_GATE.ny * h };
+}
+
 /** Navigable Places — a spot in the Grove that opens a surface diegetically.
  *  Coords are normalized; the hotspot DOM buttons sit at the same fractions, so
  *  clicking the Hollow opens Chat "at the fire". The rail still reaches every

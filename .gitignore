@@ -10,4 +10,5 @@ venv/
 node_modules/
 frontend/dist/
 *.egg-info/
+*.tsbuildinfo
 .write-probe
