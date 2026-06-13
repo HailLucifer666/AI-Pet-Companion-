@@ -23,6 +23,7 @@ import { useWeather } from "./useWeather";
 import { fxFor } from "./weather";
 import { localHour } from "./daylight";
 import { petPos } from "./petPosition";
+import { useWorldStore } from "../state/worldStore";
 
 interface ControlsLike {
   target: Vector3;
@@ -31,25 +32,62 @@ interface ControlsLike {
   removeEventListener: (type: string, cb: () => void) => void;
 }
 
-const FOLLOW_RATE = 3; // how briskly the pivot chases the pet (per second)
+const FOLLOW_RATE = 3.4; // how briskly the pivot chases the pet (per second)
+const ZOOM_RATE = 5; // how briskly the camera glides to its target distance
+const LEAD = 0.4; // seconds of look-ahead — the camera anticipates travel
+const MAX_LEAD = 1.6; // cap the look-ahead offset (world units)
 const IDLE_AFTER = 6; // seconds of no input + settled pet before the camera drifts
 const IDLE_DRIFT = 0.05; // rad/sec — a slow cinematic orbit
+const MANUAL_HOLD = 6; // seconds a manual zoom is respected before autonomy resumes
+const AUTO_RATE = 0.6; // how slowly the camera re-takes its own distance
+const MIN_D = 8;
+const MAX_D = 26;
+const WHEEL_SENS = 0.0012; // wheel delta → fractional distance change
 
-/** Keeps the pet framed: each frame it pans BOTH the orbit pivot and the camera
- *  by the same delta, so following never changes the angle or zoom you chose
- *  (the fix for the island sliding off when you orbit). Idle → a slow drift. */
+// Distance the camera prefers for what the pet is doing: in close while it works,
+// back to take in the roam, mid at rest. Eased toward, never snapped.
+function autoDistance(working: boolean, moving: boolean): number {
+  if (working) return 11;
+  if (moving) return 20;
+  return 15;
+}
+
+const clampD = (d: number) => Math.max(MIN_D, Math.min(MAX_D, d));
+
+/** A fluid drone-follow rig. It pans camera + pivot together so the pet stays
+ *  framed at the angle/zoom you chose; eases the zoom itself (OrbitControls dollies
+ *  in hard steps, so we own zoom here); leans slightly toward where the pet is
+ *  heading; and, once you stop touching it, takes its own distance to suit the
+ *  pet's activity and drifts in a slow cinematic orbit. Reduced-motion → snap. */
 function CameraRig({ reduced }: { reduced: boolean }) {
   const camera = useThree((s) => s.camera);
+  const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls) as unknown as ControlsLike | null;
 
   const followed = useRef(new Vector3());
   const want = useRef(new Vector3());
+  const vel = useRef(new Vector3());
   const lastPetXZ = useRef(new Vector3());
+  const offset = useRef(new Vector3());
+  const targetDist = useRef(19);
+  const manualUntil = useRef(0);
   const lastInput = useRef(0);
   const elapsed = useRef(0);
   const inited = useRef(false);
 
-  // Any orbit/zoom interaction stamps the clock so the idle drift backs off.
+  // Own the wheel: ease zoom instead of OrbitControls' hard dolly steps.
+  useEffect(() => {
+    const el = gl.domElement;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      targetDist.current = clampD(targetDist.current * (1 + e.deltaY * WHEEL_SENS));
+      manualUntil.current = elapsed.current + MANUAL_HOLD;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [gl]);
+
+  // Orbit interaction also backs the idle drift off.
   useEffect(() => {
     if (!controls) return;
     const stamp = () => {
@@ -69,19 +107,36 @@ function CameraRig({ reduced }: { reduced: boolean }) {
     elapsed.current = t;
     const dt = Math.min(delta, 0.05);
 
-    want.current.set(petPos.x, petPos.y + 0.6, petPos.z);
+    // Pet velocity (smoothed) from ground-plane deltas → look-ahead + moving flag.
+    const px = petPos.x;
+    const pz = petPos.z;
+    const moved = Math.hypot(px - lastPetXZ.current.x, pz - lastPetXZ.current.z);
+    if (dt > 0) {
+      const vk = reduced ? 1 : 1 - Math.exp(-5 * dt);
+      vel.current.x += ((px - lastPetXZ.current.x) / dt - vel.current.x) * vk;
+      vel.current.z += ((pz - lastPetXZ.current.z) / dt - vel.current.z) * vk;
+    }
+    lastPetXZ.current.set(px, 0, pz);
+
+    let leadX = reduced ? 0 : vel.current.x * LEAD;
+    let leadZ = reduced ? 0 : vel.current.z * LEAD;
+    const leadLen = Math.hypot(leadX, leadZ);
+    if (leadLen > MAX_LEAD) {
+      leadX = (leadX / leadLen) * MAX_LEAD;
+      leadZ = (leadZ / leadLen) * MAX_LEAD;
+    }
+    want.current.set(px + leadX, petPos.y + 0.6, pz + leadZ);
+
     if (!inited.current) {
       followed.current.copy(want.current);
       controls.target.copy(want.current);
-      lastPetXZ.current.set(petPos.x, 0, petPos.z);
       inited.current = true;
     }
 
     const k = reduced ? 1 : 1 - Math.exp(-FOLLOW_RATE * dt);
     followed.current.lerp(want.current, k);
 
-    // Pan rig: move camera + target by the same delta → keeps the pet centered
-    // without disturbing the user's chosen orbit angle or zoom.
+    // Pan camera + target by the same delta → framing holds at your angle/zoom.
     const dx = followed.current.x - controls.target.x;
     const dy = followed.current.y - controls.target.y;
     const dz = followed.current.z - controls.target.z;
@@ -92,21 +147,34 @@ function CameraRig({ reduced }: { reduced: boolean }) {
     camera.position.y += dy;
     camera.position.z += dz;
 
-    if (!reduced) {
-      const moved = Math.hypot(petPos.x - lastPetXZ.current.x, petPos.z - lastPetXZ.current.z);
-      lastPetXZ.current.set(petPos.x, 0, petPos.z);
-      const settled = moved < 0.005; // pet's idle bob doesn't move it on the ground plane
-      if (settled && t - lastInput.current > IDLE_AFTER) {
-        const a = IDLE_DRIFT * dt;
-        const ox = camera.position.x - controls.target.x;
-        const oz = camera.position.z - controls.target.z;
-        const cos = Math.cos(a);
-        const sin = Math.sin(a);
-        camera.position.x = controls.target.x + ox * cos - oz * sin;
-        camera.position.z = controls.target.z + ox * sin + oz * cos;
-      }
+    // Autonomous distance once the user's manual zoom has had its moment.
+    const working = useWorldStore.getState().lumen.mode === "work";
+    const moving = moved > 0.01;
+    if (t > manualUntil.current) {
+      const auto = autoDistance(working, moving);
+      const ak = reduced ? 1 : 1 - Math.exp(-AUTO_RATE * dt);
+      targetDist.current += (auto - targetDist.current) * ak;
     }
 
+    // Ease the camera's distance toward the target (the buttery zoom).
+    offset.current.copy(camera.position).sub(controls.target);
+    const curDist = offset.current.length() || 1;
+    const zk = reduced ? 1 : 1 - Math.exp(-ZOOM_RATE * dt);
+    const newDist = curDist + (clampD(targetDist.current) - curDist) * zk;
+    offset.current.setLength(newDist);
+
+    // Idle cinematic orbit: settled pet + hands off → drift the offset slowly.
+    if (!reduced && moved < 0.005 && t - lastInput.current > IDLE_AFTER) {
+      const a = IDLE_DRIFT * dt;
+      const cos = Math.cos(a);
+      const sin = Math.sin(a);
+      const ox = offset.current.x;
+      const oz = offset.current.z;
+      offset.current.x = ox * cos - oz * sin;
+      offset.current.z = ox * sin + oz * cos;
+    }
+
+    camera.position.copy(controls.target).add(offset.current);
     controls.update();
   });
 
@@ -130,7 +198,7 @@ export function World3D() {
       shadows
       dpr={[1, 1.75]}
       frameloop={reduced ? "demand" : "always"}
-      camera={{ position: [14, 11, 14], fov: 42, near: 0.1, far: 140 }}
+      camera={{ position: [12, 10, 12], fov: 42, near: 0.1, far: 140 }}
       gl={{ antialias: true }}
     >
       {/* Sky, light + fog — driven by real time of day × real weather. */}
@@ -148,8 +216,9 @@ export function World3D() {
       <OrbitControls
         makeDefault
         enablePan={false}
+        enableZoom={false}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.06}
         minDistance={8}
         maxDistance={26}
         minPolarAngle={0.6}
