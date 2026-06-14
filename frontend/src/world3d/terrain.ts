@@ -71,5 +71,5 @@ export const WATER_LEVEL = 0;
  *  & weather radii). Object SIZES (tree/rock/pet scale, geometry dims) do NOT — so the
  *  world grows into a sprawling landscape full of normal-sized things, not a blow-up.
  *  Dial it to re-scale the whole world in one place (set to 1 to restore the original). */
-export const WORLD_SCALE = 7;
-export const ISLAND_MAX_R = 16 * WORLD_SCALE; // =112 — shared by terrain mesh + anything placed on it
+export const WORLD_SCALE = 5;
+export const ISLAND_MAX_R = 16 * WORLD_SCALE; // =80 — shared by terrain mesh + anything placed on it

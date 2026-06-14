@@ -14,7 +14,7 @@ import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
-const COUNT = 60; // scaled up for the bigger island (still sparse per-area — scattered spots)
+const COUNT = 36; // scattered bioluminescent spots, tuned for the ×5 island
 const LIT = 3; // only the first few carry a co-located point-light (perf — NEVER scale this)
 const CAP_BASE = 1.1; // base emissive; ×glowBoost at night
 const LIGHT_BASE = 0.32;

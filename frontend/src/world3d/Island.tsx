@@ -78,7 +78,7 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
   const r = mulberry32(0x9e07);
   const trees: Placement[] = [];
   const rocks: Placement[] = [];
-  for (let i = 0; i < 30000 && (trees.length < 450 || rocks.length < 300); i++) {
+  for (let i = 0; i < 24000 && (trees.length < 260 || rocks.length < 170); i++) {
     const ang = r() * Math.PI * 2;
     const rad = Math.sqrt(r()) * MAX_R * 0.92;
     const x = Math.cos(ang) * rad;
@@ -86,11 +86,11 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
     const y = islandHeight(x, z, MAX_R);
     if (!clearOf(x, z)) continue;
     // Trees ring the open meadow, spaced apart; rocks may sit closer in.
-    if (rad > MEADOW_R && y > 0.7 && y < 2.2 && trees.length < 450) {
+    if (rad > MEADOW_R && y > 0.7 && y < 2.2 && trees.length < 260) {
       if (trees.every((t) => Math.hypot(x - t.x, z - t.z) > TREE_GAP)) {
         trees.push({ x, y: y - 0.1, z, scale: 0.6 + r() * 0.55, rot: r() * Math.PI * 2 });
       }
-    } else if (y > 0.25 && y < 3.2 && rocks.length < 300) {
+    } else if (y > 0.25 && y < 3.2 && rocks.length < 170) {
       rocks.push({ x, y, z, scale: 0.45 + r() * 0.8, rot: r() * Math.PI * 2 });
     }
   }
@@ -104,16 +104,16 @@ function scatterGround(): { bushes: Placement[]; grass: Placement[] } {
   const r = mulberry32(0x5a11);
   const bushes: Placement[] = [];
   const grass: Placement[] = [];
-  for (let i = 0; i < 24000 && (bushes.length < 120 || grass.length < 240); i++) {
+  for (let i = 0; i < 18000 && (bushes.length < 70 || grass.length < 140); i++) {
     const ang = r() * Math.PI * 2;
     const rad = Math.sqrt(r()) * MAX_R * 0.9;
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     const y = islandHeight(x, z, MAX_R);
     if (!clearOf(x, z)) continue;
-    if (rad > MEADOW_R * 0.7 && y > 0.3 && y < 2.2 && bushes.length < 120) {
+    if (rad > MEADOW_R * 0.7 && y > 0.3 && y < 2.2 && bushes.length < 70) {
       bushes.push({ x, y, z, scale: 0.6 + r() * 0.5, rot: r() * Math.PI * 2 });
-    } else if (y > 0.2 && y < 2.6 && grass.length < 240) {
+    } else if (y > 0.2 && y < 2.6 && grass.length < 140) {
       grass.push({ x, y, z, scale: 0.7 + r() * 0.6, rot: r() * Math.PI * 2 });
     }
   }
