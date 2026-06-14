@@ -26,6 +26,8 @@ import { CursorLure } from "./CursorLure";
 import { useWeather } from "./useWeather";
 import { fxFor } from "./weather";
 import { localHour } from "./daylight";
+import { petPos } from "./petPosition";
+import { cameraFocus } from "./cameraFocus";
 
 interface ControlsLike {
   target: Vector3;
@@ -37,13 +39,15 @@ interface ControlsLike {
 const ZOOM_RATE = 5; // how briskly the camera glides to its target distance
 const IDLE_AFTER = 6; // seconds hands-off before the camera drifts in a slow orbit
 const IDLE_DRIFT = 0.05; // rad/sec — a slow cinematic orbit around the diorama
-const MIN_D = 24; // closest zoom — a detail look at part of the island
+const MIN_D = 4; // closest zoom — a close-up of the companion ("see my pet")
 const MAX_D = 70; // farthest — the whole island (radius 16) framed with margin
 const DEFAULT_DIST = 46; // resting distance that frames the island
 const WHEEL_SENS = 0.0012; // wheel delta → fractional distance change
+const FOCUS_FAR = 22; // beyond this the pivot is the island; below, it eases onto the pet
+const FOCUS_NEAR = 8; // at/under this the pivot is fully the pet (a close-up)
 
-// The pivot the camera frames: the island's centre. The whole island stays in
-// view, so the companion is always visible as it roams — no chase needed.
+// The pivot when zoomed out: the island's centre (whole island framed). As you zoom
+// in past FOCUS_FAR the pivot eases onto the companion, so a close zoom = a close-up.
 const ISLAND_CENTER: [number, number, number] = [0, 1.5, 0];
 
 const clampD = (d: number) => Math.max(MIN_D, Math.min(MAX_D, d));
@@ -101,9 +105,25 @@ function CameraRig({ reduced }: { reduced: boolean }) {
     elapsed.current = t;
     const dt = Math.min(delta, 0.05);
 
-    // Pin the pivot to the island centre — the whole island stays framed; the pet
-    // roams within it. The camera frames the world, it does not track the pet.
-    controls.target.set(ISLAND_CENTER[0], ISLAND_CENTER[1], ISLAND_CENTER[2]);
+    // The "see my pet" button asks for a distance — adopt it, then clear the request.
+    if (cameraFocus.request > 0) {
+      targetDist.current = clampD(cameraFocus.request);
+      cameraFocus.request = 0;
+      lastInput.current = t;
+    }
+
+    // Pivot: the island centre when zoomed out; as you zoom in past FOCUS_FAR it eases
+    // onto the companion, so a close zoom becomes a close-up of your pet. Eased so it
+    // never snaps as the pet moves.
+    const dist = clampD(targetDist.current);
+    const focus = Math.max(0, Math.min(1, (FOCUS_FAR - dist) / (FOCUS_FAR - FOCUS_NEAR)));
+    const tx = ISLAND_CENTER[0] + (petPos.x - ISLAND_CENTER[0]) * focus;
+    const ty = ISLAND_CENTER[1] + (petPos.y + 0.3 - ISLAND_CENTER[1]) * focus;
+    const tz = ISLAND_CENTER[2] + (petPos.z - ISLAND_CENTER[2]) * focus;
+    const tk = reduced ? 1 : 1 - Math.exp(-6 * dt);
+    controls.target.x += (tx - controls.target.x) * tk;
+    controls.target.y += (ty - controls.target.y) * tk;
+    controls.target.z += (tz - controls.target.z) * tk;
 
     // Ease the camera's distance toward the wheel-set target (the buttery zoom).
     offset.current.copy(camera.position).sub(controls.target);
@@ -176,7 +196,7 @@ export function World3D() {
         enableDamping
         dampingFactor={0.06}
         mouseButtons={{ LEFT: MOUSE.ROTATE, RIGHT: MOUSE.ROTATE }}
-        minDistance={24}
+        minDistance={4}
         maxDistance={70}
         minPolarAngle={0.35}
         maxPolarAngle={0.85}

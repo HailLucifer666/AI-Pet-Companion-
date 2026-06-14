@@ -8,6 +8,25 @@ import { World3D } from "../../world3d/World3D";
 import { SurfaceOverlay } from "./SurfaceOverlay";
 import { DenHud } from "./DenHud";
 import { CoilRing } from "./CoilRing";
+import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus";
+
+/** Flies the camera in for a close-up of the companion (or back out to the Grove).
+ *  Just nudges the camera's target distance — the rig eases the pivot onto the pet. */
+function SeePetButton() {
+  const [close, setClose] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        const next = !close;
+        cameraFocus.request = next ? SEE_PET_DIST : GROVE_DIST;
+        setClose(next);
+      }}
+      className="pointer-events-auto absolute bottom-8 left-5 select-none rounded-full border border-claw-500/40 bg-ink-950/70 px-3 py-1.5 font-display text-xs font-medium text-ink-200 backdrop-blur-sm transition-colors duration-150 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400"
+    >
+      {close ? "↩ Back to the Grove" : "🔍 See my pet"}
+    </button>
+  );
+}
 
 export default function DenView() {
   const [host, setHost] = useState<HTMLDivElement | null>(null);
@@ -19,10 +38,11 @@ export default function DenView() {
       <div className="pointer-events-none absolute left-5 top-4 select-none">
         <p className="font-display text-sm font-medium tracking-wide text-ink-300/90">The Grove</p>
         {/* pointer-only mechanics — the Places are keyboard-reachable as buttons (PlaceHotspots) */}
-        <p aria-hidden="true" className="text-xs text-ink-500/80">drag to orbit · scroll to zoom · click a place to enter</p>
+        <p aria-hidden="true" className="text-xs text-ink-500/80">drag to orbit · scroll in to meet your pet · click a place to enter</p>
       </div>
       <DenHud />
       <CoilRing />
+      <SeePetButton />
       <SurfaceOverlay container={host} />
     </div>
   );
