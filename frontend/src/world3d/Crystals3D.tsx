@@ -12,6 +12,7 @@ import { freshCrystals, useWorldStore } from "../state/worldStore";
 import { mulberry32 } from "../world/engine/rng";
 import { SPECIES, type CrystalSeed } from "../world/entities/crystalSeed";
 import { crystalPosition, CRYSTAL_COLOR } from "./crystalPlacement";
+import { compostSpec, freshness } from "./compost";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
@@ -77,7 +78,7 @@ function Shape({ seed, matRef }: { seed: CrystalSeed; matRef: React.RefObject<Me
   }
 }
 
-function Crystal({ seed }: { seed: CrystalSeed }) {
+function Crystal({ seed, fresh }: { seed: CrystalSeed; fresh: number }) {
   const reduced = useReducedMotion() ?? false;
   const ref = useRef<Group>(null);
   const matRef = useRef<MeshStandardMaterial>(null);
@@ -87,6 +88,11 @@ function Crystal({ seed }: { seed: CrystalSeed }) {
   const pos = useMemo(() => crystalPosition(seed.seed), [seed.seed]);
   const spin = useMemo(() => 0.15 + mulberry32(seed.seed)() * 0.4, [seed.seed]);
 
+  // Compost: the longer a memory goes unaccessed, the more its crystal sinks toward
+  // the roots, shrinks, and dims (real recency). `fresh` (0..1) comes from the store.
+  const compost = compostSpec(fresh);
+  const sunkY = pos.y - compost.sink;
+
   useFrame((state, delta) => {
     const g = ref.current;
     if (!g) return;
@@ -95,22 +101,20 @@ function Crystal({ seed }: { seed: CrystalSeed }) {
       if (!reduced && freshCrystals.has(seed.id)) flash.current = 1; // a memory just formed here
       freshCrystals.delete(seed.id);
     }
-    if (grow.current < 1) {
-      grow.current = Math.min(1, grow.current + delta * 2.4);
-      g.scale.setScalar(BASE * (1 - Math.pow(1 - grow.current, 3)));
-    }
+    if (grow.current < 1) grow.current = Math.min(1, grow.current + delta * 2.4);
+    const ease = 1 - Math.pow(1 - grow.current, 3);
+    g.scale.setScalar(BASE * compost.scale * ease);
     if (flash.current > 0) flash.current = Math.max(0, flash.current - delta * 1.4);
     if (matRef.current) {
-      matRef.current.emissiveIntensity = CRYSTAL_EMISSIVE * glowBoost(sky.dayness) * (1 + flash.current * 3);
+      matRef.current.emissiveIntensity =
+        CRYSTAL_EMISSIVE * compost.dim * glowBoost(sky.dayness) * (1 + flash.current * 3);
     }
-    if (!reduced) {
-      g.rotation.y += delta * spin;
-      g.position.y = pos.y + Math.sin(state.clock.elapsedTime * 1.3 + seed.id) * 0.03;
-    }
+    g.position.y = sunkY + (reduced ? 0 : Math.sin(state.clock.elapsedTime * 1.3 + seed.id) * 0.03);
+    if (!reduced) g.rotation.y += delta * spin;
   });
 
   return (
-    <group ref={ref} position={[pos.x, pos.y, pos.z]} scale={reduced ? BASE : 0}>
+    <group ref={ref} position={[pos.x, sunkY, pos.z]} scale={reduced ? BASE * compost.scale : 0}>
       <Shape seed={seed} matRef={matRef} />
     </group>
   );
@@ -118,10 +122,12 @@ function Crystal({ seed }: { seed: CrystalSeed }) {
 
 export function Crystals3D() {
   const crystals = useWorldStore((s) => s.crystals);
+  const recencyById = useWorldStore((s) => s.recencyById);
+  const nowMs = Date.now(); // recency moves over days — once per render is plenty
   return (
     <group>
       {crystals.map((c) => (
-        <Crystal key={c.id} seed={c} />
+        <Crystal key={c.id} seed={c} fresh={freshness(recencyById[c.id] ?? null, nowMs)} />
       ))}
     </group>
   );

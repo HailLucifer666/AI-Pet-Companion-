@@ -221,7 +221,7 @@ async def memory_graph(db: aiosqlite.Connection) -> dict:
     """Nodes (id/type/confidence/recency) + similarity edges for the Memory Web.
     Cosine over the stored embeddings, in sqlite-vec; pruned by `graph_edges`."""
     cur = await db.execute(
-        "SELECT id, type, confidence, last_accessed_at, access_count FROM memories"
+        "SELECT id, type, confidence, last_accessed_at, access_count, created_at FROM memories"
         " WHERE superseded_by IS NULL"
     )
     nodes = [
@@ -231,6 +231,7 @@ async def memory_graph(db: aiosqlite.Connection) -> dict:
             "confidence": r["confidence"],
             "last_accessed_at": r["last_accessed_at"],
             "access_count": r["access_count"],
+            "created_at": r["created_at"],
         }
         for r in await cur.fetchall()
     ]

@@ -38,6 +38,7 @@ export interface MemoryGraphNode {
   confidence: number;
   last_accessed_at: string | null;
   access_count: number;
+  created_at: string | null;
 }
 export interface MemoryGraphEdge {
   a: number;

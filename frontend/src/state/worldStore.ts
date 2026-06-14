@@ -10,7 +10,8 @@
  */
 
 import { create } from "zustand";
-import { api, type MemoryGraphEdge, type MemoryType } from "../lib/api";
+import { api, type MemoryGraphEdge, type MemoryGraphNode, type MemoryType } from "../lib/api";
+import { parseSqliteUtc } from "../world3d/compost";
 import { connectSynapse } from "../lib/synapse";
 import type { SSEEvent } from "../lib/sse";
 import { mulberry32 } from "../world/engine/rng";
@@ -37,6 +38,14 @@ const nowMs = () => (typeof performance !== "undefined" ? performance.now() : Da
  *  for each flashes once as it sprouts; Crystals3D consumes the id on first frame. */
 export const freshCrystals = new Set<number>();
 
+/** memory_id → the epoch ms a memory last *mattered* (last accessed, else created).
+ *  Feeds compost: crystals fade + sink the longer they go unaccessed. */
+function recencyMap(nodes: MemoryGraphNode[]): Record<number, number | null> {
+  const map: Record<number, number | null> = {};
+  for (const n of nodes) map[n.id] = parseSqliteUtc(n.last_accessed_at) ?? parseSqliteUtc(n.created_at);
+  return map;
+}
+
 export interface Pulse {
   id: number;
   origin: PulseOrigin;
@@ -52,6 +61,7 @@ interface WorldStore {
   pulses: Pulse[];
   bloomAt: number; // performance.now() of the last level-up (the gate blooms)
   threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
+  recencyById: Record<number, number | null>; // memory_id → last-mattered epoch ms (compost)
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
@@ -74,6 +84,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   pulses: [],
   bloomAt: 0,
   threads: [],
+  recencyById: {},
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
@@ -114,8 +125,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
 
   refreshThreads: async () => {
     try {
-      const { edges } = await api.memoryGraph();
-      set({ threads: edges });
+      const { nodes, edges } = await api.memoryGraph();
+      set({ threads: edges, recencyById: recencyMap(nodes) });
     } catch {
       // keep the last web on a transient failure
     }
@@ -139,6 +150,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
         level: Math.floor(total / 100),
         xpFrac: (((total % 100) + 100) % 100) / 100,
         threads: graph.edges,
+        recencyById: recencyMap(graph.nodes),
       });
     } catch {
       // Offline / backend down: the live stream still plants crystals + ticks XP.
