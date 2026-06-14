@@ -16,6 +16,11 @@ export interface Lure {
 /** Frame-write singleton, read by Lumenform3D. Outside React/zustand on purpose. */
 export const lure: Lure = { x: 0, z: 0, until: 0 };
 
+/** Whether the companion answers the cursor at all. Flipped by the Den's free-roam
+ *  toggle; when off, CursorLure stops writing calls and the pet just lives its own
+ *  FSM life (roam / work / nap). A frame-read singleton like `lure` itself. */
+export const lureControl = { enabled: true };
+
 /** The cursor target to walk toward, or null to defer to the FSM. The pet answers
  *  the lure only when it's resting (work overrides play), motion is allowed, and
  *  the call hasn't decayed. Pure → testable. */

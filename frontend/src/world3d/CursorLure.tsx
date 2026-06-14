@@ -9,7 +9,7 @@
 import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import { Plane, Raycaster, Vector2, Vector3 } from "three";
-import { lure } from "./lure";
+import { lure, lureControl } from "./lure";
 import { petPos } from "./petPosition";
 
 const LURE_HOLD = 2500; // ms the call lingers after the cursor stops moving
@@ -27,6 +27,7 @@ export function CursorLure({ reduced }: { reduced: boolean }) {
     const ground = new Plane(new Vector3(0, 1, 0), 0); // y = -constant
 
     const onMove = (e: PointerEvent) => {
+      if (!lureControl.enabled) return; // free-roam: ignore the cursor, live its own life
       const rect = el.getBoundingClientRect();
       ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;

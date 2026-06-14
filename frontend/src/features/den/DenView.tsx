@@ -11,6 +11,10 @@ import { CoilRing } from "./CoilRing";
 import { MindsEye } from "./MindsEye";
 import { PetChat } from "./PetChat";
 import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus";
+import { lure, lureControl } from "../../world3d/lure";
+
+const PILL =
+  "pointer-events-auto absolute left-5 select-none rounded-full border border-claw-500/40 bg-ink-950/70 px-3 py-1.5 font-display text-xs font-medium text-ink-200 backdrop-blur-sm transition-colors duration-150 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400";
 
 /** Flies the camera in for a close-up of the companion (or back out to the Grove).
  *  Just nudges the camera's target distance — the rig eases the pivot onto the pet. */
@@ -23,9 +27,28 @@ function SeePetButton() {
         cameraFocus.request = next ? SEE_PET_DIST : GROVE_DIST;
         setClose(next);
       }}
-      className="pointer-events-auto absolute bottom-8 left-5 select-none rounded-full border border-claw-500/40 bg-ink-950/70 px-3 py-1.5 font-display text-xs font-medium text-ink-200 backdrop-blur-sm transition-colors duration-150 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400"
+      className={`${PILL} bottom-8`}
     >
       {close ? "↩ Back to the Grove" : "🔍 See my pet"}
+    </button>
+  );
+}
+
+/** Toggles whether the companion follows your cursor. Off = free-roam: it ignores
+ *  the mouse and lives its own FSM life (roam / work / nap). */
+function FreeRoamButton() {
+  const [following, setFollowing] = useState(lureControl.enabled);
+  return (
+    <button
+      onClick={() => {
+        const next = !following;
+        lureControl.enabled = next;
+        if (!next) lure.until = 0; // drop any lingering call immediately
+        setFollowing(next);
+      }}
+      className={`${PILL} bottom-[7.5rem]`}
+    >
+      {following ? "🐾 Following you" : "🍃 Roaming free"}
     </button>
   );
 }
@@ -60,6 +83,7 @@ export default function DenView() {
       <PetChat />
       <CoilRing />
       <SeePetButton />
+      <FreeRoamButton />
       <button
         onClick={() => setMindOpen(true)}
         className="pointer-events-auto absolute bottom-[4.25rem] left-5 select-none rounded-full border border-claw-500/40 bg-ink-950/70 px-3 py-1.5 font-display text-xs font-medium text-ink-200 backdrop-blur-sm transition-colors duration-150 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400"
