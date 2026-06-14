@@ -72,9 +72,10 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
     }
     if (amb.current) {
       amb.current.color.lerp(tmpAmb.set(base.ambient), k);
-      // Scale ambient with daylight so night sinks dark (≈0.22) and the emissive
-      // crystals/pet/mushrooms own it; day fills to ≈0.62.
-      const ambTarget = (0.22 + base.dayness * 0.4) * (1 - fx.dim * 0.4);
+      // Scale ambient with daylight so night stays moody (≈0.30 — lifted a touch so
+      // shapes read clean, not muddy) while the emissive crystals/pet/mushrooms still
+      // own it; day fills to ≈0.64.
+      const ambTarget = (0.3 + base.dayness * 0.34) * (1 - fx.dim * 0.4);
       amb.current.intensity += (ambTarget - amb.current.intensity) * k;
     }
     if (rim.current) {

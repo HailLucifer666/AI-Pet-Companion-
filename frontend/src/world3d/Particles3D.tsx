@@ -13,7 +13,7 @@ import { makeField, motePosition } from "./particles/flow";
 import { WORLD } from "./palette";
 import { WORLD_SCALE } from "./terrain";
 
-const COUNT = 360; // motes over the ×5 island (cheap Points — still one draw call)
+const COUNT = 260; // motes over the ×5 island (cheap Points — still one draw call); thinned for a cleaner sky
 const FIELD_R = 13 * WORLD_SCALE;
 
 export function Particles3D() {

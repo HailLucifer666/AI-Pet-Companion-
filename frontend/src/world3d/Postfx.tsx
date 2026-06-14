@@ -16,7 +16,7 @@ export function Postfx() {
   if (reduced) return null;
 
   return (
-    <EffectComposer>
+    <EffectComposer multisampling={8}>
       <Bloom
         intensity={0.7}
         luminanceThreshold={0.9}
