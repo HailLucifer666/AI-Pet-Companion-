@@ -5,8 +5,8 @@
  *  real agent events stream into its glowing centre (GATE_POINT). Ember palette,
  *  brighter at night via glowBoost. Reduced-motion → fill sits at value, no flash. */
 
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
@@ -25,8 +25,19 @@ const nowMs = () => (typeof performance !== "undefined" ? performance.now() : 0)
 
 export function SporeGate3D() {
   const reduced = useReducedMotion() ?? false;
+  const invalidate = useThree((s) => s.invalidate);
   const baseY = islandHeight(GX, GZ, ISLAND_MAX_R);
   const coreLocalY = GATE_POINT.y - baseY; // GATE_POINT is world-space; group sits at baseY
+
+  // Under reduced-motion the canvas renders on demand, so a real XP change must
+  // queue a frame for the fill/bloom to apply (useFrame reads the store via getState).
+  useEffect(
+    () =>
+      useWorldStore.subscribe((s, p) => {
+        if (s.xpFrac !== p.xpFrac || s.bloomAt !== p.bloomAt) invalidate();
+      }),
+    [invalidate],
+  );
 
   const group = useRef<Group>(null);
   const fill = useRef<Mesh>(null);

@@ -56,6 +56,7 @@ interface WorldStore {
   removeCrystal: (id: number) => void;
   setXp: (total: number) => void;
   addPulse: (origin: PulseOrigin) => void;
+  prunePulses: () => void;
   bloom: () => void;
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
@@ -83,6 +84,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
 
   removeCrystal: (id) =>
     set((state) => {
+      freshCrystals.delete(id); // drop a never-mounted fresh id so the set can't leak
       if (!state.crystals.some((c) => c.id === id)) return state;
       return { crystals: state.crystals.filter((c) => c.id !== id) };
     }),
@@ -95,6 +97,14 @@ export const useWorldStore = create<WorldStore>((set) => ({
       const t = nowMs();
       const live = state.pulses.filter((p) => t - p.bornMs < PULSE_DURATION); // drop finished
       return { pulses: [...live, { id: pulseId++, origin, bornMs: t }].slice(-MAX_PULSES) };
+    }),
+
+  prunePulses: () =>
+    set((state) => {
+      if (state.pulses.length === 0) return state;
+      const t = nowMs();
+      const live = state.pulses.filter((p) => t - p.bornMs < PULSE_DURATION);
+      return live.length === state.pulses.length ? state : { pulses: live }; // unmount finished motes
     }),
 
   bloom: () => set(() => ({ bloomAt: nowMs() })),
@@ -185,7 +195,10 @@ export function connect(): void {
     const event = toWorldEvent(ev);
     if (event) store.dispatch(event);
   });
-  idleTimer = setInterval(() => store.tickIdle(), 700);
+  idleTimer = setInterval(() => {
+    store.tickIdle();
+    store.prunePulses(); // evict finished pulses so their Mote components unmount
+  }, 700);
 }
 
 export function disconnectWorld(): void {

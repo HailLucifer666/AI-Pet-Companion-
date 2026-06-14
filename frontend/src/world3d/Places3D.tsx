@@ -46,7 +46,8 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
           <coneGeometry args={[0.1, 0.3, 5]} />
           <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={hot ? 3.0 : 1.8} flatShading />
         </mesh>
-        <pointLight color={WORLD.ember} intensity={hot ? 7 : 4} distance={8} decay={2} position={[0, 0.5, 0]} />
+        {/* the fire's light only when it matters — the emissive flame carries the cold state */}
+        {hot && <pointLight color={WORLD.ember} intensity={7} distance={8} decay={2} position={[0, 0.5, 0]} />}
       </group>
     );
   }
@@ -56,7 +57,7 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
         {[-0.26, 0, 0.26].map((dx, i) => (
           <mesh key={i} position={[dx, 0.26 + (i === 1 ? 0.06 : 0), 0]} castShadow>
             <coneGeometry args={[0.12, 0.5, 5]} />
-            <meshStandardMaterial color={0x49d39a} emissive={0x49d39a} emissiveIntensity={hovered ? 1.8 : 0.85} flatShading />
+            <meshStandardMaterial color={WORLD.garden} emissive={WORLD.garden} emissiveIntensity={hovered ? 1.8 : 0.85} flatShading />
           </mesh>
         ))}
       </group>

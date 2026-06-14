@@ -7,8 +7,8 @@
  *  Reduced-motion → it sits, still, exactly where the state says it should be.
  */
 
-import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
@@ -30,6 +30,17 @@ const groundY = (x: number, z: number) => islandHeight(x, z, ISLAND_MAX_R);
 export function Lumenform3D() {
   const reduced = useReducedMotion() ?? false;
   const stage = useWorldStore((s) => s.stage);
+  const invalidate = useThree((s) => s.invalidate);
+
+  // Under reduced-motion the canvas renders on demand; an FSM transition (or the
+  // 700ms idle tick) must queue a frame so the pet snaps to its new target.
+  useEffect(
+    () =>
+      useWorldStore.subscribe((s, p) => {
+        if (s.lumen !== p.lumen) invalidate();
+      }),
+    [invalidate],
+  );
 
   const baseScale = 0.95 + stage * 0.12; // grows with life stage — the companion is the subject
   const start = useMemo(() => placeTarget("home"), []);

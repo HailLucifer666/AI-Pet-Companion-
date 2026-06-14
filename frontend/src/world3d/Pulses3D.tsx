@@ -5,7 +5,7 @@
  *  `pulse.ts`. Reduced-motion → a brief static glow at the origin, no travel. */
 
 import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import { AdditiveBlending, type Mesh } from "three";
 import { useWorldStore } from "../state/worldStore";
@@ -31,11 +31,15 @@ const nowMs = () => (typeof performance !== "undefined" ? performance.now() : 0)
 function Mote({ origin, bornMs, reduced }: { origin: PulseOrigin; bornMs: number; reduced: boolean }) {
   const mesh = useRef<Mesh>(null);
   const start = useMemo(() => originPoint(origin), [origin]);
+  const invalidate = useThree((s) => s.invalidate);
 
   useFrame(() => {
     const m = mesh.current;
     if (!m) return;
     const t = pulseT(bornMs, nowMs());
+    // On-demand mode renders only when asked: keep frames coming while in flight,
+    // then stop (the pulse settles / unmounts). Harmless under always-mode.
+    if (!pulseDone(t)) invalidate();
 
     if (reduced) {
       // No travel: a brief glow at the origin that fades over the lifetime.

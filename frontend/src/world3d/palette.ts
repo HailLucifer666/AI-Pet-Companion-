@@ -24,6 +24,9 @@ export const WORLD = {
   pine: 0x4f9a58,
   pineHi: 0x6cbb6c,
 
+  // Memory Garden green — the sprout marker + its glow.
+  garden: 0x49d39a,
+
   // The ember accent (matches the UI's --color-claw) for the companion/crystals.
   ember: 0xe2a04a,
   emberHi: 0xf6dba6,
