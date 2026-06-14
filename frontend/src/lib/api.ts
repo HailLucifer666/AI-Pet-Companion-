@@ -31,6 +31,24 @@ export interface Memory {
   created_at: string;
 }
 
+/** The Living Memory Web: kept memories + similarity links (real embeddings). */
+export interface MemoryGraphNode {
+  id: number;
+  type: MemoryType;
+  confidence: number;
+  last_accessed_at: string | null;
+  access_count: number;
+}
+export interface MemoryGraphEdge {
+  a: number;
+  b: number;
+  sim: number; // cosine similarity 0..1
+}
+export interface MemoryGraph {
+  nodes: MemoryGraphNode[];
+  edges: MemoryGraphEdge[];
+}
+
 export interface ProfileEntry {
   key: string;
   value: string;
@@ -144,6 +162,7 @@ export const api = {
     get<{ memories: Memory[] }>(
       `/memory?q=${encodeURIComponent(q)}${type ? `&type=${type}` : ""}`,
     ),
+  memoryGraph: () => get<MemoryGraph>("/memory/graph"),
   createMemory: (body: { type: MemoryType; content: string }) =>
     request<{ id: number | null }>("POST", "/memory", body),
   updateMemory: (id: number, content: string) =>
@@ -172,6 +191,7 @@ export const queryKeys = {
   sessions: ["sessions"] as const,
   sessionMessages: (id: string) => ["sessions", id, "messages"] as const,
   memory: (q: string, type: string) => ["memory", q, type] as const,
+  memoryGraph: ["memory", "graph"] as const,
   profile: ["profile"] as const,
   notes: (q: string) => ["notes", q] as const,
 };

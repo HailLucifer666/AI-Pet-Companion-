@@ -10,7 +10,7 @@
  */
 
 import { create } from "zustand";
-import { api, type MemoryType } from "../lib/api";
+import { api, type MemoryGraphEdge, type MemoryType } from "../lib/api";
 import { connectSynapse } from "../lib/synapse";
 import type { SSEEvent } from "../lib/sse";
 import { mulberry32 } from "../world/engine/rng";
@@ -51,6 +51,7 @@ interface WorldStore {
   level: number;
   pulses: Pulse[];
   bloomAt: number; // performance.now() of the last level-up (the gate blooms)
+  threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
@@ -58,6 +59,7 @@ interface WorldStore {
   addPulse: (origin: PulseOrigin) => void;
   prunePulses: () => void;
   bloom: () => void;
+  refreshThreads: () => Promise<void>;
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
   tickIdle: () => void;
@@ -71,6 +73,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   level: 0,
   pulses: [],
   bloomAt: 0,
+  threads: [],
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
@@ -109,16 +112,34 @@ export const useWorldStore = create<WorldStore>((set) => ({
 
   bloom: () => set(() => ({ bloomAt: nowMs() })),
 
+  refreshThreads: async () => {
+    try {
+      const { edges } = await api.memoryGraph();
+      set({ threads: edges });
+    } catch {
+      // keep the last web on a transient failure
+    }
+  },
+
   hydrate: async () => {
     try {
-      const [{ memories }, petRes] = await Promise.all([api.memory(), api.pet()]);
+      const [{ memories }, petRes, graph] = await Promise.all([
+        api.memory(),
+        api.pet(),
+        api.memoryGraph().catch(() => ({ nodes: [], edges: [] })),
+      ]);
       // Newest last so the MAX_CRYSTALS cap keeps the most recent if over the limit.
       const ordered = [...memories].reverse();
       const crystals = ordered
         .map((m) => makeCrystalSeed(m.id, m.type))
         .slice(-MAX_CRYSTALS);
       const total = petRes.pet?.xp ?? 0;
-      set({ crystals, level: Math.floor(total / 100), xpFrac: (((total % 100) + 100) % 100) / 100 });
+      set({
+        crystals,
+        level: Math.floor(total / 100),
+        xpFrac: (((total % 100) + 100) % 100) / 100,
+        threads: graph.edges,
+      });
     } catch {
       // Offline / backend down: the live stream still plants crystals + ticks XP.
     }
@@ -182,10 +203,12 @@ export function connect(): void {
       store.addCrystal(Number(ev.memory_id) || 0, String(ev.memory_type || "fact") as MemoryType);
       store.dispatch({ kind: "memory-formed", memoryId: Number(ev.memory_id) || 0 });
       store.addPulse("garden");
+      void store.refreshThreads(); // the web gained a node — re-link it
       return;
     }
     if (ev.type === "memory.forgotten") {
       store.removeCrystal(Number(ev.memory_id) || 0);
+      void store.refreshThreads();
       return;
     }
     // A real tool run / skill draft sends a pulse from its origin, then still

@@ -14,6 +14,7 @@ import { Island } from "./Island";
 import { GlowMushrooms3D } from "./GlowMushrooms3D";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
+import { MemoryThreads3D } from "./MemoryThreads3D";
 import { Places3D } from "./Places3D";
 import { SporeGate3D } from "./SporeGate3D";
 import { Pulses3D } from "./Pulses3D";
@@ -180,6 +181,7 @@ export function World3D() {
       <GlowMushrooms3D reduced={reduced} />
       <Lumenform3D />
       <Crystals3D />
+      <MemoryThreads3D />
       <Places3D />
       <SporeGate3D />
       <Pulses3D />

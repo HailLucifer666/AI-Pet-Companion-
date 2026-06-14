@@ -190,3 +190,57 @@ def _fts_escape(query: str) -> str:
     """Quote each term so user text can't break FTS5 query syntax."""
     terms = [t.replace('"', '""') for t in query.split() if t.strip()]
     return " OR ".join(f'"{t}"' for t in terms)
+
+
+# ── Living Memory Web: a similarity graph over the kept memories ──────────────
+
+GRAPH_SIM_THRESHOLD = 0.45  # cosine ≥ this → the two memories are "related"
+GRAPH_TOP_K = 3  # keep each memory's strongest few links so the web stays legible
+
+
+def graph_edges(
+    pairs: list[tuple[int, int, float]], threshold: float, top_k: int
+) -> list[tuple[int, int, float]]:
+    """Pure: from all (a, b, similarity) pairs keep those ≥ threshold, then each
+    node's `top_k` strongest links, de-duplicated and ordered. No DB/IO."""
+    strong = [(a, b, s) for (a, b, s) in pairs if s >= threshold]
+    by_node: dict[int, list[tuple[float, int]]] = {}
+    sim_by_pair: dict[tuple[int, int], float] = {}
+    for a, b, s in strong:
+        by_node.setdefault(a, []).append((s, b))
+        by_node.setdefault(b, []).append((s, a))
+        sim_by_pair[(min(a, b), max(a, b))] = s
+    keep: set[tuple[int, int]] = set()
+    for node, links in by_node.items():
+        for s, other in sorted(links, reverse=True)[:top_k]:
+            keep.add((min(node, other), max(node, other)))
+    return [(a, b, sim_by_pair[(a, b)]) for (a, b) in sorted(keep)]
+
+
+async def memory_graph(db: aiosqlite.Connection) -> dict:
+    """Nodes (id/type/confidence/recency) + similarity edges for the Memory Web.
+    Cosine over the stored embeddings, in sqlite-vec; pruned by `graph_edges`."""
+    cur = await db.execute(
+        "SELECT id, type, confidence, last_accessed_at, access_count FROM memories"
+        " WHERE superseded_by IS NULL"
+    )
+    nodes = [
+        {
+            "id": r["id"],
+            "type": r["type"],
+            "confidence": r["confidence"],
+            "last_accessed_at": r["last_accessed_at"],
+            "access_count": r["access_count"],
+        }
+        for r in await cur.fetchall()
+    ]
+    cur = await db.execute(
+        "SELECT v1.memory_id AS a, v2.memory_id AS b,"
+        " 1.0 - vec_distance_cosine(v1.embedding, v2.embedding) AS sim"
+        " FROM vec_memories v1 JOIN vec_memories v2 ON v2.memory_id > v1.memory_id"
+        " WHERE v1.memory_id IN (SELECT id FROM memories WHERE superseded_by IS NULL)"
+        " AND v2.memory_id IN (SELECT id FROM memories WHERE superseded_by IS NULL)"
+    )
+    pairs = [(r["a"], r["b"], float(r["sim"])) for r in await cur.fetchall()]
+    edges = graph_edges(pairs, GRAPH_SIM_THRESHOLD, GRAPH_TOP_K)
+    return {"nodes": nodes, "edges": [{"a": a, "b": b, "sim": round(s, 4)} for a, b, s in edges]}

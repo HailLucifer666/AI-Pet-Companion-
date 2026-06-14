@@ -321,6 +321,12 @@ async def list_memory(request: Request, q: str = "", type: str | None = None):
     return {"memories": [m.__dict__ for m in memories]}
 
 
+@api_router.get("/memory/graph")
+async def memory_graph(request: Request):
+    """The Living Memory Web: nodes + similarity edges over the kept memories."""
+    return await store.memory_graph(request.app.state.db)
+
+
 @api_router.post("/memory")
 async def create_memory(body: MemoryCreate, request: Request):
     if body.type not in store.MEMORY_TYPES:
