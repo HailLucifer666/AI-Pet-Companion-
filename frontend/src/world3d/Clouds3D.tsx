@@ -26,25 +26,28 @@ interface Puff {
   sz: number;
 }
 
+// Placed HIGH and over the island (not out at sea): the high-diorama camera frames
+// the whole island, so clusters that used to ring it at mid-height now read as
+// floating rocks. Keeping them high + central + flat makes them read as sky again.
 function buildPuffs(): Puff[] {
   const r = mulberry32(0xc10d);
   const puffs: Puff[] = [];
   let clusters = 0;
   while (puffs.length < PUFFS && clusters < 12) {
     const ang = r() * Math.PI * 2;
-    const rad = 12 + r() * 22;
+    const rad = 3 + r() * 14; // 3..17 — over the island, not floating out over the sea
     const cx = Math.cos(ang) * rad;
     const cz = Math.sin(ang) * rad;
-    const cy = 14 + r() * 7;
+    const cy = 26 + r() * 9; // 26..35 — high in the sky, reads as overcast not rim-rock
     const n = 3 + Math.floor(r() * 2);
     for (let i = 0; i < n && puffs.length < PUFFS; i++) {
       puffs.push({
-        x: cx + (r() - 0.5) * 3.2,
-        y: cy + (r() - 0.5) * 1.2,
-        z: cz + (r() - 0.5) * 3.2,
-        sx: 2.4 + r() * 1.8,
-        sy: 1.0 + r() * 0.6,
-        sz: 2.4 + r() * 1.8,
+        x: cx + (r() - 0.5) * 4,
+        y: cy + (r() - 0.5) * 1.4,
+        z: cz + (r() - 0.5) * 4,
+        sx: 3.4 + r() * 2.4, // wider + flatter → a cloud sheet, not a faceted blob
+        sy: 0.6 + r() * 0.45,
+        sz: 3.4 + r() * 2.4,
       });
     }
     clusters++;
@@ -77,7 +80,7 @@ export function Clouds3D({ amount, reduced }: { amount: number; reduced: boolean
       group.current.position.z = Math.cos(t * 0.015) * 3;
     }
     if (mat.current) {
-      const target = Math.min(0.92, amount);
+      const target = Math.min(0.55, amount); // wispy ceiling — soft cloud, not solid rock
       const k = reduced ? 1 : Math.min(1, delta * 1.2);
       mat.current.opacity += (target - mat.current.opacity) * k;
     }
@@ -86,7 +89,7 @@ export function Clouds3D({ amount, reduced }: { amount: number; reduced: boolean
   return (
     <group ref={group}>
       <instancedMesh ref={mesh} args={[undefined, undefined, PUFFS]} frustumCulled={false}>
-        <icosahedronGeometry args={[1, 0]} />
+        <icosahedronGeometry args={[1, 1]} />
         <meshStandardMaterial
           ref={mat}
           color={CLOUD_COLOR}

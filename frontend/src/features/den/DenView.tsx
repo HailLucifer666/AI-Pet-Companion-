@@ -17,7 +17,7 @@ export default function DenView() {
       <div className="den-atmosphere" aria-hidden />
       <div className="pointer-events-none absolute left-5 top-4 select-none">
         <p className="font-display text-sm font-medium tracking-wide text-ink-300/90">The Grove</p>
-        <p className="text-xs text-ink-500/80">drag to move · scroll to zoom · click a place to enter</p>
+        <p className="text-xs text-ink-500/80">drag to orbit · scroll to zoom · click a place to enter</p>
       </div>
       <DenHud />
       <SurfaceOverlay container={host} />
