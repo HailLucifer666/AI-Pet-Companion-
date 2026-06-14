@@ -6,16 +6,19 @@
  *  or the graph changes; safe under reduced-motion's on-demand frameloop. */
 
 import { useMemo } from "react";
-import { Line } from "@react-three/drei";
+import { QuadraticBezierLine } from "@react-three/drei";
 import { useWorldStore } from "../state/worldStore";
 import { crystalPosition } from "./crystalPlacement";
+import { threadArc, type Vec3 } from "./thread";
 
 const THREAD_COLOR = 0x6be9ff; // mycelial cyan
-const Y_LIFT = 0.4; // raise the filament toward the crystal's mid-height
+const Y_LIFT = 0.7; // raise the endpoint to the crystal's body, not its base
 
 interface Thread {
   key: string;
-  points: [[number, number, number], [number, number, number]];
+  start: Vec3;
+  end: Vec3;
+  mid: Vec3; // arc control point — lifts the filament over the terrain
   sim: number;
 }
 
@@ -24,7 +27,7 @@ export function MemoryThreads3D() {
   const threads = useWorldStore((s) => s.threads);
 
   const lines = useMemo<Thread[]>(() => {
-    const posById = new Map<number, [number, number, number]>();
+    const posById = new Map<number, Vec3>();
     for (const c of crystals) {
       const p = crystalPosition(c.seed);
       posById.set(c.id, [p.x, p.y + Y_LIFT, p.z]);
@@ -33,7 +36,7 @@ export function MemoryThreads3D() {
     for (const e of threads) {
       const a = posById.get(e.a);
       const b = posById.get(e.b);
-      if (a && b) out.push({ key: `${e.a}-${e.b}`, points: [a, b], sim: e.sim });
+      if (a && b) out.push({ key: `${e.a}-${e.b}`, start: a, end: b, mid: threadArc(a, b), sim: e.sim });
     }
     return out;
   }, [crystals, threads]);
@@ -43,13 +46,15 @@ export function MemoryThreads3D() {
   return (
     <group>
       {lines.map((l) => (
-        <Line
+        <QuadraticBezierLine
           key={l.key}
-          points={l.points}
+          start={l.start}
+          end={l.end}
+          mid={l.mid}
           color={THREAD_COLOR}
-          lineWidth={0.6 + l.sim * 1.8}
+          lineWidth={0.7 + l.sim * 1.8}
           transparent
-          opacity={0.1 + l.sim * 0.3}
+          opacity={0.18 + l.sim * 0.34}
         />
       ))}
     </group>

@@ -11,6 +11,13 @@ import { api, queryKeys, type MemoryType } from "../../lib/api";
 import { CRYSTAL_COLOR } from "../../world3d/crystalPlacement";
 
 const TYPE_ORDER: MemoryType[] = ["identity", "preference", "project", "event", "fact"];
+const TYPE_LABEL: Record<MemoryType, string> = {
+  identity: "Identity",
+  preference: "Preference",
+  project: "Project",
+  event: "Event",
+  fact: "Fact",
+};
 const CX = 400;
 const CY = 400;
 const R = 320;
@@ -41,13 +48,23 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
     const nodes = [...(graph.data?.nodes ?? [])].sort(
       (a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type) || a.id - b.id,
     );
-    const n = nodes.length || 1;
+    const n = nodes.length;
+    if (n === 0) return [];
+    // Cluster each memory type into its own arc, with a gap between clusters so
+    // the kinds read as distinct constellations rather than one even ring.
+    let groups = 0;
+    for (let i = 0; i < n; i++) if (i === 0 || nodes[i].type !== nodes[i - 1].type) groups++;
+    const GAP = 1.4; // a between-cluster gap is 1.4 node-steps wide
+    const unit = (Math.PI * 2) / (n + groups * GAP);
+    let ang = -Math.PI / 2;
     return nodes.map((node, i) => {
-      const ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+      if (i === 0 || node.type !== nodes[i - 1].type) ang += unit * GAP;
+      const a = ang;
+      ang += unit;
       return {
         id: node.id,
-        x: CX + R * Math.cos(ang),
-        y: CY + R * Math.sin(ang),
+        x: CX + R * Math.cos(a),
+        y: CY + R * Math.sin(a),
         type: node.type,
         confidence: node.confidence,
       };
@@ -64,6 +81,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
 
   const edges = graph.data?.edges ?? [];
   const empty = !graph.isLoading && placed.length === 0;
+  const presentTypes = TYPE_ORDER.filter((t) => placed.some((p) => p.type === t));
 
   return (
     <div
@@ -80,6 +98,20 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
             <p className="text-xs text-ink-400">
               {placed.length} memories · links by real similarity · hover to read
             </p>
+            {presentTypes.length > 0 && (
+              <ul className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1" aria-label="Memory kinds">
+                {presentTypes.map((t) => (
+                  <li key={t} className="flex items-center gap-1.5 text-[11px] text-ink-400">
+                    <span
+                      className="inline-block size-2 rounded-full"
+                      style={{ backgroundColor: hex(CRYSTAL_COLOR[t]), boxShadow: `0 0 6px ${hex(CRYSTAL_COLOR[t])}` }}
+                      aria-hidden
+                    />
+                    {TYPE_LABEL[t]}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -96,6 +128,11 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
           </p>
         ) : (
           <svg viewBox="0 0 800 800" className="aspect-square w-full" role="img" aria-label="Memory similarity graph">
+            <defs>
+              <filter id="me-node-glow" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="7" />
+              </filter>
+            </defs>
             {edges.map((e) => {
               const a = posById.get(e.a);
               const b = posById.get(e.b);
@@ -119,6 +156,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
             {placed.map((p) => {
               const lit = hovered === null || hovered === p.id;
               const r = 6 + p.confidence * 7;
+              const color = hex(CRYSTAL_COLOR[p.type]);
               return (
                 <g
                   key={p.id}
@@ -126,8 +164,9 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
                   onMouseLeave={() => setHovered(null)}
                   style={{ cursor: "pointer" }}
                 >
-                  <circle cx={p.x} cy={p.y} r={r} fill={hex(CRYSTAL_COLOR[p.type])} opacity={lit ? 0.55 + p.confidence * 0.45 : 0.25} />
-                  <title>{`${p.type}: ${contentById.get(p.id) ?? "…"}`}</title>
+                  <circle cx={p.x} cy={p.y} r={r * 2} fill={color} opacity={lit ? 0.28 : 0.08} filter="url(#me-node-glow)" />
+                  <circle cx={p.x} cy={p.y} r={r} fill={color} opacity={lit ? 0.6 + p.confidence * 0.4 : 0.25} />
+                  <title>{`${TYPE_LABEL[p.type]}: ${contentById.get(p.id) ?? "…"}`}</title>
                 </g>
               );
             })}
@@ -136,7 +175,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
 
         {hovered !== null && (
           <p className="mt-2 truncate rounded-lg border border-ink-700/50 bg-ink-900/80 px-3 py-2 text-center text-sm text-ink-200">
-            <span className="text-claw-300">{posById.get(hovered)?.type}</span> · {contentById.get(hovered) ?? "…"}
+            <span className="text-claw-300">{(() => { const t = posById.get(hovered)?.type; return t ? TYPE_LABEL[t] : ""; })()}</span> · {contentById.get(hovered) ?? "…"}
           </p>
         )}
       </div>
