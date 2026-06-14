@@ -31,6 +31,12 @@ export const WORLD = {
   ember: 0xe2a04a,
   emberHi: 0xf6dba6,
 
+  // The companion robot: dark plated body, glowing cyan screen-face + ember glow.
+  botBody: 0x2b3354, // dark indigo plate
+  botPlate: 0x3c466e, // lighter indigo edge plate (higher stages)
+  botEye: 0x7fe9ff, // bright cyan screen glow (eyes)
+  botGlow: 0xe2a04a, // ember — antenna tips + point light, ties to the companion
+
   // Cool back-rim light — separates silhouettes from the indigo fog.
   rim: 0x8b7bd6,
   // Cool accent for the minority of drifting motes (warm uses emberHi).
