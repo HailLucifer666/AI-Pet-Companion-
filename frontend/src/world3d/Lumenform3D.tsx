@@ -136,21 +136,21 @@ export function Lumenform3D() {
   return (
     <group ref={group} position={[start.x, groundY(start.x, start.z) + LIFT, start.z]} scale={baseScale}>
       {/* the living light */}
-      <pointLight ref={light} color={WORLD.ember} intensity={1.8} distance={7} decay={2} position={[0, 0.2, 0]} />
+      <pointLight ref={light} color={WORLD.ember} intensity={1.8} distance={7} decay={2} position={[0, 0.25, 0]} />
 
-      {/* layered crystalline body: a glassy faceted shell over an inner wireframe
-          over a glowing emissive core (what Bloom picks up) — reads as a lumenform,
-          not a plain blob. The core (ref) carries the breath + mode glow. */}
-      <mesh castShadow scale-y={0.92}>
-        <icosahedronGeometry args={[0.52, 2]} />
+      {/* ── torso: a layered crystalline body — a glassy faceted shell over a
+          wireframe over a glowing emissive core (what Bloom picks up). The core
+          (ref) carries the breath + mode glow. ── */}
+      <mesh castShadow scale-y={0.9}>
+        <icosahedronGeometry args={[0.46, 2]} />
         <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.25} transparent opacity={0.42} roughness={0.12} metalness={0.55} flatShading />
       </mesh>
-      <mesh scale-y={0.92}>
-        <icosahedronGeometry args={[0.5, 1]} />
+      <mesh scale-y={0.9}>
+        <icosahedronGeometry args={[0.44, 1]} />
         <meshStandardMaterial color={WORLD.emberHi} wireframe transparent opacity={0.16} />
       </mesh>
-      <mesh ref={body} scale-y={0.9}>
-        <icosahedronGeometry args={[0.34, 1]} />
+      <mesh ref={body} scale-y={0.88}>
+        <icosahedronGeometry args={[0.3, 1]} />
         <meshStandardMaterial
           ref={mat}
           color={WORLD.emberHi}
@@ -163,29 +163,58 @@ export function Lumenform3D() {
         />
       </mesh>
 
-      {/* eyes — on the +Z face of the core, so they lead the way it walks */}
-      <mesh position={[-0.13, 0.06, 0.32]}>
-        <sphereGeometry args={[0.055, 8, 8]} />
-        <meshStandardMaterial color={0x14161d} />
-      </mesh>
-      <mesh position={[0.13, 0.06, 0.32]}>
-        <sphereGeometry args={[0.055, 8, 8]} />
-        <meshStandardMaterial color={0x14161d} />
-      </mesh>
+      {/* ── head: a smaller crystal dome up front; eyes + ears ride it so they
+          lead the way it walks (+Z is forward). ── */}
+      <group position={[0, 0.34, 0.22]}>
+        <mesh castShadow>
+          <icosahedronGeometry args={[0.24, 1]} />
+          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.55} flatShading roughness={0.3} metalness={0.3} />
+        </mesh>
+        <mesh position={[-0.1, 0.02, 0.2]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color={0x14161d} />
+        </mesh>
+        <mesh position={[0.1, 0.02, 0.2]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshStandardMaterial color={0x14161d} />
+        </mesh>
+        {/* ears appear from the Juvenile stage */}
+        {stage >= 2 && (
+          <>
+            <mesh position={[-0.13, 0.22, 0]} rotation-z={0.32} castShadow>
+              <coneGeometry args={[0.1, 0.28, 5]} />
+              <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.5} flatShading />
+            </mesh>
+            <mesh position={[0.13, 0.22, 0]} rotation-z={-0.32} castShadow>
+              <coneGeometry args={[0.1, 0.28, 5]} />
+              <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.5} flatShading />
+            </mesh>
+          </>
+        )}
+      </group>
 
-      {/* ears appear from the Juvenile stage */}
-      {stage >= 2 && (
-        <>
-          <mesh position={[-0.26, 0.46, 0]} rotation-z={0.3} castShadow>
-            <coneGeometry args={[0.14, 0.34, 5]} />
-            <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.5} flatShading />
-          </mesh>
-          <mesh position={[0.26, 0.46, 0]} rotation-z={-0.3} castShadow>
-            <coneGeometry args={[0.14, 0.34, 5]} />
-            <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.5} flatShading />
-          </mesh>
-        </>
-      )}
+      {/* ── four stubby legs (apex down) ── */}
+      {[
+        [-0.2, 0.16],
+        [0.2, 0.16],
+        [-0.2, -0.16],
+        [0.2, -0.16],
+      ].map(([x, z], i) => (
+        <mesh key={i} position={[x, -0.34, z]} rotation-x={Math.PI} castShadow>
+          <coneGeometry args={[0.08, 0.3, 4]} />
+          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.3} flatShading roughness={0.6} />
+        </mesh>
+      ))}
+
+      {/* ── a wisp tail of light, curling up at the back (−Z trails behind travel) ── */}
+      <mesh position={[0, 0.06, -0.4]}>
+        <icosahedronGeometry args={[0.12, 0]} />
+        <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={1.1} flatShading transparent opacity={0.9} />
+      </mesh>
+      <mesh position={[0, 0.2, -0.5]}>
+        <icosahedronGeometry args={[0.08, 0]} />
+        <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={1.2} flatShading transparent opacity={0.85} />
+      </mesh>
 
       {/* emoji bubble above the head — shows what it's doing right now */}
       <PetBubble />
