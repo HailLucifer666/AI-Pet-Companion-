@@ -8,7 +8,6 @@
 
 import type { Gesture } from "../world/entities/lumenform/LumenformFSM";
 
-const TAU = Math.PI * 2;
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 
 /** Volume-preserving breath for the body core: a y-scale the caller pairs with an
@@ -98,12 +97,6 @@ export function earFlickDelta(t: number, flickStart: number, side: "L" | "R" | "
 /** Contact-shadow scale — shrinks as the pet hops (yOff), grounding the bounce. */
 export function shadowScale(yOff: number, maxYOff = 0.45): number {
   return 0.7 + 0.3 * (1 - Math.min(1, Math.abs(yOff) / maxYOff));
-}
-
-/** Position of celebrate sparkle `i` of `n`, orbiting the pet over time. */
-export function orbitPos(t: number, i: number, n: number, radius = 0.5): [number, number, number] {
-  const angle = (i / n) * TAU + t * 2.5;
-  return [Math.cos(angle) * radius, Math.sin(t * 3 + i) * 0.2, Math.sin(angle) * radius];
 }
 
 /** Work-ring yaw advance for this frame. */

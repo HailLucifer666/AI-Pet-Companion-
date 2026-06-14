@@ -31,7 +31,6 @@ import {
   headNodY,
   legLift,
   nextBlinkInterval,
-  orbitPos,
   shadowScale,
   tailWag,
   workRingDelta,
@@ -198,7 +197,7 @@ export function Lumenform3D() {
     const dxg = lookX - pos.current.x;
     const dzg = lookZ - pos.current.z;
     if (headG) {
-      const targetYaw = gazeYaw(dxg, dzg, g.rotation.y);
+      const targetYaw = gazeYaw(dxg, dzg, heading.current);
       const yawSpeed = lured ? 4.5 : 1.8;
       headG.rotation.y += (targetYaw - headG.rotation.y) * Math.min(1, yawSpeed * dt);
       headG.position.y = HEAD_Y + headNodY(t, working, gesture);
@@ -268,16 +267,17 @@ export function Lumenform3D() {
     }
 
     // ── GLOW: the light on its state ceiling; the core pulses on a freq ≠ breath. ──
+    const glowK = reduced ? 1 : 1 - Math.exp(-5 * dt); // ≈0.08 at 60fps, but frame-rate-independent
     const lightTarget = glowIntensity(t, gesture, working, moving);
-    if (light.current) light.current.intensity += (lightTarget - light.current.intensity) * 0.08;
+    if (light.current) light.current.intensity += (lightTarget - light.current.intensity) * glowK;
     if (mat.current) {
       const boost = glowBoost(sky.dayness); // blazes at night, eases off by day
       let core: number;
       if (gesture === "nap") core = 0.45;
       else if (gesture === "celebrate") core = 1.2 + Math.sin(t * 6) * 0.25;
-      else if (working) core = Math.min(1.35, 1.35 + Math.sin(t * 4) * 0.2);
+      else if (working) core = 1.2 + Math.sin(t * 4) * 0.2; // centred pulse — blazes AND eases
       else core = 0.9 + Math.sin(t * 2.2) * 0.1;
-      mat.current.emissiveIntensity += (core * boost - mat.current.emissiveIntensity) * 0.08;
+      mat.current.emissiveIntensity += (core * boost - mat.current.emissiveIntensity) * glowK;
     }
 
     // ── SHADOW: a contact blob that shrinks as it hops (grounds the bounce). ──
@@ -293,15 +293,15 @@ export function Lumenform3D() {
     const sg = sparkleGroup.current;
     if (sg) {
       const targetS = gesture === "celebrate" ? 1 : 0;
-      const rate = targetS > sg.scale.x ? 0.1 : 0.15;
-      const s = sg.scale.x + (targetS - sg.scale.x) * rate;
+      const k = targetS > sg.scale.x ? 6 : 9; // per-second fade in / out
+      const s = sg.scale.x + (targetS - sg.scale.x) * Math.min(1, k * dt);
       sg.scale.setScalar(s);
       if (s > 0.01) {
         for (let i = 0; i < 6; i++) {
           const sp = sparkleRefs[i].current;
           if (sp) {
-            const [ox, oy, oz] = orbitPos(t, i, 6);
-            sp.position.set(ox, oy, oz);
+            const ang = (i / 6) * Math.PI * 2 + t * 2.5; // orbit; inlined to avoid a per-frame tuple
+            sp.position.set(Math.cos(ang) * 0.5, Math.sin(t * 3 + i) * 0.2, Math.sin(ang) * 0.5);
           }
         }
       }

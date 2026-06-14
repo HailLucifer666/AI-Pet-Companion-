@@ -9,7 +9,6 @@ import {
   headNodY,
   legLift,
   nextBlinkInterval,
-  orbitPos,
   shadowScale,
   tailWag,
   workRingDelta,
@@ -116,14 +115,6 @@ describe("shadowScale", () => {
     expect(shadowScale(0)).toBe(1.0);
     expect(shadowScale(0.45)).toBeCloseTo(0.7);
     expect(shadowScale(0.9)).toBeCloseTo(0.7);
-  });
-});
-
-describe("orbitPos", () => {
-  it("places sparkles on a ring", () => {
-    expect(orbitPos(0, 0, 6)[0]).toBeCloseTo(0.5);
-    expect(orbitPos(0, 0, 6)[2]).toBeCloseTo(0);
-    expect(orbitPos(0, 3, 6)[0]).toBeCloseTo(-0.5);
   });
 });
 
