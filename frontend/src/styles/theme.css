@@ -154,6 +154,42 @@ h1, h2, h3 {
   to { opacity: 0; transform: translateX(16px); }
 }
 
+/* ── The Den frame — a non-interactive atmosphere layer over the 3D canvas:
+      a soft vignette so the world floats in a dark frame, plus faint ember
+      scanlines so it reads as a living instrument you peer through. Sits above
+      the canvas, below the rail/overlays; never intercepts pointer (so the
+      cursor-lure + orbit still work). Tokens only (claw/ink). ────────────── */
+.den-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.den-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(125% 95% at 50% 42%, transparent 56%, oklch(0% 0 0 / 55%) 100%);
+}
+.den-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  background-image: repeating-linear-gradient(
+    0deg,
+    oklch(73% 0.18 72 / 3.5%) 0px,
+    oklch(73% 0.18 72 / 3.5%) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* Soft outer glow for text/icons that should feel lit (ember). */
+@utility glow-soft {
+  text-shadow: 0 0 16px oklch(73% 0.18 72 / 35%);
+}
+
 /* ── Accessibility: honor reduced-motion everywhere (WCAG 2.2). ────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

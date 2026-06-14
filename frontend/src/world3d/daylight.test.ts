@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { daylightAt, localHour } from "./daylight";
+import { daylightAt, glowBoost, localHour } from "./daylight";
 
 describe("daylightAt", () => {
   it("is bright, lit, and not night at noon", () => {
@@ -38,5 +38,19 @@ describe("daylightAt", () => {
   it("localHour reads hours + minutes as a fraction", () => {
     expect(localHour(new Date(2026, 0, 1, 9, 30))).toBeCloseTo(9.5);
     expect(localHour(new Date(2026, 0, 1, 0, 0))).toBe(0);
+  });
+});
+
+describe("glowBoost — full-glow night", () => {
+  it("is ~1x at noon and brightest at deep night", () => {
+    expect(glowBoost(1)).toBeCloseTo(1);
+    expect(glowBoost(0)).toBeCloseTo(2.7);
+    expect(glowBoost(0)).toBeGreaterThan(glowBoost(0.5));
+    expect(glowBoost(0.5)).toBeGreaterThan(glowBoost(1));
+  });
+
+  it("clamps out-of-range dayness", () => {
+    expect(glowBoost(2)).toBeCloseTo(1);
+    expect(glowBoost(-1)).toBeCloseTo(2.7);
   });
 });

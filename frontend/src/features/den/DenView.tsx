@@ -13,6 +13,7 @@ export default function DenView() {
   return (
     <div ref={setHost} className="relative h-full w-full overflow-hidden bg-ink-950">
       <World3D />
+      <div className="den-atmosphere" aria-hidden />
       <div className="pointer-events-none absolute left-5 top-4 select-none">
         <p className="font-display text-sm font-medium tracking-wide text-ink-300/90">The Grove</p>
         <p className="text-xs text-ink-500/80">drag to move · scroll to zoom · click a place to enter</p>

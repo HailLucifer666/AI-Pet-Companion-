@@ -7,10 +7,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
-import { MOUSE, Vector3 } from "three";
+import { ACESFilmicToneMapping, MOUSE, Vector3 } from "three";
 import { Island } from "./Island";
+import { GlowMushrooms3D } from "./GlowMushrooms3D";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
 import { Places3D } from "./Places3D";
@@ -19,6 +20,7 @@ import { Postfx } from "./Postfx";
 import { Atmosphere } from "./Atmosphere";
 import { Clouds3D } from "./Clouds3D";
 import { Rain3D } from "./Rain3D";
+import { CursorLure } from "./CursorLure";
 import { useWeather } from "./useWeather";
 import { fxFor } from "./weather";
 import { localHour } from "./daylight";
@@ -32,13 +34,13 @@ interface ControlsLike {
   removeEventListener: (type: string, cb: () => void) => void;
 }
 
-const FOLLOW_RATE = 3.4; // how briskly the pivot chases the pet (per second)
+const FOLLOW_RATE = 7; // how briskly the pivot chases the pet (per second) — tight
 const ZOOM_RATE = 5; // how briskly the camera glides to its target distance
-const LEAD = 0.4; // seconds of look-ahead — the camera anticipates travel
+const LEAD = 0.25; // seconds of look-ahead — the camera anticipates travel
 const MAX_LEAD = 1.6; // cap the look-ahead offset (world units)
 const IDLE_AFTER = 6; // seconds of no input + settled pet before the camera drifts
 const IDLE_DRIFT = 0.05; // rad/sec — a slow cinematic orbit
-const MANUAL_HOLD = 6; // seconds a manual zoom is respected before autonomy resumes
+const MANUAL_HOLD = 2; // seconds a drag/zoom is respected before follow re-locks
 const AUTO_RATE = 0.6; // how slowly the camera re-takes its own distance
 const MIN_D = 8;
 const MAX_D = 26;
@@ -216,12 +218,17 @@ export function World3D() {
       dpr={[1, 1.75]}
       frameloop={reduced ? "demand" : "always"}
       camera={{ position: [12, 10, 12], fov: 42, near: 0.1, far: 140 }}
-      gl={{ antialias: true }}
+      gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >
       {/* Sky, light + fog — driven by real time of day × real weather. */}
       <Atmosphere hour={hour} fx={fx} reduced={reduced} />
 
+      {/* Deep-sky stars — faint by day (the bright sky + fog swallow them), a real
+          field at night. `fade` blends them into the horizon fog. */}
+      <Stars radius={120} depth={50} count={1400} factor={3} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
+
       <Island />
+      <GlowMushrooms3D reduced={reduced} />
       <Lumenform3D />
       <Crystals3D />
       <Places3D />
@@ -230,6 +237,7 @@ export function World3D() {
       <Rain3D rain={fx.rain} lightning={fx.lightning} reduced={reduced} />
 
       <CameraRig reduced={reduced} />
+      <CursorLure reduced={reduced} />
       <OrbitControls
         makeDefault
         enableZoom={false}

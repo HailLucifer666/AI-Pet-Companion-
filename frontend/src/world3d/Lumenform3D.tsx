@@ -14,8 +14,12 @@ import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { arrive, placeTarget, WALK_SPEED } from "./locomotion";
+import { activeLure, lure } from "./lure";
 import { petPos } from "./petPosition";
+import { glowBoost } from "./daylight";
+import { sky } from "./skyState";
 import { WORLD } from "./palette";
+import { PetBubble } from "./PetBubble";
 
 const LIFT = 0.55; // raise the body so it sits on the ground, not in it
 const ACCEL = 3.2; // how briskly velocity chases the desired velocity (ease in/out)
@@ -46,7 +50,10 @@ export function Lumenform3D() {
     const dt = Math.min(delta, 0.05); // clamp long frames so a stall can't teleport it
     const { lumen } = useWorldStore.getState();
     const t = state.clock.elapsedTime;
-    const target = placeTarget(lumen.place, lumen.wanderSeed);
+    // Answer the user's cursor-call while at rest; otherwise follow the FSM's intent.
+    const target =
+      activeLure(lure, performance.now(), lumen.mode, reduced) ??
+      placeTarget(lumen.place, lumen.wanderSeed);
 
     if (reduced) {
       // Static-but-alive: snap to where the state says, no motion for its own sake.
@@ -60,7 +67,7 @@ export function Lumenform3D() {
       petPos.y = y;
       petPos.z = target.z;
       if (light.current) light.current.intensity = 2.2;
-      if (mat.current) mat.current.emissiveIntensity = 0.8;
+      if (mat.current) mat.current.emissiveIntensity = 0.85 * glowBoost(sky.dayness);
       return;
     }
 
@@ -109,7 +116,8 @@ export function Lumenform3D() {
       gesture === "nap" ? 0.6 : gesture === "celebrate" ? 4 : working ? 3.2 : moving ? 2.2 : 1.8;
     if (light.current) light.current.intensity += (targetGlow - light.current.intensity) * 0.08;
     if (mat.current) {
-      const e = gesture === "nap" ? 0.3 : working ? 1.1 : 0.7;
+      const boost = glowBoost(sky.dayness); // blazes at night, eases off by day
+      const e = (gesture === "nap" ? 0.45 : working ? 1.35 : 0.9) * boost;
       mat.current.emissiveIntensity += (e - mat.current.emissiveIntensity) * 0.08;
     }
   });
@@ -119,26 +127,38 @@ export function Lumenform3D() {
       {/* the living light */}
       <pointLight ref={light} color={WORLD.ember} intensity={1.8} distance={7} decay={2} position={[0, 0.2, 0]} />
 
-      {/* body */}
-      <mesh ref={body} castShadow scale-y={0.9}>
+      {/* layered crystalline body: a glassy faceted shell over an inner wireframe
+          over a glowing emissive core (what Bloom picks up) — reads as a lumenform,
+          not a plain blob. The core (ref) carries the breath + mode glow. */}
+      <mesh castShadow scale-y={0.92}>
+        <icosahedronGeometry args={[0.52, 2]} />
+        <meshStandardMaterial color={WORLD.ember} transparent opacity={0.28} roughness={0.12} metalness={0.8} flatShading />
+      </mesh>
+      <mesh scale-y={0.92}>
         <icosahedronGeometry args={[0.5, 1]} />
+        <meshStandardMaterial color={WORLD.emberHi} wireframe transparent opacity={0.16} />
+      </mesh>
+      <mesh ref={body} scale-y={0.9}>
+        <icosahedronGeometry args={[0.34, 1]} />
         <meshStandardMaterial
           ref={mat}
-          color={WORLD.ember}
+          color={WORLD.emberHi}
           emissive={WORLD.ember}
-          emissiveIntensity={0.7}
+          emissiveIntensity={0.9}
           flatShading
-          roughness={0.5}
+          roughness={0.4}
+          transparent
+          opacity={0.95}
         />
       </mesh>
 
-      {/* eyes — on the +Z face, so they lead the way it walks */}
-      <mesh position={[-0.16, 0.08, 0.42]}>
-        <sphereGeometry args={[0.07, 8, 8]} />
+      {/* eyes — on the +Z face of the core, so they lead the way it walks */}
+      <mesh position={[-0.13, 0.06, 0.32]}>
+        <sphereGeometry args={[0.055, 8, 8]} />
         <meshStandardMaterial color={0x14161d} />
       </mesh>
-      <mesh position={[0.16, 0.08, 0.42]}>
-        <sphereGeometry args={[0.07, 8, 8]} />
+      <mesh position={[0.13, 0.06, 0.32]}>
+        <sphereGeometry args={[0.055, 8, 8]} />
         <meshStandardMaterial color={0x14161d} />
       </mesh>
 
@@ -155,6 +175,9 @@ export function Lumenform3D() {
           </mesh>
         </>
       )}
+
+      {/* emoji bubble above the head — shows what it's doing right now */}
+      <PetBubble />
     </group>
   );
 }

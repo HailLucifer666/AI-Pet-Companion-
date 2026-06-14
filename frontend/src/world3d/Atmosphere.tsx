@@ -9,6 +9,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Color, Fog } from "three";
 import type { AmbientLight, DirectionalLight, HemisphereLight } from "three";
 import { daylightAt } from "./daylight";
+import { sky } from "./skyState";
 import type { WeatherFx } from "./weather";
 import { WORLD } from "./palette";
 
@@ -35,6 +36,7 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
 
   useFrame((_, delta) => {
     const base = daylightAt(hour);
+    sky.dayness = base.dayness; // shared with the glowing things (pet/crystals/mushrooms)
     const k = reduced ? 1 : 1 - Math.exp(-1.5 * delta);
 
     // Cloud cover greys the sky — but deep night stays dark (scale by dayness).
@@ -63,7 +65,10 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
     }
     if (amb.current) {
       amb.current.color.lerp(tmpAmb.set(base.ambient), k);
-      amb.current.intensity += (0.5 * (1 - fx.dim * 0.4) - amb.current.intensity) * k;
+      // Scale ambient with daylight so night sinks dark (≈0.22) and the emissive
+      // crystals/pet/mushrooms own it; day fills to ≈0.62.
+      const ambTarget = (0.22 + base.dayness * 0.4) * (1 - fx.dim * 0.4);
+      amb.current.intensity += (ambTarget - amb.current.intensity) * k;
     }
     if (rim.current) {
       rim.current.intensity += (0.55 * (1 - fx.dim * 0.3) - rim.current.intensity) * k;
