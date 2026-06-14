@@ -9,6 +9,7 @@ NeuraClaw is a **local-first personal AI companion** that lives on your machine:
 | Doc | Read it for |
 |---|---|
 | **`docs/ROADMAP.md`** | **READ FIRST — live status (current version), the V-2.5 hardening track, and what to work on next. Cross-app source of truth.** |
+| **`docs/WORLD-VILLAGE.md`** | **The locked WORLD DIRECTION — build-ready Bioluminescent Medieval Village spec (data model, road pathing, place→building, assets+lighting, file-by-file build order). Read before touching the world.** |
 | `docs/PRD.md` (v2.0) | Product source of truth — vision, users, the Mycelium, roadmap |
 | `docs/WORLD-BIBLE.md` | The world: cosmology, realms, places, pet behavior, interaction laws, weather, cinematics |
 | `docs/ARCHITECTURE-WORLD.md` | World engine architecture — module map, store↔engine contracts, hydration, perf ladder |

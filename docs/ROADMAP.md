@@ -14,6 +14,7 @@ An AI companion **pet that lives autonomously in a low-poly 3D game world** that
 | **V-2** Pet | procedural screen-faced **robot** + data-driven expression face (`FaceScreen`, `petAnim.ts`) | 🔨 IN PROGRESS |
 | **V-2.5** Hardening | game-dev gap-closure — **see track below** | ⏳ NEXT |
 | **V-3** World props | Quaternius **CC0** GLB trees/rocks replacing procedural scatter | 🔨 IN PROGRESS |
+| **World v2** · Bioluminescent Village | medieval village (buildings · roads · fences · plaza) under the bioluminescent dusk layer; pet walks roads building→building | 🔒 LOCKED — full spec → `docs/WORLD-VILLAGE.md` |
 | **V-4** Voice | STT in + TTS out, voice-primary (browser-native; partly wired) | ◐ PARTIAL |
 | **V-5** OS-control | computer-use, trust-gated + kill-switch | ⏸ later (risky) |
 | **V-6** Exploration | XP-unlocked regions / realms ("The Widening") | ⏸ later |
@@ -22,6 +23,25 @@ An AI companion **pet that lives autonomously in a low-poly 3D game world** that
 
 **Baselines (keep green):** 72 pytest · 100 vitest · `npm run build` passes · world chunk ≤350 kB gz.
 **World engine = react-three-fiber + three** (`frontend/src/world3d/`). NOTE: AGENTS.md / older docs say PixiJS — **superseded**; the live world is r3f. `frontend/src/world/` (Pixi) is legacy/dead **except** `crystalSeed.ts` + `entities/lumenform/LumenformFSM.ts` (still reused).
+
+> **Workflow rule:** research/planning happens in the **Claude Code app**; building happens in **Antigravity** (Claude Code), same machine, same repo. **Every locked decision lands HERE in the repo** (`D:\NeuraClaw v1`) so Antigravity sees it. The `.claude/plans/` file is the research-app scratchpad — NOT authoritative for builds.
+
+---
+
+## 🔒 WORLD DIRECTION (LOCKED 2026-06-14) — Bioluminescent Medieval Village
+The world = a small low-poly **MEDIEVAL VILLAGE** (buildings · cobble roads · fences · central plaza) with the **BIOLUMINESCENT magic as the mood layer painted over it** (ember-glowing windows/lanterns, glow-mushrooms along the roads, ember memory-crystals, weather × day/night, bloom, drifting motes). The pet **walks the roads building→building** to do its work. Recolor the medieval CC0 assets to our **dusk tokens** — a screenshot must read **"magical dusk hamlet", not "daytime RPG town."**
+**Locked layout:** central **plaza/hearth** hub · buildings **radiate** · cobble roads **spoke out**. Pet **home = central plaza by the hearth**. **First cut = plaza + 3 buildings + roads** — Hollow (chat) = tavern w/ fireplace · Workbench (notes) = workshop/forge · Memory Garden (memory) = greenhouse/shrine where crystals grow.
+**Additive** — keeps terrain, weather, glow, crystals, camera, locomotion, places. **Full build-ready spec → `docs/WORLD-VILLAGE.md`** (read it before building the village).
+
+## 🔒 Locked decisions (cross-app log — everything we've decided, in one place)
+- **World direction** → Bioluminescent Medieval Village (above; spec `docs/WORLD-VILLAGE.md`).
+- **V-2 Pet** → procedural r3f **screen-faced robot** + data-driven face; ember-indigo tokens; rounded floaty silhouette; **robot from hatch**, stages = plating/antennae/glow upgrades. No GLB/credits. (`Lumenform3D.tsx` + `pet/face.ts`; wire the existing `petAnim.ts`.)
+- **V-3 Props** → Quaternius **Ultimate Stylized Nature** (CC0) — pack in repo (gitignored), convert FBX→GLB via `npx fbx2gltf` → `frontend/public/models/nature/`, **keep albedo** (lighting sets mood), instanced. Used for the village's **grove edges**.
+- **Assets (all CC0/permissive)** → Quaternius (nature/creatures) · **KayKit** (medieval buildings/fences + rigged chars/animations) · Kenney (roads/village) · Poly Haven (HDRI) · ambientCG (textures) · Mixamo (humanoid anims). Reference bundle: **`levy-street/world-of-claudecraft`** (MIT code + CC0 assets — mine for asset packs + rigged-char/animation + canvas-icon technique; **don't clone the MMO**). Rule: CC0 default · CC-BY keep a CREDITS file · avoid NC/GPL.
+- **Gravity Garden** → cleared-to-reuse (Higgsfield remix + CC0); look-pass (bloom/motes/rim) **SHIPPED**. Teardown `docs/refs/gravity-garden-teardown.md`.
+- **Windows app** → DECIDED **Path B: Tauri v2 + Python sidecar** (PyInstaller backend, P-0..P-5). Capstone — after world v1 + the GPU/2D-fallback debt.
+- **V-7 Gesture** → webcam pet-stroke + pinch-zoom (MediaPipe, local, 0 credits). **DEFERRED** — after world alive + voice.
+- **V-2.5 Hardening** → the track below (GPU-tier/quality-ladder/2D-fallback, audio, wire petAnim, tool→place routing, quick-wins).
 
 ---
 
