@@ -8,6 +8,7 @@ NeuraClaw is a **local-first personal AI companion** that lives on your machine:
 ## Docs map
 | Doc | Read it for |
 |---|---|
+| **`docs/ROADMAP.md`** | **READ FIRST — live status (current version), the V-2.5 hardening track, and what to work on next. Cross-app source of truth.** |
 | `docs/PRD.md` (v2.0) | Product source of truth — vision, users, the Mycelium, roadmap |
 | `docs/WORLD-BIBLE.md` | The world: cosmology, realms, places, pet behavior, interaction laws, weather, cinematics |
 | `docs/ARCHITECTURE-WORLD.md` | World engine architecture — module map, store↔engine contracts, hydration, perf ladder |
@@ -16,10 +17,11 @@ NeuraClaw is a **local-first personal AI companion** that lives on your machine:
 | `docs/ANIMATION-SYSTEM.md` | Motion language, transition grammar, particle budgets, reduced-motion contract (from W-2) |
 | `SOUL.md` | The companion's identity template (user-editable, hot-reloaded into the system prompt) |
 
-## Current state (2026-06-13)
-- **Shipped + verified:** agent backend, bioluminescent design system (`bf3c80e`), Chat/Memory/Notes/Settings surfaces, **Synapse event bus + ambient Creature (M-0.2b, `194a78b`)**, startup-cycle fix (`236a923`).
-- **Baselines (must stay green):** **37 pytest**, **16 vitest**, `tsc -b --noEmit` clean, ruff clean, prod JS bundle **~207 kB gz** (< 300 kB).
-- **Next:** W-1 (pet/XP/hatch/ladder backend) per the build plan. Then W-2+ build the world.
+## Current state (2026-06-14) — **see `docs/ROADMAP.md` for the live version + next work**
+- **Version ≈ V-2.x.** V-1 (living roaming world) **shipped**; **V-2 (robot pet) + V-3 (Quaternius CC0 props) in active development**; some V-4 voice already wired.
+- **World engine = react-three-fiber + three** (`frontend/src/world3d/`). The PixiJS mentions below/in older docs are **superseded** — `frontend/src/world/` (Pixi) is legacy/dead except `crystalSeed.ts` + `LumenformFSM.ts` (reused).
+- **Baselines (must stay green):** **72 pytest**, **100 vitest**, `tsc -b` clean, `npm run build` passes, world chunk **≤350 kB gz**.
+- **Next:** the **V-2.5 hardening track** in `docs/ROADMAP.md` (close the tech-demo→game gaps: GPU-tier/quality-ladder/2D-fallback, audio, wire `petAnim`, tool→place routing, quick-win batch). Two coding apps share this repo via GitHub `master` — read ROADMAP, `git fetch github` first, push before swapping.
 
 ## Run & verify (Windows / PowerShell; Bash tool also available)
 ```
