@@ -12,3 +12,9 @@ frontend/dist/
 *.egg-info/
 *.tsbuildinfo
 .write-probe
+
+# Raw 3D asset packs — convert to GLB into frontend/public/models/, never commit the source packs
+Ultimate Stylized Nature*/
+*.fbx
+*.blend
+*.blend1

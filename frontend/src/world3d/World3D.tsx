@@ -5,9 +5,10 @@
  *  once you let go it drifts in a slow cinematic orbit. Reduced-motion holds a
  *  still framed shot. The whole three.js stack is lazy-loaded with the Den. */
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
+import { NaturePreview } from "./NaturePreview";
 import { useReducedMotion } from "motion/react";
 import { ACESFilmicToneMapping, MOUSE, Vector3 } from "three";
 import { Island } from "./Island";
@@ -155,6 +156,10 @@ export function World3D() {
   const weather = useWeather();
   const fx = fxFor(weather);
 
+  // DEV-only: ?nature=1 drops the converted Quaternius GLBs into the scene to eyeball.
+  const showNature =
+    import.meta.env.DEV && typeof location !== "undefined" && new URLSearchParams(location.search).has("nature");
+
   // The sky tracks the real local clock; re-read each minute.
   const [hour, setHour] = useState(() => localHour(new Date()));
   useEffect(() => {
@@ -178,6 +183,11 @@ export function World3D() {
       <Stars radius={120} depth={50} count={1400} factor={3} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
 
       <Island />
+      {showNature && (
+        <Suspense fallback={null}>
+          <NaturePreview />
+        </Suspense>
+      )}
       <GlowMushrooms3D reduced={reduced} />
       <Lumenform3D />
       <Crystals3D />
