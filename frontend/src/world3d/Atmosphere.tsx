@@ -12,11 +12,14 @@ import { daylightAt } from "./daylight";
 import { sky } from "./skyState";
 import type { WeatherFx } from "./weather";
 import { WORLD } from "./palette";
+import { ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
 
-// Tuned for the high-diorama camera (rests ~46 out): the island reads clear with a
-// hint of depth on its far rim, and the surrounding sea dissolves into the horizon.
-const FOG_NEAR = 50;
-const FOG_FAR = 120;
+// Tuned for the close explorable camera on the big island: a hazy horizon that
+// dissolves the far world into mist (reinforcing "more world beyond"), rather than
+// showing the whole island crisply. Sea (radius ~1120) sits well past the fog.
+const FOG_NEAR = 80;
+const FOG_FAR = 300;
+const SHADOW_R = ISLAND_MAX_R; // ortho shadow frustum covers the whole island
 const OVERCAST = new Color(0x7a8290);
 
 // Reused work colors (a single Atmosphere instance lives per canvas).
@@ -57,9 +60,11 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
     if (dir.current) {
       dir.current.color.lerp(tmpSun.set(base.sun), k);
       dir.current.intensity += (base.sunIntensity * (1 - fx.dim) - dir.current.intensity) * k;
-      dir.current.position.x += (base.sunDir[0] - dir.current.position.x) * k;
-      dir.current.position.y += (base.sunDir[1] - dir.current.position.y) * k;
-      dir.current.position.z += (base.sunDir[2] - dir.current.position.z) * k;
+      // Push the sun out beyond the (now big) island so its ortho shadow camera sees
+      // the whole island in front of it — the light DIRECTION is unchanged.
+      dir.current.position.x += (base.sunDir[0] * WORLD_SCALE - dir.current.position.x) * k;
+      dir.current.position.y += (base.sunDir[1] * WORLD_SCALE - dir.current.position.y) * k;
+      dir.current.position.z += (base.sunDir[2] * WORLD_SCALE - dir.current.position.z) * k;
     }
     if (hemi.current) {
       hemi.current.color.lerp(skyTarget, k);
@@ -85,17 +90,17 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
         ref={dir}
         color={WORLD.sun}
         intensity={1.45}
-        position={[18, 18, 10]}
+        position={[18 * WORLD_SCALE, 18 * WORLD_SCALE, 10 * WORLD_SCALE]}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={-22}
-        shadow-camera-right={22}
-        shadow-camera-top={22}
-        shadow-camera-bottom={-22}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-left={-SHADOW_R}
+        shadow-camera-right={SHADOW_R}
+        shadow-camera-top={SHADOW_R}
+        shadow-camera-bottom={-SHADOW_R}
         shadow-camera-near={1}
-        shadow-camera-far={80}
-        shadow-bias={-0.0004}
+        shadow-camera-far={SHADOW_R * 6}
+        shadow-bias={-0.0002}
       />
       {/* Cool back-rim — lifts the low-poly silhouettes out of the fog. */}
       <directionalLight ref={rim} color={WORLD.rim} intensity={0.55} position={[-14, 7, -16]} />

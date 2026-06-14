@@ -7,24 +7,25 @@
 import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
-import { islandHeight, ISLAND_MAX_R } from "./terrain";
+import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
 import { WORLD } from "./palette";
 import { InstancedModel, type NaturePlacement } from "./nature/InstancedModel";
 import { NATURE_TREES, NATURE_ROCKS, NATURE_BUSHES, NATURE_GRASS, natureUrl } from "./nature/models";
 
-const SIZE = 36;
-const SEG = 96;
+const W = WORLD_SCALE;
+const SIZE = 36 * W; // terrain plane — must fully contain the island (≥ 2 × MAX_R)
+const SEG = 200; // subdivision — kept dense enough that faces stay ~1.3 u over the bigger plane
 const MAX_R = ISLAND_MAX_R;
 const FLOOR = -1.5;
 
-const POOL = { x: 5.5, z: 3.5, r: 2.0 };
-const MEADOW_R = 4.5; // open clearing in the middle — where the pet roams, no trees
-// Keep scatter off the pool and the three Place markers (placeDefs coords).
+const POOL = { x: 5.5 * W, z: 3.5 * W, r: 2.0 }; // position scales out; the pond itself stays small
+const MEADOW_R = 4.5 * W; // open clearing in the middle — where the pet roams, no trees
+// Keep scatter off the pool and the three Place markers (placeDefs coords × scale).
 const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
   { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
-  { x: -5, z: -2.5, r: 1.8 }, // hollow
-  { x: 4.5, z: -3.3, r: 1.8 }, // garden
-  { x: -4, z: 3.8, r: 1.8 }, // workbench
+  { x: -5 * W, z: -2.5 * W, r: 2.4 }, // hollow
+  { x: 4.5 * W, z: -3.3 * W, r: 2.4 }, // garden
+  { x: -4 * W, z: 3.8 * W, r: 2.4 }, // workbench
 ];
 
 function colorForHeight(y: number): THREE.Color {
@@ -77,7 +78,7 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
   const r = mulberry32(0x9e07);
   const trees: Placement[] = [];
   const rocks: Placement[] = [];
-  for (let i = 0; i < 2000 && (trees.length < 38 || rocks.length < 30); i++) {
+  for (let i = 0; i < 30000 && (trees.length < 450 || rocks.length < 300); i++) {
     const ang = r() * Math.PI * 2;
     const rad = Math.sqrt(r()) * MAX_R * 0.92;
     const x = Math.cos(ang) * rad;
@@ -85,11 +86,11 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
     const y = islandHeight(x, z, MAX_R);
     if (!clearOf(x, z)) continue;
     // Trees ring the open meadow, spaced apart; rocks may sit closer in.
-    if (rad > MEADOW_R && y > 0.7 && y < 2.2 && trees.length < 38) {
+    if (rad > MEADOW_R && y > 0.7 && y < 2.2 && trees.length < 450) {
       if (trees.every((t) => Math.hypot(x - t.x, z - t.z) > TREE_GAP)) {
         trees.push({ x, y: y - 0.1, z, scale: 0.6 + r() * 0.55, rot: r() * Math.PI * 2 });
       }
-    } else if (y > 0.25 && y < 3.2 && rocks.length < 30) {
+    } else if (y > 0.25 && y < 3.2 && rocks.length < 300) {
       rocks.push({ x, y, z, scale: 0.45 + r() * 0.8, rot: r() * Math.PI * 2 });
     }
   }
@@ -103,16 +104,16 @@ function scatterGround(): { bushes: Placement[]; grass: Placement[] } {
   const r = mulberry32(0x5a11);
   const bushes: Placement[] = [];
   const grass: Placement[] = [];
-  for (let i = 0; i < 1500 && (bushes.length < 12 || grass.length < 18); i++) {
+  for (let i = 0; i < 24000 && (bushes.length < 120 || grass.length < 240); i++) {
     const ang = r() * Math.PI * 2;
     const rad = Math.sqrt(r()) * MAX_R * 0.9;
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     const y = islandHeight(x, z, MAX_R);
     if (!clearOf(x, z)) continue;
-    if (rad > MEADOW_R * 0.7 && y > 0.3 && y < 2.2 && bushes.length < 12) {
+    if (rad > MEADOW_R * 0.7 && y > 0.3 && y < 2.2 && bushes.length < 120) {
       bushes.push({ x, y, z, scale: 0.6 + r() * 0.5, rot: r() * Math.PI * 2 });
-    } else if (y > 0.2 && y < 2.6 && grass.length < 18) {
+    } else if (y > 0.2 && y < 2.6 && grass.length < 240) {
       grass.push({ x, y, z, scale: 0.7 + r() * 0.6, rot: r() * Math.PI * 2 });
     }
   }
@@ -199,8 +200,8 @@ export function Island() {
 
       {/* The surrounding sea — vast enough that its edge is always far beyond the
           fog, so the world never shows a hard cut at any camera angle. */}
-      <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
-        <planeGeometry args={[320, 320]} />
+      <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow={false}>
+        <planeGeometry args={[320 * W, 320 * W]} />
         <meshStandardMaterial color={WORLD.water} transparent opacity={0.82} roughness={0.4} metalness={0.1} flatShading />
       </mesh>
 

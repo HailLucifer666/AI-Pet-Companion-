@@ -12,10 +12,14 @@ export interface Vec3 {
 
 export type PulseOrigin = "workbench" | "garden" | "hollow";
 
+import { WORLD_SCALE } from "./terrain";
+
 export const PULSE_DURATION = 2200; // ms, origin → gate
 
-/** The gate's glowing centre — pulses terminate here (shared with SporeGate3D). */
-export const GATE_POINT: Vec3 = { x: 0, y: 3.2, z: -7 };
+/** The gate's glowing centre — pulses terminate here (shared with SporeGate3D). The
+ *  arch sits proportionally back on the bigger island (z × WORLD_SCALE); its height
+ *  (y) is an object-space offset above the terrain, so it stays the same size. */
+export const GATE_POINT: Vec3 = { x: 0, y: 3.2, z: -7 * WORLD_SCALE };
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;

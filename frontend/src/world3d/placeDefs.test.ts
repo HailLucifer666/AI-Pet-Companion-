@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PLACES_3D } from "./placeDefs";
+import { ISLAND_MAX_R } from "./terrain";
 
 describe("PLACES_3D", () => {
   it("has the three Grove places with routes", () => {
@@ -11,7 +12,7 @@ describe("PLACES_3D", () => {
     for (const p of PLACES_3D) {
       const [x, y, z] = p.pos;
       expect(Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)).toBe(true);
-      expect(Math.hypot(x, z)).toBeLessThan(10);
+      expect(Math.hypot(x, z)).toBeLessThan(ISLAND_MAX_R);
       expect(y).toBeGreaterThan(0);
     }
   });

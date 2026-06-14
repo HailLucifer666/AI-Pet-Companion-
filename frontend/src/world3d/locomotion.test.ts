@@ -17,7 +17,7 @@ describe("placeTarget", () => {
     const a = placeTarget("wander", 42);
     expect(placeTarget("wander", 42)).toEqual(a); // same seed → same spot
     expect(placeTarget("wander", 43)).not.toEqual(a); // different seed → different spot
-    expect(Math.hypot(a.x, a.z)).toBeLessThanOrEqual(6); // mid radius, never past the rim
+    expect(Math.hypot(a.x, a.z)).toBeLessThan(ISLAND_MAX_R); // local roaming region, never past the rim
   });
 });
 

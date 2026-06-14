@@ -4,4 +4,6 @@
  *  re-render. Both readers live inside the same Canvas, so this is module-local
  *  shared state, not app state. */
 
-export const petPos = { x: 1.6, y: 1, z: 2.6 };
+import { WORLD_SCALE } from "./terrain";
+
+export const petPos = { x: 1.6 * WORLD_SCALE, y: 1, z: 2.6 * WORLD_SCALE };

@@ -10,9 +10,9 @@ import { mulberry32 } from "../world/engine/rng";
 import { petPos } from "./petPosition";
 
 const MAX = 360;
-const RADIUS = 20; // wider spread → rain veils the scene instead of pillaring on the pet
+const RADIUS = 52; // wider spread → rain veils the scene instead of pillaring on the pet (tracks the pet; partial scale for the bigger world)
 const CORE_HOLE = 0.12; // keep a clear-ish core so streaks don't stack on the pet
-const FALL_H = 18; // column height; drops recycle to the top after passing the ground
+const FALL_H = 30; // column height; drops recycle to the top after passing the ground
 const RAIN_COLOR = 0xbcd4e6;
 
 const M = new THREE.Matrix4();
@@ -102,7 +102,7 @@ export function Rain3D({
           <meshBasicMaterial color={RAIN_COLOR} transparent opacity={0.22} depthWrite={false} />
         </instancedMesh>
       )}
-      {lightning && <pointLight ref={light} color={0xcfe2ff} intensity={0} distance={120} decay={1.4} />}
+      {lightning && <pointLight ref={light} color={0xcfe2ff} intensity={0} distance={360} decay={1.4} />}
     </group>
   );
 }

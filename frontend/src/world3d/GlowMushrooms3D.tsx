@@ -10,15 +10,15 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { MeshStandardMaterial, PointLight } from "three";
 import { mulberry32 } from "../world/engine/rng";
-import { islandHeight, ISLAND_MAX_R } from "./terrain";
+import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
-const COUNT = 14;
-const LIT = 3; // only the first few carry a co-located point-light (perf)
+const COUNT = 60; // scaled up for the bigger island (still sparse per-area — scattered spots)
+const LIT = 3; // only the first few carry a co-located point-light (perf — NEVER scale this)
 const CAP_BASE = 1.1; // base emissive; ×glowBoost at night
 const LIGHT_BASE = 0.32;
-const MEADOW_R = 4.8; // keep clear of the central roaming meadow
+const MEADOW_R = 4.8 * WORLD_SCALE; // keep clear of the central roaming meadow
 const CAP_COLORS = [0x49d39a, 0x6be9ff, 0x9d7bff, 0x8be06a]; // bio cyan/violet/lime
 
 interface Spot {
@@ -32,9 +32,9 @@ interface Spot {
 function place(): Spot[] {
   const r = mulberry32(0x5eed);
   const spots: Spot[] = [];
-  for (let i = 0; i < 3000 && spots.length < COUNT; i++) {
+  for (let i = 0; i < 18000 && spots.length < COUNT; i++) {
     const ang = r() * Math.PI * 2;
-    const rad = MEADOW_R + r() * 8; // 4.8 .. 12.8 — mid-band, off the meadow
+    const rad = MEADOW_R + r() * 8 * WORLD_SCALE; // mid-band, off the meadow, spread to the island
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     const y = islandHeight(x, z, ISLAND_MAX_R);

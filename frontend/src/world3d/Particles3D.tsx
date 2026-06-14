@@ -11,15 +11,17 @@ import { useReducedMotion } from "motion/react";
 import * as THREE from "three";
 import { makeField, motePosition } from "./particles/flow";
 import { WORLD } from "./palette";
+import { WORLD_SCALE } from "./terrain";
 
-const COUNT = 150;
+const COUNT = 600; // more motes spread over the bigger island (cheap Points — still one draw call)
+const FIELD_R = 13 * WORLD_SCALE;
 
 export function Particles3D() {
   const reduced = useReducedMotion() ?? false;
   const points = useRef<THREE.Points>(null);
 
   const { geom, field } = useMemo(() => {
-    const field = makeField(COUNT, 0x6c10);
+    const field = makeField(COUNT, 0x6c10, FIELD_R);
     const positions = new Float32Array(COUNT * 3);
     const colors = new Float32Array(COUNT * 3);
     const warm = new THREE.Color(WORLD.emberHi);

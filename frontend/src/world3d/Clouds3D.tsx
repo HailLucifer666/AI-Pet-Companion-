@@ -8,8 +8,9 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
+import { WORLD_SCALE } from "./terrain";
 
-const PUFFS = 30; // ~8 clusters of 3–4 puffs
+const PUFFS = 60; // ~16 clusters of 3–4 puffs, spread over the bigger sky
 const CLOUD_COLOR = 0xdfe6ee;
 
 const M = new THREE.Matrix4();
@@ -33,21 +34,21 @@ function buildPuffs(): Puff[] {
   const r = mulberry32(0xc10d);
   const puffs: Puff[] = [];
   let clusters = 0;
-  while (puffs.length < PUFFS && clusters < 12) {
+  while (puffs.length < PUFFS && clusters < 24) {
     const ang = r() * Math.PI * 2;
-    const rad = 3 + r() * 14; // 3..17 — over the island, not floating out over the sea
+    const rad = (3 + r() * 14) * WORLD_SCALE; // over the island, spread across the bigger sky
     const cx = Math.cos(ang) * rad;
     const cz = Math.sin(ang) * rad;
-    const cy = 26 + r() * 9; // 26..35 — high in the sky, reads as overcast not rim-rock
+    const cy = (26 + r() * 9) * 2; // high in the sky over the big island, reads as overcast
     const n = 3 + Math.floor(r() * 2);
     for (let i = 0; i < n && puffs.length < PUFFS; i++) {
       puffs.push({
-        x: cx + (r() - 0.5) * 4,
-        y: cy + (r() - 0.5) * 1.4,
-        z: cz + (r() - 0.5) * 4,
-        sx: 3.4 + r() * 2.4, // wider + flatter → a cloud sheet, not a faceted blob
+        x: cx + (r() - 0.5) * 4 * WORLD_SCALE,
+        y: cy + (r() - 0.5) * 1.4 * 2,
+        z: cz + (r() - 0.5) * 4 * WORLD_SCALE,
+        sx: (3.4 + r() * 2.4) * 2.5, // wider + flatter → a cloud sheet; bigger to read at distance
         sy: 0.6 + r() * 0.45,
-        sz: 3.4 + r() * 2.4,
+        sz: (3.4 + r() * 2.4) * 2.5,
       });
     }
     clusters++;
@@ -76,8 +77,8 @@ export function Clouds3D({ amount, reduced }: { amount: number; reduced: boolean
   useFrame((state, delta) => {
     if (group.current && !reduced) {
       const t = state.clock.elapsedTime;
-      group.current.position.x = Math.sin(t * 0.02) * 4;
-      group.current.position.z = Math.cos(t * 0.015) * 3;
+      group.current.position.x = Math.sin(t * 0.02) * 4 * WORLD_SCALE;
+      group.current.position.z = Math.cos(t * 0.015) * 3 * WORLD_SCALE;
     }
     if (mat.current) {
       const target = Math.min(0.55, amount); // wispy ceiling — soft cloud, not solid rock

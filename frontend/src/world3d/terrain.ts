@@ -52,13 +52,24 @@ export function fbm(x: number, z: number): number {
   return total / norm;
 }
 
-/** Height at world (x, z); land peaks near the origin, sinks past `maxR`. */
+/** Height at world (x, z); land peaks near the origin, sinks past `maxR`. The noise
+ *  frequency is in absolute world units, so a larger island (bigger `maxR`) gets
+ *  proportionally MORE rolling hills across it — richer terrain to roam, not a
+ *  stretched blob. A gentle height bump + a smaller water-dip keep the now much
+ *  wider mid-island solidly above the waterline. */
 export function islandHeight(x: number, z: number, maxR: number): number {
   const r = Math.min(1, Math.hypot(x, z) / maxR);
   const fall = Math.pow(Math.max(0, 1 - r), 1.7); // 1 at center → 0 at the rim
   const n = fbm((x + 100) * 0.16, (z + 100) * 0.16); // offset so noise isn't centered
-  return fall * (1.1 + n * 4.3) - (1 - fall) * 1.6; // dips below 0 (water) at the edges
+  return fall * (1.6 + n * 5.4) - (1 - fall) * 1.4; // dips below 0 (water) at the edges
 }
 
 export const WATER_LEVEL = 0;
-export const ISLAND_MAX_R = 16; // shared by terrain mesh + anything placed on it
+
+/** Master spatial scale — every absolute world POSITION/DISTANCE multiplies by this
+ *  (island radius, plane, sea, fog, shadow frustum, place/anchor/gate coords, scatter
+ *  & weather radii). Object SIZES (tree/rock/pet scale, geometry dims) do NOT — so the
+ *  world grows into a sprawling landscape full of normal-sized things, not a blow-up.
+ *  Dial it to re-scale the whole world in one place (set to 1 to restore the original). */
+export const WORLD_SCALE = 7;
+export const ISLAND_MAX_R = 16 * WORLD_SCALE; // =112 — shared by terrain mesh + anything placed on it
