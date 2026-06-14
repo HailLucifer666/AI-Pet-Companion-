@@ -62,6 +62,7 @@ interface WorldStore {
   bloomAt: number; // performance.now() of the last level-up (the gate blooms)
   threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
   recencyById: Record<number, number | null>; // memory_id → last-mattered epoch ms (compost)
+  speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
@@ -69,6 +70,7 @@ interface WorldStore {
   addPulse: (origin: PulseOrigin) => void;
   prunePulses: () => void;
   bloom: () => void;
+  setSpeech: (text: string) => void;
   refreshThreads: () => Promise<void>;
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
@@ -85,6 +87,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   bloomAt: 0,
   threads: [],
   recencyById: {},
+  speech: "",
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
@@ -122,6 +125,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
     }),
 
   bloom: () => set(() => ({ bloomAt: nowMs() })),
+
+  setSpeech: (text) => set(() => ({ speech: text })),
 
   refreshThreads: async () => {
     try {

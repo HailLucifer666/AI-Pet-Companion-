@@ -9,6 +9,7 @@ import { SurfaceOverlay } from "./SurfaceOverlay";
 import { DenHud } from "./DenHud";
 import { CoilRing } from "./CoilRing";
 import { MindsEye } from "./MindsEye";
+import { PetChat } from "./PetChat";
 import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus";
 
 /** Flies the camera in for a close-up of the companion (or back out to the Grove).
@@ -56,6 +57,7 @@ export default function DenView() {
         <p aria-hidden="true" className="text-xs text-ink-500/80">drag to orbit · scroll in to meet your pet · click a place to enter</p>
       </div>
       <DenHud />
+      <PetChat />
       <CoilRing />
       <SeePetButton />
       <button

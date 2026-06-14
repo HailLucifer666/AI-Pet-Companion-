@@ -16,7 +16,25 @@ import { petEmoji } from "./petMood";
 export function PetBubble() {
   const reduced = useReducedMotion() ?? false;
   const lumen = useWorldStore((s) => s.lumen);
+  const speech = useWorldStore((s) => s.speech);
   const emoji = petEmoji(lumen.mode, lumen.gesture);
+
+  // The companion is speaking a chat reply → show the words over its head; this
+  // takes priority over the activity emoji.
+  if (speech) {
+    return (
+      <Html position={[0, 1.7, 0]} center distanceFactor={6} zIndexRange={[40, 0]}>
+        <div
+          className={cx(
+            "pointer-events-none max-w-[15rem] select-none rounded-2xl border border-claw-500/40 bg-ink-950/85 px-3 py-1.5 text-center text-[13px] leading-snug text-ink-100 shadow-lg shadow-ink-950/50 backdrop-blur-md",
+            !reduced && "animate-[pop-in_180ms_ease-out]",
+          )}
+        >
+          {speech}
+        </div>
+      </Html>
+    );
+  }
 
   if (!emoji) return null; // resting → no bubble
 
