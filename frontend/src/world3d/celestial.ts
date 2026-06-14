@@ -8,7 +8,7 @@
  *  camera position so the body reads as infinitely far. */
 
 export const SKY_DIST = 200; // camera-relative distance to the celestial body
-const MAX_ELEV = 0.28; // radians (~16°) — cap height so the body stays in the forward view, not overhead
+const MAX_ELEV = 0.5; // radians (~29°) — cap height so the body sits in the forward view, not overhead
 
 export interface Celestial {
   /** Offset from the camera to the body (direction × SKY_DIST). */

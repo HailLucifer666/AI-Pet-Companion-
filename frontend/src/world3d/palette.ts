@@ -51,7 +51,7 @@ export const VILLAGE = {
   stoneHi: 0x3a3545,
   timberDark: 0x2e2016,
   roofDark: 0x1a1520,
-  plazaCobble: 0x3e3b30,
-  roadCobble: 0x4a4035,
+  plazaCobble: 0x6a6150, // lighter warm cobble — reads against the dark grass
+  roadCobble: 0x7a6e54,
   fenceWood: 0x4a3822,
 } as const;

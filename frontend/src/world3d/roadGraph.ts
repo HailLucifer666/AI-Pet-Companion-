@@ -110,9 +110,9 @@ export interface RoadGeometryData {
   index: Uint32Array;
 }
 
-const COB_R = 0x4a / 255,
-  COB_G = 0x40 / 255,
-  COB_B = 0x35 / 255; // VILLAGE.roadCobble
+const COB_R = 0x7a / 255,
+  COB_G = 0x6e / 255,
+  COB_B = 0x54 / 255; // VILLAGE.roadCobble — lightened to read against the grass
 
 /** A flat-ish cobble strip from `from` to `to`, following the terrain height at
  *  each step (so the road drapes over the hills), one draw call. */
@@ -135,10 +135,10 @@ export function buildRoadGeometry(road: RoadSpec): RoadGeometryData {
       cz = road.fromZ + dz * t;
     const lx = cx + nx * hw,
       lz = cz + nz * hw,
-      ly = islandHeight(lx, lz, ISLAND_MAX_R) + 0.04;
+      ly = islandHeight(lx, lz, ISLAND_MAX_R) + 0.08;
     const rx = cx - nx * hw,
       rz = cz - nz * hw,
-      ry = islandHeight(rx, rz, ISLAND_MAX_R) + 0.04;
+      ry = islandHeight(rx, rz, ISLAND_MAX_R) + 0.08;
     const li = i * 2,
       ri = i * 2 + 1;
     positions.set([lx, ly, lz], li * 3);

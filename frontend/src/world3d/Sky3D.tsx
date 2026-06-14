@@ -13,8 +13,9 @@ import { daylightAt } from "./daylight";
 import { celestialPlacement } from "./celestial";
 import { WORLD } from "./palette";
 
-const SUN_R = 17; // disc radius at SKY_DIST (live-tune the apparent size)
-const MOON_R = 13;
+const SUN_R = 20; // disc radius at SKY_DIST (live-tune the apparent size)
+const MOON_R = 16;
+const MOON_CORE = 0xeef2ff; // near-white so the night moon clears the 0.90 bloom gate and glows
 const HALO = 2.0; // soft halo behind each body
 const hex = (n: number) => new THREE.Color(n);
 
@@ -50,17 +51,17 @@ export function Sky3D({ hour, reduced }: { hour: number; reduced: boolean }) {
       <group ref={sun}>
         <mesh>
           <sphereGeometry args={[SUN_R, 24, 24]} />
-          <meshBasicMaterial ref={sunMat} color={hex(WORLD.emberHi)} transparent fog={false} toneMapped={false} />
+          <meshBasicMaterial ref={sunMat} color={hex(WORLD.sun)} transparent depthWrite={false} fog={false} toneMapped={false} />
         </mesh>
         <mesh>
           <sphereGeometry args={[SUN_R * HALO, 20, 20]} />
-          <meshBasicMaterial ref={sunHalo} color={hex(WORLD.sun)} transparent depthWrite={false} fog={false} toneMapped={false} />
+          <meshBasicMaterial ref={sunHalo} color={hex(WORLD.emberHi)} transparent depthWrite={false} fog={false} toneMapped={false} />
         </mesh>
       </group>
       <group ref={moon}>
         <mesh>
           <sphereGeometry args={[MOON_R, 24, 24]} />
-          <meshBasicMaterial ref={moonMat} color={hex(WORLD.moon)} transparent fog={false} toneMapped={false} />
+          <meshBasicMaterial ref={moonMat} color={hex(MOON_CORE)} transparent depthWrite={false} fog={false} toneMapped={false} />
         </mesh>
         <mesh>
           <sphereGeometry args={[MOON_R * HALO, 20, 20]} />

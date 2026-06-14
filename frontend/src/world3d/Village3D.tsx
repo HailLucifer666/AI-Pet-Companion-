@@ -115,6 +115,16 @@ function Lantern({ mats, x, z, h = 1.0 }: { mats: Mats; x: number; z: number; h?
   );
 }
 
+/** A lantern post planted on the terrain at world (x, z). */
+function GroundLantern({ mats, x, z, h = 1.1 }: { mats: Mats; x: number; z: number; h?: number }) {
+  const y = islandHeight(x, z, ISLAND_MAX_R);
+  return (
+    <group position={[x, y, z]}>
+      <Lantern mats={mats} x={0} z={0} h={h} />
+    </group>
+  );
+}
+
 /** Tavern (Hollow): timber box, peaked roof, stone chimney, two ember windows, a
  *  door lantern. */
 function Tavern({ mats }: { mats: Mats }) {
@@ -250,6 +260,17 @@ function Plaza({ mats }: { mats: Mats }) {
         <coneGeometry args={[0.5, 0.9, 6]} />
         <primitive object={mats.fire} attach="material" />
       </mesh>
+      {/* a ring of lanterns around the plaza edge (raised onto the cobble) */}
+      {Array.from({ length: 6 }, (_, i) => {
+        const a = (i / 6) * Math.PI * 2;
+        const lx = Math.cos(a) * 4.6,
+          lz = Math.sin(a) * 4.6;
+        return (
+          <group key={i} position={[lx, py, lz]}>
+            <Lantern mats={mats} x={0} z={0} h={1.2} />
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -269,12 +290,39 @@ function Roads({ mats }: { mats: Mats }) {
     [],
   );
   useEffect(() => () => geoms.forEach((g) => g.dispose()), [geoms]);
+
+  // Lantern posts flanking each road at intervals (alternating sides) so the
+  // cobble ways read as lit paths leading out from the plaza.
+  const lanterns = useMemo(() => {
+    const spots: { x: number; z: number }[] = [];
+    for (const r of VILLAGE_ROADS) {
+      const dx = r.toX - r.fromX,
+        dz = r.toZ - r.fromZ,
+        len = Math.hypot(dx, dz);
+      const nx = dz / len,
+        nz = -dx / len,
+        off = r.width / 2 + 0.7;
+      const count = Math.max(2, Math.floor(len / 7));
+      for (let i = 1; i < count; i++) {
+        const t = i / count,
+          cx = r.fromX + dx * t,
+          cz = r.fromZ + dz * t,
+          side = i % 2 ? 1 : -1;
+        spots.push({ x: cx + nx * off * side, z: cz + nz * off * side });
+      }
+    }
+    return spots;
+  }, []);
+
   return (
     <>
       {geoms.map((g, i) => (
         <mesh key={i} geometry={g} receiveShadow>
           <primitive object={mats.road} attach="material" />
         </mesh>
+      ))}
+      {lanterns.map((s, i) => (
+        <GroundLantern key={`l${i}`} mats={mats} x={s.x} z={s.z} />
       ))}
     </>
   );

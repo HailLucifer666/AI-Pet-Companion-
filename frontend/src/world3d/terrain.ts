@@ -58,10 +58,19 @@ export function fbm(x: number, z: number): number {
  *  stretched blob. A gentle height bump + a smaller water-dip keep the now much
  *  wider mid-island solidly above the waterline. */
 export function islandHeight(x: number, z: number, maxR: number): number {
-  const r = Math.min(1, Math.hypot(x, z) / maxR);
+  const dist = Math.hypot(x, z);
+  const r = Math.min(1, dist / maxR);
   const fall = Math.pow(Math.max(0, 1 - r), 1.7); // 1 at center → 0 at the rim
   const n = fbm((x + 100) * 0.16, (z + 100) * 0.16); // offset so noise isn't centered
-  return fall * (1.6 + n * 5.4) - (1 - fall) * 1.4; // dips below 0 (water) at the edges
+  // Gently-rolling island (no central mountain): a low base rise + modest noise
+  // hills, dipping below 0 (water) at the edges.
+  const rolling = fall * (1.3 + n * 2.4) - (1 - fall) * 1.15;
+  // Flatten the central village basin into a calm plateau so the hamlet sits on
+  // even ground; blend back to the rolling hills past the inner radius.
+  const innerR = maxR * 0.55;
+  const t = smooth(Math.min(1, dist / innerR)); // 0 at center → 1 at innerR+
+  const plateau = 1.9 + n * 0.5;
+  return lerp(plateau, rolling, t);
 }
 
 export const WATER_LEVEL = 0;

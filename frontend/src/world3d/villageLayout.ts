@@ -45,7 +45,7 @@ export const VILLAGE_ROADS: RoadSpec[] = PLACES_3D.map((p) => ({
   fromZ: pz,
   toX: p.pos[0],
   toZ: p.pos[2],
-  width: 1.8,
+  width: 2.6,
   segmentLen: 1.5,
 }));
 
