@@ -126,23 +126,30 @@ const ROCK_BASE = 1.1;
 const BUSH_BASE = 1.4;
 const GRASS_BASE = 1.2;
 
+/** Split placements round-robin across a model list (deterministic by index, so
+ *  it never disturbs the placement RNG). Each model gets every Nth placement. */
+function roundRobin(places: Placement[], models: string[]): Placement[][] {
+  return models.map((_, k) => places.filter((_, i) => i % models.length === k));
+}
+
 function Scatter() {
   const { trees, rocks } = useMemo(scatter, []);
   const { bushes, grass } = useMemo(scatterGround, []);
-  // Spread the tree placements across the available tree models (round-robin by
-  // index — deterministic, and it doesn't disturb the placement RNG).
-  const treeGroups = useMemo(
-    () => NATURE_TREES.map((_, k) => trees.filter((_, i) => i % NATURE_TREES.length === k)),
-    [trees],
-  );
+  const treeGroups = useMemo(() => roundRobin(trees, NATURE_TREES), [trees]);
+  const rockGroups = useMemo(() => roundRobin(rocks, NATURE_ROCKS), [rocks]);
+  const bushGroups = useMemo(() => roundRobin(bushes, NATURE_BUSHES), [bushes]);
 
   return (
     <Suspense fallback={null}>
       {NATURE_TREES.map((name, k) => (
         <InstancedModel key={name} url={natureUrl(name)} places={treeGroups[k]} baseScale={TREE_BASE} />
       ))}
-      <InstancedModel url={natureUrl(NATURE_ROCKS[0])} places={rocks} baseScale={ROCK_BASE} />
-      <InstancedModel url={natureUrl(NATURE_BUSHES[0])} places={bushes} baseScale={BUSH_BASE} />
+      {NATURE_ROCKS.map((name, k) => (
+        <InstancedModel key={name} url={natureUrl(name)} places={rockGroups[k]} baseScale={ROCK_BASE} />
+      ))}
+      {NATURE_BUSHES.map((name, k) => (
+        <InstancedModel key={name} url={natureUrl(name)} places={bushGroups[k]} baseScale={BUSH_BASE} />
+      ))}
       <InstancedModel url={natureUrl(NATURE_GRASS[0])} places={grass} baseScale={GRASS_BASE} />
     </Suspense>
   );
