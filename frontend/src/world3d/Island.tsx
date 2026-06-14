@@ -1,14 +1,16 @@
 /** Island — the low-poly Grove. A faceted terrain mesh (per-face flat colors,
  *  banded by height), a translucent sea, an inland pool, and deterministically
- *  scattered pines and rocks. The scatter is drawn with InstancedMesh — four draw
- *  calls for the whole forest — so the larger island still holds frame-rate on
- *  low-end GPUs. Geometry is built once; same island every launch. */
+ *  scattered nature: real low-poly GLB trees, rocks, bushes and grass (Quaternius,
+ *  CC0), each instanced (one draw call per submesh) so the island holds frame-rate
+ *  on low-end GPUs. The placement is seeded — same island every launch. */
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { WORLD } from "./palette";
+import { InstancedModel, type NaturePlacement } from "./nature/InstancedModel";
+import { NATURE_TREES, NATURE_ROCKS, NATURE_BUSHES, NATURE_GRASS, natureUrl } from "./nature/models";
 
 const SIZE = 36;
 const SEG = 96;
@@ -63,13 +65,7 @@ function buildTerrain(): THREE.BufferGeometry {
   return geo;
 }
 
-interface Placement {
-  x: number;
-  y: number;
-  z: number;
-  scale: number;
-  rot: number;
-}
+type Placement = NaturePlacement;
 
 function clearOf(x: number, z: number): boolean {
   return CLEAR_ZONES.every((c) => Math.hypot(x - c.x, z - c.z) > c.r);
@@ -100,70 +96,55 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
   return { trees, rocks };
 }
 
-// Shared temporaries for composing instance matrices (created once).
-const M = new THREE.Matrix4();
-const P = new THREE.Vector3();
-const Q = new THREE.Quaternion();
-const S = new THREE.Vector3();
-const YAXIS = new THREE.Vector3(0, 1, 0);
-
-function setInstance(
-  mesh: THREE.InstancedMesh,
-  i: number,
-  x: number,
-  y: number,
-  z: number,
-  s: number,
-  rot: number,
-): void {
-  P.set(x, y, z);
-  Q.setFromAxisAngle(YAXIS, rot);
-  S.set(s, s, s);
-  M.compose(P, Q, S);
-  mesh.setMatrixAt(i, M);
+/** Lower ground cover — bushes + grass tufts — on a separate seed so it never
+ *  shifts the tree/rock placement above. Sits in the low/outer band, off the
+ *  meadow and the Place markers. */
+function scatterGround(): { bushes: Placement[]; grass: Placement[] } {
+  const r = mulberry32(0x5a11);
+  const bushes: Placement[] = [];
+  const grass: Placement[] = [];
+  for (let i = 0; i < 1500 && (bushes.length < 12 || grass.length < 18); i++) {
+    const ang = r() * Math.PI * 2;
+    const rad = Math.sqrt(r()) * MAX_R * 0.9;
+    const x = Math.cos(ang) * rad;
+    const z = Math.sin(ang) * rad;
+    const y = islandHeight(x, z, MAX_R);
+    if (!clearOf(x, z)) continue;
+    if (rad > MEADOW_R * 0.7 && y > 0.3 && y < 2.2 && bushes.length < 12) {
+      bushes.push({ x, y, z, scale: 0.6 + r() * 0.5, rot: r() * Math.PI * 2 });
+    } else if (y > 0.2 && y < 2.6 && grass.length < 18) {
+      grass.push({ x, y, z, scale: 0.7 + r() * 0.6, rot: r() * Math.PI * 2 });
+    }
+  }
+  return { bushes, grass };
 }
+
+// Per-category display scale (× each placement's own scale) — tunes the unit-
+// normalised GLBs to island proportions.
+const TREE_BASE = 3.0;
+const ROCK_BASE = 1.1;
+const BUSH_BASE = 1.4;
+const GRASS_BASE = 1.2;
 
 function Scatter() {
   const { trees, rocks } = useMemo(scatter, []);
-  const trunk = useRef<THREE.InstancedMesh>(null);
-  const low = useRef<THREE.InstancedMesh>(null);
-  const high = useRef<THREE.InstancedMesh>(null);
-  const rock = useRef<THREE.InstancedMesh>(null);
-
-  useLayoutEffect(() => {
-    trees.forEach((t, i) => {
-      const s = t.scale;
-      if (trunk.current) setInstance(trunk.current, i, t.x, t.y + 0.33 * s, t.z, s, t.rot);
-      if (low.current) setInstance(low.current, i, t.x, t.y + 0.86 * s, t.z, s, t.rot);
-      if (high.current) setInstance(high.current, i, t.x, t.y + 1.42 * s, t.z, s, t.rot);
-    });
-    rocks.forEach((rk, i) => {
-      if (rock.current) setInstance(rock.current, i, rk.x, rk.y, rk.z, rk.scale, rk.rot);
-    });
-    for (const ref of [trunk, low, high, rock]) {
-      if (ref.current) ref.current.instanceMatrix.needsUpdate = true;
-    }
-  }, [trees, rocks]);
+  const { bushes, grass } = useMemo(scatterGround, []);
+  // Spread the tree placements across the available tree models (round-robin by
+  // index — deterministic, and it doesn't disturb the placement RNG).
+  const treeGroups = useMemo(
+    () => NATURE_TREES.map((_, k) => trees.filter((_, i) => i % NATURE_TREES.length === k)),
+    [trees],
+  );
 
   return (
-    <group>
-      <instancedMesh ref={trunk} args={[undefined, undefined, trees.length]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.07, 0.11, 0.66, 5]} />
-        <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
-      </instancedMesh>
-      <instancedMesh ref={low} args={[undefined, undefined, trees.length]} castShadow>
-        <coneGeometry args={[0.5, 1.04, 6]} />
-        <meshStandardMaterial color={WORLD.pine} flatShading roughness={1} />
-      </instancedMesh>
-      <instancedMesh ref={high} args={[undefined, undefined, trees.length]} castShadow>
-        <coneGeometry args={[0.32, 0.74, 6]} />
-        <meshStandardMaterial color={WORLD.pineHi} flatShading roughness={1} />
-      </instancedMesh>
-      <instancedMesh ref={rock} args={[undefined, undefined, rocks.length]} castShadow receiveShadow>
-        <icosahedronGeometry args={[0.45, 0]} />
-        <meshStandardMaterial color={WORLD.rock} flatShading roughness={1} />
-      </instancedMesh>
-    </group>
+    <Suspense fallback={null}>
+      {NATURE_TREES.map((name, k) => (
+        <InstancedModel key={name} url={natureUrl(name)} places={treeGroups[k]} baseScale={TREE_BASE} />
+      ))}
+      <InstancedModel url={natureUrl(NATURE_ROCKS[0])} places={rocks} baseScale={ROCK_BASE} />
+      <InstancedModel url={natureUrl(NATURE_BUSHES[0])} places={bushes} baseScale={BUSH_BASE} />
+      <InstancedModel url={natureUrl(NATURE_GRASS[0])} places={grass} baseScale={GRASS_BASE} />
+    </Suspense>
   );
 }
 
