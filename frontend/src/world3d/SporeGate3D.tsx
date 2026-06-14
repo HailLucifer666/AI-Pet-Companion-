@@ -12,6 +12,7 @@ import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { glowBoost } from "./daylight";
+import { bloomFlash, bloomGateScale } from "./bloomCinematic";
 import { sky } from "./skyState";
 import { GATE_POINT } from "./pulse";
 import { WORLD } from "./palette";
@@ -59,9 +60,9 @@ export function SporeGate3D() {
       fill.current.position.y = h / 2; // grow up from the base
     }
 
-    // Bloom: a flash that decays over BLOOM_MS after a level-up.
+    // Bloom: a cubic-out flash that pops then decays over BLOOM_MS after a level-up.
     const since = nowMs() - bloomAt;
-    const flash = !reduced && bloomAt > 0 && since < BLOOM_MS ? 1 - since / BLOOM_MS : 0;
+    const flash = !reduced && bloomAt > 0 ? bloomFlash(since, BLOOM_MS) : 0;
 
     if (fillMat.current) fillMat.current.emissiveIntensity = (1.4 + flash * 3) * boost;
     if (coreMat.current) coreMat.current.emissiveIntensity = (1.0 + flash * 3) * boost;
@@ -69,7 +70,7 @@ export function SporeGate3D() {
       const breathe = reduced ? 0 : Math.sin(state.clock.elapsedTime * 2) * 0.3;
       light.current.intensity = 2.2 + breathe + flash * 8;
     }
-    if (group.current) group.current.scale.setScalar(1 + flash * 0.12);
+    if (group.current) group.current.scale.setScalar(bloomGateScale(flash));
   });
 
   return (

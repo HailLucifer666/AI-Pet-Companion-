@@ -214,6 +214,7 @@ export function connect(): void {
     if (ev.type === "pet.levelup") {
       store.setXp(Number(ev.total) || 0);
       store.bloom();
+      store.addPulse("garden"); // an inbound mote draws energy into the arch as it blooms
       return;
     }
     if (ev.type === "memory.formed") {
