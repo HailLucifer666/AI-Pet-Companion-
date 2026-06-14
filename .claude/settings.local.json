@@ -6,7 +6,13 @@
       "Bash(grep -rln \"synapse\" backend/)",
       "Bash(ls frontend/src/state/ frontend/src/components/creature/ frontend/src/lib/synapse.ts)",
       "Bash(ls backend/tests/test_synapse.py)",
-      "Bash(./.venv/Scripts/python.exe -m pytest backend/tests/test_synapse.py -q)"
+      "Bash(./.venv/Scripts/python.exe -m pytest backend/tests/test_synapse.py -q)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git stash *)",
+      "Bash(git merge *)",
+      "Bash(./.venv/Scripts/python.exe -m pytest -q)",
+      "Bash(npm run *)"
     ]
   }
 }

@@ -2,12 +2,14 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-14 · **Branch / sync point:** GitHub `master` (`8ff660b`) · **Current slice:** V-2f.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`a12dfd1`) · **Current:** W-6 cinematics (Blooming + Forging shipped; Quickening pending).
+>
+> **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
 ---
 
 ## 1 · Where we are (one line)
-The 3D world is alive — pet roams an open grove, real day/night + real weather, ambient life, a fluid drone camera. **Next big unlock:** the reactive core (V-2e) — making XP / memories / tool-runs visibly drive the world. Then the pet gets a real body (V-3).
+The 3D world is a living **bioluminescent medieval village**: a screen-faced robot pet rests at a plaza hearth and walks cobble roads to the forge/greenhouse on real events — real day/night + weather, visible sun & moon, a decluttered low-poly grove, voice chat, and a reactive core (Spore Gate fills/blooms with real XP, mycelium pulses, memory crystals + Mind's Eye web). Cinematics: the **Blooming** (level-up) + the **Forging** (skill draft) land as real-data moments. **Next:** the Quickening (in-world hatch) + V-2.5 hardening.
 
 ---
 
@@ -28,22 +30,34 @@ The 3D world is alive — pet roams an open grove, real day/night + real weather
 | V-1a / V-1b | Pet roams (pure `locomotion.ts`); bigger fuller island, instanced forest, pool | `c821f36` |
 | V-2a/b/d | Follow camera, opened grove (no tree wall), ambient particles + bloom | `a2d857f` |
 | V-2c | Sky + real local-clock day/night + real weather by IP (rain/clouds/storm) | `ebab910` |
-| V-2a′ | Fluid eased zoom + autonomous drone-follow | `a2e668d` |
-| V-2a″ | Map-drag pan (left=pan, right=rotate, scroll=zoom) + auto re-follow | `8ff660b` |
+| V-2a′ / V-2a″ | Fluid eased zoom + drone-follow; map-drag pan (left=pan, right=rotate) + auto re-follow | `a2e668d`/`8ff660b` |
+| V-2f / f′ | Tight follow + activity emoji bubble; cursor-lure (pet follows your cursor) | `2230537` |
+| V-2e | **Reactive core** — Spore Gate fills/blooms with real XP, mycelium pulses on tool/memory/skill, crystal sprout-flash | `2c79d2e`-era |
+| V-2-ART | Bioluminescent art pass — ACES tonemapping, crystalline pet, glow grade, selective bloom | `3d0c499`/`2f35d76` |
+| Den HUD | live clock + real weather + city chip | `d164b3e` |
+| V-2g / V-2i | Living Memory Web (embedding-linked crystals + Ebbinghaus compost) + Mind's Eye graph (press **M**) | `7bc12e2`/`9902cb7` |
+| PIVOT | Land on `/den` + Grove tab · memory threads off-island · glass pet-chat (real `/api/chat` stream + voice STT/TTS + in-world speech) | `d9a8c45` |
+| PIVOT-2 / 2b | Instanced Quaternius GLB trees/rocks/bushes (CC0) replace procedural scatter | `fd2fa52`/`0d9c406` |
+| V-2-BOT | Screen-faced **robot pet** + data-driven expression face | `52238b9` |
+| GROW | Visible **sun + moon** · grow world ×7 · explorable follow-camera | `64b8913`/`cbad18d` |
+| GROW-2 | Right-size ×5 · **bioluminescent village** (plaza/hearth, 3 buildings, cobble roads, pet road-pathing) · sun/moon visible | `3d1c0b1`/`25aa185` |
+| Eyeball fixes | Flatten island · lit roads · flat plaza pad · warm campfire + props · declutter + cleaner night · **free-roam toggle** · pet walks to Memory Garden on a formed memory | `5e28a84`→`0539780` |
+| W-6 Blooming | cubic-out level-up gate flash + inbound pulse (pure tested core `bloomCinematic.ts`) | `1819d9b` |
+| W-6 Forging | skill draft → **forge erupts** + pet celebrates at the Foundry | `a12dfd1` |
 
 ### In progress 🔨
-| Slice | What | Effort |
-|-------|------|--------|
-| **V-2f** | Tighter auto-follow (centered, fast re-lock) + activity emoji bubble above pet's head + this ROADMAP | **S** |
+_(none — at a clean checkpoint; pick the next from Pending)_
 
 ### Pending ⏳
 | Slice | What | Effort |
 |-------|------|--------|
-| V-2e | **Reactive core** — XP into store, Spore Gate fills with real XP, mycelium pulses on tool-runs, crystal flash on memory.formed, fire flares while working | **L** |
-| V-3 | Pet **character form** — replace the icosahedron blob with a real low-poly creature, per-stage growth | **L** |
-| W-6 | Cinematics + HUD — The Quickening (in-world hatch), Blooming (levelup), Forging (skill), Coil XP ring | **L** |
+| W-6 Quickening | **in-world egg-hatch cinematic** — replaces the DOM hatch ritual (first-run-flow rework; ~10 coupling hazards — run its own scope workflow) | **L** |
+| V-2.5 | Hardening — GPU-tier quality ladder (gate bloom/lights on weak GPUs), placeRegistry consolidation, 2D fallback | **M** |
+| V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
+| V-2h | Emotion Vector — arousal/valence/curiosity from real agent cadence → pet glow (fills the `mood` stub) | **M** |
 | W-7 | The Widening — realms II (Wilderness) + III (Observatory), camera bounds expand on stage-up | **L** |
-| W-8 | Full-game layer — diegetic chat at the Hollow, clickable crystals open real memories, skill monuments, play | **L** |
+| W-8 | Full-game layer — clickable crystals open real memories, skill monuments, play | **L** |
+| V-4 | Sight & Voice — browser teaching → Tauri native shell + desktop pointing (see `docs/SIGHT-AND-VOICE.md`) | **XL** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
 ---
@@ -97,19 +111,20 @@ NeuraClaw (trunk: local-first AI companion, real computation only)
 │
 ├── ✅ GROWTH ................. hatch ritual · XP engine · capability ladder (gates by stage)
 │
-├── ✅ THE WORLD (3D) ......... react-three-fiber grove
-│   ├── ✅ island · pet · crystals · Places-as-overlays
-│   ├── ✅ roaming pet (pure locomotion)
-│   ├── ✅ open grove (no tree wall) + ambient particles + bloom
-│   ├── ✅ real day/night (local clock) + real weather (IP → Open-Meteo)
+├── ✅ THE WORLD (3D) ......... react-three-fiber bioluminescent village
+│   ├── ✅ island · crystals · Places-as-overlays
+│   ├── ✅ screen-faced ROBOT pet (data-driven face) · roams via pure locomotion
+│   ├── ✅ bioluminescent VILLAGE — plaza/hearth + tavern/forge/greenhouse + cobble roads (pet road-pathing)
+│   ├── ✅ open decluttered grove (instanced CC0 GLB trees/rocks/bushes) + ambient particles + bloom
+│   ├── ✅ real day/night (local clock) + real weather (IP → Open-Meteo) + visible sun & moon
 │   ├── ✅ camera: fluid zoom · drone-follow · map-drag pan · auto re-follow
-│   └── 🔨 V-2f: tight follow + activity emoji bubble (🔧😴🌱🎉👀🚶🎲)
+│   └── ✅ V-2f: tight follow + activity emoji bubble (🔧😴🌱🎉👀🚶🎲) + cursor-lure + free-roam toggle
 │
-├── ⏳ REACTIVE CORE (V-2e) ... the payoff — world visibly = real work
-│   ├── ⏳ Spore Gate fills with real XP, blooms on levelup
-│   ├── ⏳ mycelium pulses travel origin→pet→Gate on tool-runs / memories / skills
-│   ├── ⏳ crystal flash on memory.formed · fold-back on forget
-│   └── ⏳ Hollow fire flares while a tool runs
+├── ✅ REACTIVE CORE (V-2e) ... the payoff — world visibly = real work
+│   ├── ✅ Spore Gate fills with real XP, blooms on levelup (cubic-out)
+│   ├── ✅ mycelium pulses travel origin→pet→Gate on tool-runs / memories / skills
+│   ├── ✅ crystal sprout-flash on memory.formed · fold-back on forget · Mind's Eye web (press M)
+│   └── ✅ forge erupts on skill draft · pet walks to the Memory Garden on a formed memory
 │
 ├── ⏳ 2050 ELEVATIONS ........ council-synthesized, gated by reality-check (see docs/COUNCIL-SYNTHESIS.md)
 │   ├── ⏳ V-2g Living Memory Web (L) — crystals placed/linked by embedding similarity + Ebbinghaus compost   [REAL-NOW]
@@ -124,9 +139,9 @@ NeuraClaw (trunk: local-first AI companion, real computation only)
 │   ├── ⏳ V-4d Desktop pointing (L) — [POINT:x,y] → transparent click-through overlay, animated pet-cursor  [REAL · native]
 │   └── ⚠️ privacy: hosted vision brain = screenshot leaves device → opt-in only, never persisted, UI warns; local Ollama-vision option
 │
-├── ⏳ THE PET, FOR REAL (V-3)  low-poly character form, per-stage body
+├── 🔨 THE PET, FOR REAL (V-3)  ✅ robot pet shipped (V-2-BOT) · ⏳ GLB prop/pet polish + Draco/LOD
 │
-├── ⏳ THE MOMENTS (W-6) ...... cinematics (Quickening / Blooming / Forging) + Coil XP HUD
+├── 🔨 THE MOMENTS (W-6) ...... ✅ Blooming · ✅ Forging · ✅ Coil XP HUD · ⏳ the Quickening (in-world hatch)
 │
 ├── ⏳ THE WIDENING (W-7) ..... realm II Wilderness · realm III Observatory (unlock on stage-up)
 │

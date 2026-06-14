@@ -18,3 +18,12 @@ Ultimate Stylized Nature*/
 *.fbx
 *.blend
 *.blend1
+
+# Local scratch / reference / side-projects — NOT part of the app build. Kept off
+# git so `git add -A` (ship.bat) stays clean and the repo doesn't bloat across
+# machines. Files stay on disk locally; un-ignore any you actually want synced.
+tracker/
+Multi LLM/
+Pet Assets Ref/
+.claude/launch.json
+WebLiveTracker-start.bat
