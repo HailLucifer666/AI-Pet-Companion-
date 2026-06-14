@@ -13,8 +13,10 @@ import { sky } from "./skyState";
 import type { WeatherFx } from "./weather";
 import { WORLD } from "./palette";
 
-const FOG_NEAR = 34;
-const FOG_FAR = 90;
+// Tuned for the high-diorama camera (rests ~46 out): the island reads clear with a
+// hint of depth on its far rim, and the surrounding sea dissolves into the horizon.
+const FOG_NEAR = 50;
+const FOG_FAR = 120;
 const OVERCAST = new Color(0x7a8290);
 
 // Reused work colors (a single Atmosphere instance lives per canvas).
