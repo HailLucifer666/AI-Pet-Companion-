@@ -14,6 +14,7 @@ import { api, type MemoryType } from "../lib/api";
 import { connectSynapse } from "../lib/synapse";
 import type { SSEEvent } from "../lib/sse";
 import { mulberry32 } from "../world/engine/rng";
+import { PULSE_DURATION, type PulseOrigin } from "../world3d/pulse";
 import {
   INITIAL,
   reduceLumenform,
@@ -28,13 +29,34 @@ const reduced =
 
 const idleRnd = mulberry32(0x10fc);
 
+const MAX_PULSES = 14;
+let pulseId = 1;
+const nowMs = () => (typeof performance !== "undefined" ? performance.now() : Date.now());
+
+/** Memory ids planted *live* (via the stream, not the REST hydration). The crystal
+ *  for each flashes once as it sprouts; Crystals3D consumes the id on first frame. */
+export const freshCrystals = new Set<number>();
+
+export interface Pulse {
+  id: number;
+  origin: PulseOrigin;
+  bornMs: number;
+}
+
 interface WorldStore {
   lumen: LumenformState;
   stage: 1 | 2 | 3 | 4;
   crystals: CrystalSeed[];
+  xpFrac: number; // 0..1 toward the next level — fills the Spore Gate
+  level: number;
+  pulses: Pulse[];
+  bloomAt: number; // performance.now() of the last level-up (the gate blooms)
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
+  setXp: (total: number) => void;
+  addPulse: (origin: PulseOrigin) => void;
+  bloom: () => void;
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
   tickIdle: () => void;
@@ -44,12 +66,17 @@ export const useWorldStore = create<WorldStore>((set) => ({
   lumen: INITIAL,
   stage: 1,
   crystals: [],
+  xpFrac: 0,
+  level: 0,
+  pulses: [],
+  bloomAt: 0,
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
   addCrystal: (id, memoryType) =>
     set((state) => {
       if (state.crystals.some((c) => c.id === id)) return state;
+      freshCrystals.add(id); // planted live → it flashes as it sprouts
       const crystal = makeCrystalSeed(id, memoryType);
       return { crystals: [...state.crystals, crystal].slice(-MAX_CRYSTALS) };
     }),
@@ -60,17 +87,30 @@ export const useWorldStore = create<WorldStore>((set) => ({
       return { crystals: state.crystals.filter((c) => c.id !== id) };
     }),
 
+  setXp: (total) =>
+    set(() => ({ level: Math.floor(total / 100), xpFrac: (((total % 100) + 100) % 100) / 100 })),
+
+  addPulse: (origin) =>
+    set((state) => {
+      const t = nowMs();
+      const live = state.pulses.filter((p) => t - p.bornMs < PULSE_DURATION); // drop finished
+      return { pulses: [...live, { id: pulseId++, origin, bornMs: t }].slice(-MAX_PULSES) };
+    }),
+
+  bloom: () => set(() => ({ bloomAt: nowMs() })),
+
   hydrate: async () => {
     try {
-      const { memories } = await api.memory();
+      const [{ memories }, petRes] = await Promise.all([api.memory(), api.pet()]);
       // Newest last so the MAX_CRYSTALS cap keeps the most recent if over the limit.
       const ordered = [...memories].reverse();
       const crystals = ordered
         .map((m) => makeCrystalSeed(m.id, m.type))
         .slice(-MAX_CRYSTALS);
-      set({ crystals });
+      const total = petRes.pet?.xp ?? 0;
+      set({ crystals, level: Math.floor(total / 100), xpFrac: (((total % 100) + 100) % 100) / 100 });
     } catch {
-      // Offline / backend down: the live stream still plants crystals as memories form.
+      // Offline / backend down: the live stream still plants crystals + ticks XP.
     }
   },
 
@@ -119,15 +159,29 @@ export function connect(): void {
       store.setStage(Number(ev.stage) || 1);
       return;
     }
+    if (ev.type === "xp.awarded") {
+      store.setXp(Number(ev.total) || 0);
+      return;
+    }
+    if (ev.type === "pet.levelup") {
+      store.setXp(Number(ev.total) || 0);
+      store.bloom();
+      return;
+    }
     if (ev.type === "memory.formed") {
       store.addCrystal(Number(ev.memory_id) || 0, String(ev.memory_type || "fact") as MemoryType);
       store.dispatch({ kind: "memory-formed", memoryId: Number(ev.memory_id) || 0 });
+      store.addPulse("garden");
       return;
     }
     if (ev.type === "memory.forgotten") {
       store.removeCrystal(Number(ev.memory_id) || 0);
       return;
     }
+    // A real tool run / skill draft sends a pulse from its origin, then still
+    // drives the FSM (toWorldEvent) below.
+    if (ev.type === "agent.tool.start") store.addPulse("workbench");
+    if (ev.type === "skill.drafted") store.addPulse("hollow");
     const event = toWorldEvent(ev);
     if (event) store.dispatch(event);
   });

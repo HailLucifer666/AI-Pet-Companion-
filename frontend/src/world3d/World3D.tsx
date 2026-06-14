@@ -15,6 +15,8 @@ import { GlowMushrooms3D } from "./GlowMushrooms3D";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
 import { Places3D } from "./Places3D";
+import { SporeGate3D } from "./SporeGate3D";
+import { Pulses3D } from "./Pulses3D";
 import { Particles3D } from "./Particles3D";
 import { Postfx } from "./Postfx";
 import { Atmosphere } from "./Atmosphere";
@@ -159,6 +161,8 @@ export function World3D() {
       <Lumenform3D />
       <Crystals3D />
       <Places3D />
+      <SporeGate3D />
+      <Pulses3D />
       <Particles3D />
       <Clouds3D amount={fx.clouds} reduced={reduced} />
       <Rain3D rain={fx.rain} lightning={fx.lightning} reduced={reduced} />

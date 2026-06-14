@@ -7,12 +7,16 @@
 import { useState } from "react";
 import { Html } from "@react-three/drei";
 import { useWorldNav } from "../state/worldNavStore";
+import { useWorldStore } from "../state/worldStore";
 import { cx } from "../components/ui";
 import { WORLD } from "./palette";
 import { PLACES_3D, type Place3D as PlaceDef, type PlaceKind } from "./placeDefs";
 
 function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
+  // The Hollow's fire flares while a real tool runs (the companion is working).
+  const working = useWorldStore((s) => s.lumen.mode === "work");
   if (kind === "hollow") {
+    const hot = hovered || working;
     return (
       <group>
         {[0, 1, 2, 3, 4].map((i) => {
@@ -33,16 +37,16 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
           <cylinderGeometry args={[0.06, 0.06, 0.8, 5]} />
           <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
         </mesh>
-        {/* flame */}
-        <mesh position-y={0.34}>
+        {/* flame — flares when hovered or while the companion works */}
+        <mesh position-y={0.34} scale-y={hot ? 1.3 : 1}>
           <coneGeometry args={[0.2, 0.6, 5]} />
-          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hovered ? 2.4 : 1.5} flatShading />
+          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hot ? 2.8 : 1.5} flatShading />
         </mesh>
-        <mesh position-y={0.5}>
+        <mesh position-y={0.5} scale-y={hot ? 1.3 : 1}>
           <coneGeometry args={[0.1, 0.3, 5]} />
-          <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={hovered ? 2.6 : 1.8} flatShading />
+          <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={hot ? 3.0 : 1.8} flatShading />
         </mesh>
-        <pointLight color={WORLD.ember} intensity={hovered ? 6 : 4} distance={7} decay={2} position={[0, 0.5, 0]} />
+        <pointLight color={WORLD.ember} intensity={hot ? 7 : 4} distance={8} decay={2} position={[0, 0.5, 0]} />
       </group>
     );
   }

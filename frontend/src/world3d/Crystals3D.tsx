@@ -8,7 +8,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import type { Group, MeshStandardMaterial } from "three";
-import { useWorldStore } from "../state/worldStore";
+import { freshCrystals, useWorldStore } from "../state/worldStore";
 import { mulberry32 } from "../world/engine/rng";
 import { SPECIES, type CrystalSeed } from "../world/entities/crystalSeed";
 import { crystalPosition, CRYSTAL_COLOR } from "./crystalPlacement";
@@ -82,17 +82,27 @@ function Crystal({ seed }: { seed: CrystalSeed }) {
   const ref = useRef<Group>(null);
   const matRef = useRef<MeshStandardMaterial>(null);
   const grow = useRef(reduced ? 1 : 0);
+  const flash = useRef(0); // one-shot bloom when planted live (not on REST hydration)
+  const consumed = useRef(false);
   const pos = useMemo(() => crystalPosition(seed.seed), [seed.seed]);
   const spin = useMemo(() => 0.15 + mulberry32(seed.seed)() * 0.4, [seed.seed]);
 
   useFrame((state, delta) => {
     const g = ref.current;
     if (!g) return;
+    if (!consumed.current) {
+      consumed.current = true;
+      if (!reduced && freshCrystals.has(seed.id)) flash.current = 1; // a memory just formed here
+      freshCrystals.delete(seed.id);
+    }
     if (grow.current < 1) {
       grow.current = Math.min(1, grow.current + delta * 2.4);
       g.scale.setScalar(BASE * (1 - Math.pow(1 - grow.current, 3)));
     }
-    if (matRef.current) matRef.current.emissiveIntensity = CRYSTAL_EMISSIVE * glowBoost(sky.dayness);
+    if (flash.current > 0) flash.current = Math.max(0, flash.current - delta * 1.4);
+    if (matRef.current) {
+      matRef.current.emissiveIntensity = CRYSTAL_EMISSIVE * glowBoost(sky.dayness) * (1 + flash.current * 3);
+    }
     if (!reduced) {
       g.rotation.y += delta * spin;
       g.position.y = pos.y + Math.sin(state.clock.elapsedTime * 1.3 + seed.id) * 0.03;
