@@ -72,8 +72,9 @@ export function reduceLumenform(
     case "done":
       return { ...state, place: "home", mode: "rest", gesture: "none", gestureUntil: 0, since: now };
     case "memory-formed":
-      // Plant where it stands (the crystal itself is spawned by the store).
-      return withGesture({ ...state, since: now }, "plant", now);
+      // Walk the road to the Memory Garden (greenhouse) and plant there — the
+      // crystal itself is spawned deterministically by the store.
+      return withGesture({ ...state, place: "garden", since: now }, "plant", now);
     case "skill-drafted":
       return withGesture({ ...state, since: now }, "celebrate", now);
     case "thinking":

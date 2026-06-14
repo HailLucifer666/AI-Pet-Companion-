@@ -30,8 +30,9 @@ export interface Velocity {
 // small UNSCALED offset beside its marker, so the pet always stands right next to
 // the fire / bench / pool — never metres away — however far the cluster is spread.
 const ANCHORS: Record<Exclude<Place, "wander">, Vec2> = {
-  home: { x: -1 * WORLD_SCALE + 1.2, z: -1 * WORLD_SCALE + 0.7 }, // CHANGED → beside the plaza hearth (village hub)
-  workbench: { x: -4 * WORLD_SCALE + 0.8, z: 3.8 * WORLD_SCALE - 0.8 }, // beside the Workbench
+  home: { x: -1 * WORLD_SCALE + 1.2, z: -1 * WORLD_SCALE + 0.7 }, // beside the plaza hearth (village hub)
+  workbench: { x: -4 * WORLD_SCALE + 0.8, z: 3.8 * WORLD_SCALE - 0.8 }, // beside the Workbench (forge)
+  garden: { x: 4.5 * WORLD_SCALE - 1.1, z: -3.3 * WORLD_SCALE + 0.6 }, // beside the Memory Garden (greenhouse) — matches roadGraph garden_entrance
   pool: { x: 5.5 * WORLD_SCALE - 1.1, z: 3.5 * WORLD_SCALE - 0.6 }, // at the inland pool's edge
 };
 

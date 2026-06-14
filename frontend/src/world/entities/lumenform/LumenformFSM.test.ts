@@ -34,10 +34,10 @@ describe("reduceLumenform — real events drive work", () => {
     expect(s.place).toBe("workbench");
   });
 
-  it("plants on a formed memory without leaving its spot", () => {
+  it("walks to the Memory Garden to plant a formed memory", () => {
     const s = reduceLumenform(at({ place: "pool" }), { kind: "memory-formed", memoryId: 7 }, 5000);
     expect(s.gesture).toBe("plant");
-    expect(s.place).toBe("pool"); // plants where it stands
+    expect(s.place).toBe("garden"); // routes to the greenhouse along the cobble road
     expect(s.gestureUntil).toBeGreaterThan(5000);
   });
 

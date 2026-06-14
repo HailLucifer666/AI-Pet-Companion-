@@ -5,11 +5,12 @@
 
 import { mulberry32, range } from "./engine/rng";
 
-export type Place = "home" | "workbench" | "pool" | "wander";
+export type Place = "home" | "workbench" | "garden" | "pool" | "wander";
 
 export const PLACES: Record<Exclude<Place, "wander">, { nx: number; ny: number }> = {
   home: { nx: 0.5, ny: 0.78 }, // by the Hollow's fire
   workbench: { nx: 0.76, ny: 0.66 }, // off to one side, where work happens
+  garden: { nx: 0.27, ny: 0.64 }, // the Memory Garden — where formed memories are planted
   pool: { nx: 0.5, ny: 0.9 },
 };
 
