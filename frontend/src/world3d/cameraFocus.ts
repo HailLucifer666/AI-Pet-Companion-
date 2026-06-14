@@ -5,5 +5,5 @@
  *  0 = nothing requested; >0 = ease the zoom to that distance. */
 export const cameraFocus = { request: 0 };
 
-export const SEE_PET_DIST = 6; // close-up of the companion
-export const GROVE_DIST = 46; // back to the whole-island framing (matches World3D DEFAULT_DIST)
+export const SEE_PET_DIST = 8; // close-up of the companion (with a little world around it)
+export const GROVE_DIST = 90; // pull back to survey a swath of the big island
