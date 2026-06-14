@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { World3D } from "../../world3d/World3D";
 import { SurfaceOverlay } from "./SurfaceOverlay";
+import { DenHud } from "./DenHud";
 
 export default function DenView() {
   const [host, setHost] = useState<HTMLDivElement | null>(null);
@@ -18,6 +19,7 @@ export default function DenView() {
         <p className="font-display text-sm font-medium tracking-wide text-ink-300/90">The Grove</p>
         <p className="text-xs text-ink-500/80">drag to move · scroll to zoom · click a place to enter</p>
       </div>
+      <DenHud />
       <SurfaceOverlay container={host} />
     </div>
   );
