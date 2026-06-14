@@ -33,4 +33,18 @@ describe("celestialPlacement", () => {
     expect(len(celestialPlacement([1, 1, 1], 1).offset)).toBeCloseTo(SKY_DIST, 4);
     expect(len(celestialPlacement([80, 270, 80], 1).offset)).toBeCloseTo(SKY_DIST, 4);
   });
+
+  it("elevation is capped low so the body rides near the horizon", () => {
+    // Noon sunDir [10,27,8] is steeply overhead (~64°) — must be pulled down.
+    const { offset } = celestialPlacement([10, 27, 8], 1);
+    const elev = Math.atan2(offset[1], Math.hypot(offset[0], offset[2]));
+    expect(elev).toBeLessThanOrEqual(0.29); // ~MAX_ELEV
+    expect(offset[1]).toBeGreaterThan(0); // still above the horizon, not below
+  });
+
+  it("preserves the compass azimuth while capping elevation", () => {
+    const { offset } = celestialPlacement([10, 27, 8], 1);
+    // azimuth in the x/z plane is unchanged by the elevation clamp
+    expect(Math.atan2(offset[2], offset[0])).toBeCloseTo(Math.atan2(8, 10), 5);
+  });
 });

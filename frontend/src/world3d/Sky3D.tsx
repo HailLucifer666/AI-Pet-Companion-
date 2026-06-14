@@ -13,8 +13,8 @@ import { daylightAt } from "./daylight";
 import { celestialPlacement } from "./celestial";
 import { WORLD } from "./palette";
 
-const SUN_R = 11; // disc radius at SKY_DIST (live-tune the apparent size)
-const MOON_R = 8;
+const SUN_R = 17; // disc radius at SKY_DIST (live-tune the apparent size)
+const MOON_R = 13;
 const HALO = 2.0; // soft halo behind each body
 const hex = (n: number) => new THREE.Color(n);
 
