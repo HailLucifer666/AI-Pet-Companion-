@@ -15,6 +15,7 @@ import * as THREE from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { glowBoost } from "./daylight";
+import { bloomFlash } from "./bloomCinematic";
 import { sky } from "./skyState";
 import { WORLD, VILLAGE } from "./palette";
 import { PLAZA_POS } from "./placeDefs";
@@ -22,6 +23,8 @@ import { BUILDING_DEFS, VILLAGE_ROADS, type BuildingDef } from "./villageLayout"
 import { buildRoadGeometry } from "./roadGraph";
 
 const hex = (n: number) => new THREE.Color(n);
+const FORGE_MS = 1600; // how long the forge erupts after a real skill draft
+const nowMs = () => (typeof performance !== "undefined" ? performance.now() : 0);
 
 /** Tag a material as glow-driven: store its base emissive intensity + optional
  *  per-frame behaviours read by the single glow `useFrame` (traversal). */
@@ -417,10 +420,12 @@ export function Village3D({ reduced }: { reduced: boolean }) {
 
   useFrame((state) => {
     const boost = glowBoost(sky.dayness);
-    const { lumen } = useWorldStore.getState();
+    const { lumen, forgeAt } = useWorldStore.getState();
     const working = lumen.mode === "work";
     const atHome = lumen.place === "home";
     const t = state.clock.elapsedTime;
+    // The Forging: a cubic-out eruption of the forge on a real skill draft.
+    const forgeFlash = reduced || !forgeAt ? 0 : bloomFlash(nowMs() - forgeAt, FORGE_MS);
 
     root.current?.traverse((o) => {
       const raw = (o as THREE.Mesh).material;
@@ -429,17 +434,20 @@ export function Village3D({ reduced }: { reduced: boolean }) {
       const base = m.userData.emissiveBase as number | undefined;
       if (base === undefined) return;
       let mult = boost;
-      if (m.userData.workFlare !== undefined) mult *= working ? (m.userData.workFlare as number) : 1;
+      if (m.userData.workFlare !== undefined) {
+        mult *= working ? (m.userData.workFlare as number) : 1;
+        mult *= 1 + forgeFlash * 2.5; // the forge erupts on a skill draft, atop the work flare
+      }
       if (!reduced && m.userData.flicker !== undefined) {
         mult *= 0.88 + 0.12 * Math.sin(t * 1.4 + (m.userData.flicker as number));
       }
       m.emissiveIntensity = base * mult;
     });
 
-    // Hearth + forge lights ride the same grade (+ a hearth flicker, work flare).
+    // Hearth + forge lights ride the same grade (+ a hearth flicker, work flare, forge eruption).
     const flick = reduced ? 1 : 0.9 + 0.1 * Math.sin(t * 5);
     if (hearthLight.current) hearthLight.current.intensity = (atHome ? 9 : 5) * boost * flick;
-    if (forgeLight.current) forgeLight.current.intensity = (working ? 5 : 2.2) * boost;
+    if (forgeLight.current) forgeLight.current.intensity = (working ? 5 : 2.2) * boost + forgeFlash * 8;
   });
 
   return (

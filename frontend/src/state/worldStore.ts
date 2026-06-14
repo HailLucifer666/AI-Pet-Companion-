@@ -60,6 +60,7 @@ interface WorldStore {
   level: number;
   pulses: Pulse[];
   bloomAt: number; // performance.now() of the last level-up (the gate blooms)
+  forgeAt: number; // performance.now() of the last skill draft (the forge erupts)
   threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
   recencyById: Record<number, number | null>; // memory_id → last-mattered epoch ms (compost)
   speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
@@ -70,6 +71,7 @@ interface WorldStore {
   addPulse: (origin: PulseOrigin) => void;
   prunePulses: () => void;
   bloom: () => void;
+  forge: () => void;
   setSpeech: (text: string) => void;
   refreshThreads: () => Promise<void>;
   hydrate: () => Promise<void>;
@@ -85,6 +87,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   level: 0,
   pulses: [],
   bloomAt: 0,
+  forgeAt: 0,
   threads: [],
   recencyById: {},
   speech: "",
@@ -125,6 +128,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
     }),
 
   bloom: () => set(() => ({ bloomAt: nowMs() })),
+
+  forge: () => set(() => ({ forgeAt: nowMs() })),
 
   setSpeech: (text) => set(() => ({ speech: text })),
 
@@ -232,7 +237,10 @@ export function connect(): void {
     // A real tool run / skill draft sends a pulse from its origin, then still
     // drives the FSM (toWorldEvent) below.
     if (ev.type === "agent.tool.start") store.addPulse("workbench");
-    if (ev.type === "skill.drafted") store.addPulse("hollow");
+    if (ev.type === "skill.drafted") {
+      store.addPulse("workbench"); // forged at the Foundry — energy from the forge
+      store.forge(); // the forge erupts (Village3D reads forgeAt)
+    }
     const event = toWorldEvent(ev);
     if (event) store.dispatch(event);
   });

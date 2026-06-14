@@ -76,7 +76,8 @@ export function reduceLumenform(
       // crystal itself is spawned deterministically by the store.
       return withGesture({ ...state, place: "garden", since: now }, "plant", now);
     case "skill-drafted":
-      return withGesture({ ...state, since: now }, "celebrate", now);
+      // Walk to the Foundry (forge/Workbench) and celebrate the newly forged skill.
+      return withGesture({ ...state, place: "workbench", since: now }, "celebrate", now);
     case "thinking":
       // Perk up only when at rest; never interrupt work.
       return state.mode === "rest" && state.gesture === "none"
