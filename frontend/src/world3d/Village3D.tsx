@@ -82,12 +82,18 @@ function useVillageMaterials() {
       0.6,
       { workFlare: 3.2 },
     );
-    const fire = glow(
-      new THREE.MeshStandardMaterial({ color: hex(WORLD.emberHi), emissive: hex(WORLD.emberHi), flatShading: true }),
-      1.6,
+    // Campfire: a warm orange flame body (not blown-white) + a small bright core.
+    const flame = glow(
+      new THREE.MeshStandardMaterial({ color: hex(WORLD.ember), emissive: hex(WORLD.ember), flatShading: true }),
+      0.85,
       { flicker: 0.3 },
     );
-    return { stone, stoneHi, timber, roof, cobble, road, window, workWindow, lantern, glass, crystal, forgeTop, fire };
+    const flameTip = glow(
+      new THREE.MeshStandardMaterial({ color: hex(WORLD.emberHi), emissive: hex(WORLD.emberHi), flatShading: true }),
+      1.25,
+      { flicker: 1.1 },
+    );
+    return { stone, stoneHi, timber, roof, cobble, road, window, workWindow, lantern, glass, crystal, forgeTop, flame, flameTip };
   }, []);
 
   useEffect(
@@ -241,25 +247,94 @@ function Building({ def, mats }: { def: BuildingDef; mats: Mats }) {
   );
 }
 
-/** The plaza: a cobble disc + a stone-ringed hearth/bonfire at its centre. */
-function Plaza({ mats }: { mats: Mats }) {
-  const [px, py, pz] = PLAZA_POS;
+/** A campfire: a stone fire-ring, a small stack of logs, and warm layered flames
+ *  with a bright core (reads as fire, not a white pyramid). `y0` = ground height. */
+function Campfire({ mats, y0 }: { mats: Mats; y0: number }) {
   return (
-    <group position={[px, 0, pz]}>
-      <mesh rotation-x={-Math.PI / 2} position-y={py + 0.02} receiveShadow>
-        <circleGeometry args={[5.2, 28]} />
-        <primitive object={mats.cobble} attach="material" />
-      </mesh>
-      {/* hearth ring */}
-      <mesh position-y={py + 0.2} castShadow>
-        <cylinderGeometry args={[0.8, 0.9, 0.4, 8]} />
+    <group position-y={y0}>
+      {/* stone fire-ring */}
+      <mesh position-y={0.18} castShadow>
+        <cylinderGeometry args={[0.85, 0.95, 0.36, 9]} />
         <primitive object={mats.stone} attach="material" />
       </mesh>
-      {/* bonfire */}
-      <mesh position-y={py + 0.7}>
-        <coneGeometry args={[0.5, 0.9, 6]} />
-        <primitive object={mats.fire} attach="material" />
+      {/* crossed logs */}
+      {[0, 1, 2].map((i) => (
+        <mesh key={i} position-y={0.34} rotation={[Math.PI / 2, 0, (i / 3) * Math.PI]} castShadow>
+          <cylinderGeometry args={[0.09, 0.11, 1.3, 6]} />
+          <primitive object={mats.timber} attach="material" />
+        </mesh>
+      ))}
+      {/* layered warm flames — three small cones + a bright inner core */}
+      <mesh position={[0.12, 0.62, 0.06]}>
+        <coneGeometry args={[0.32, 0.7, 6]} />
+        <primitive object={mats.flame} attach="material" />
       </mesh>
+      <mesh position={[-0.14, 0.56, -0.08]}>
+        <coneGeometry args={[0.26, 0.56, 6]} />
+        <primitive object={mats.flame} attach="material" />
+      </mesh>
+      <mesh position={[0.0, 0.82, 0.0]}>
+        <coneGeometry args={[0.16, 0.48, 6]} />
+        <primitive object={mats.flameTip} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+/** A little stone wishing-well with a timber post + plank roof. */
+function Well({ mats }: { mats: Mats }) {
+  return (
+    <group>
+      <mesh position-y={0.4} castShadow receiveShadow>
+        <cylinderGeometry args={[0.7, 0.75, 0.8, 10]} />
+        <primitive object={mats.stone} attach="material" />
+      </mesh>
+      <mesh position={[-0.55, 1.2, 0]} castShadow>
+        <boxGeometry args={[0.12, 1.5, 0.12]} />
+        <primitive object={mats.timber} attach="material" />
+      </mesh>
+      <mesh position={[0.55, 1.2, 0]} castShadow>
+        <boxGeometry args={[0.12, 1.5, 0.12]} />
+        <primitive object={mats.timber} attach="material" />
+      </mesh>
+      <mesh position-y={1.95} rotation-y={Math.PI / 4} castShadow>
+        <coneGeometry args={[0.95, 0.5, 4]} />
+        <primitive object={mats.roof} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+/** The plaza: cobble disc, central campfire, a well + a few crates, lantern ring. */
+function Plaza({ mats }: { mats: Mats }) {
+  const [px, py, pz] = PLAZA_POS;
+  const crates: [number, number, number][] = [
+    [3.0, 0.35, -2.6],
+    [3.5, 0.35, -2.0],
+    [3.1, 1.0, -2.3],
+  ];
+  return (
+    <group position={[px, 0, pz]}>
+      <mesh rotation-x={-Math.PI / 2} position-y={py + 0.06} receiveShadow>
+        <circleGeometry args={[5.2, 32]} />
+        <primitive object={mats.cobble} attach="material" />
+      </mesh>
+
+      <Campfire mats={mats} y0={py} />
+
+      {/* a well off to one side */}
+      <group position={[-3.2, py, 2.4]}>
+        <Well mats={mats} />
+      </group>
+
+      {/* a small stack of crates */}
+      {crates.map((c, i) => (
+        <mesh key={i} position={[c[0], py + c[1], c[2]]} rotation-y={i * 0.5} castShadow receiveShadow>
+          <boxGeometry args={[0.6, 0.6, 0.6]} />
+          <primitive object={mats.timber} attach="material" />
+        </mesh>
+      ))}
+
       {/* a ring of lanterns around the plaza edge (raised onto the cobble) */}
       {Array.from({ length: 6 }, (_, i) => {
         const a = (i / 6) * Math.PI * 2;
@@ -302,7 +377,7 @@ function Roads({ mats }: { mats: Mats }) {
       const nx = dz / len,
         nz = -dx / len,
         off = r.width / 2 + 0.7;
-      const count = Math.max(2, Math.floor(len / 7));
+      const count = Math.max(2, Math.floor(len / 10)); // sparser — lit path, not a runway
       for (let i = 1; i < count; i++) {
         const t = i / count,
           cx = r.fromX + dx * t,

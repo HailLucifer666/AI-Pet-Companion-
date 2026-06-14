@@ -19,6 +19,12 @@ const PERM = (() => {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
+// The village-plaza flat pad (see islandHeight): a level clearing so the cobble
+// disc, hearth and lanterns never get clipped by terrain noise.
+const PLAZA_H = 1.9; // matches the plateau base → seamless blend
+const PLAZA_PAD_FLAT = 6.5; // dead-flat within this radius of the plaza
+const PLAZA_PAD_RAMP = 5.0; // smooth ramp back to natural terrain over this
+
 function lattice(ix: number, iz: number): number {
   // Hash two ints into the permutation table.
   const h = (Math.imul(ix, 73856093) ^ Math.imul(iz, 19349663)) >>> 0;
@@ -70,7 +76,15 @@ export function islandHeight(x: number, z: number, maxR: number): number {
   const innerR = maxR * 0.55;
   const t = smooth(Math.min(1, dist / innerR)); // 0 at center → 1 at innerR+
   const plateau = 1.9 + n * 0.5;
-  return lerp(plateau, rolling, t);
+  const natural = lerp(plateau, rolling, t);
+  // A dead-flat pad under the village plaza so the cobble disc, hearth and
+  // lanterns sit on truly level ground — the rolling noise no longer pokes up
+  // through them. Plaza sits at (-W, -W); flat within PLAZA_PAD_FLAT, then a
+  // smooth ramp back to the natural terrain.
+  const W = WORLD_SCALE;
+  const dPlaza = Math.hypot(x + W, z + W);
+  const k = smooth(Math.min(1, Math.max(0, (dPlaza - PLAZA_PAD_FLAT) / PLAZA_PAD_RAMP)));
+  return lerp(PLAZA_H, natural, k);
 }
 
 export const WATER_LEVEL = 0;
