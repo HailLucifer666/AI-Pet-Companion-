@@ -7,6 +7,7 @@ export const WORLD = {
   sky: 0x1b2138, // deep dusk indigo — also the fog color
   fog: 0x1b2138,
   sun: 0xffe6b8, // warm low sun
+  moon: 0xd0d8e0, // pale cool moon disc (night)
   ambient: 0x5a6b8c, // cool fill from the sky
 
   water: 0x2b6f8c,

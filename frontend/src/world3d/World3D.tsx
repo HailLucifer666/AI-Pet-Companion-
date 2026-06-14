@@ -20,6 +20,7 @@ import { Pulses3D } from "./Pulses3D";
 import { Particles3D } from "./Particles3D";
 import { Postfx } from "./Postfx";
 import { Atmosphere } from "./Atmosphere";
+import { Sky3D } from "./Sky3D";
 import { Clouds3D } from "./Clouds3D";
 import { Rain3D } from "./Rain3D";
 import { CursorLure } from "./CursorLure";
@@ -171,6 +172,9 @@ export function World3D() {
     >
       {/* Sky, light + fog — driven by real time of day × real weather. */}
       <Atmosphere hour={hour} fx={fx} reduced={reduced} />
+
+      {/* The sun + moon disc, riding the same day/night light arc. */}
+      <Sky3D hour={hour} reduced={reduced} />
 
       {/* Deep-sky stars — faint by day (the bright sky + fog swallow them), a real
           field at night. `fade` blends them into the horizon fog. */}
