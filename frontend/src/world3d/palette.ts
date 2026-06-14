@@ -43,3 +43,15 @@ export const WORLD = {
   // Cool accent for the minority of drifting motes (warm uses emberHi).
   mote: 0x9fd8e6,
 } as const;
+
+/** The medieval hamlet's stone/timber/roof/cobble tones — dark dusk surfaces the
+ *  emissive windows, lanterns, crystals and mushrooms glow against. */
+export const VILLAGE = {
+  stoneDark: 0x2a2730,
+  stoneHi: 0x3a3545,
+  timberDark: 0x2e2016,
+  roofDark: 0x1a1520,
+  plazaCobble: 0x3e3b30,
+  roadCobble: 0x4a4035,
+  fenceWood: 0x4a3822,
+} as const;

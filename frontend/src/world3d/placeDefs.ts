@@ -26,3 +26,8 @@ export const PLACES_3D: Place3D[] = [
   { id: "garden", label: "Memory Garden", sub: "what it remembers", route: "/memory", kind: "garden", pos: on(4.5 * W, -3.3 * W) },
   { id: "workbench", label: "The Workbench", sub: "notes & making", route: "/notes", kind: "workbench", pos: on(-4 * W, 3.8 * W) },
 ];
+
+/** The village plaza hub — the central hearth the companion calls home. NOT a
+ *  navigable surface, so it stays out of PLACES_3D (which the test array-locks).
+ *  Scales with the world like every other position. */
+export const PLAZA_POS: [number, number, number] = on(-1 * W, -1 * W);

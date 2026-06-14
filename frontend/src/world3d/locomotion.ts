@@ -9,6 +9,7 @@
 import { mulberry32 } from "../world/engine/rng";
 import { WORLD_SCALE } from "./terrain";
 import type { Place } from "../world/places";
+import { bfsPath, NODES, PLACE_ENTRY, nearestNode } from "./roadGraph";
 
 export interface Vec2 {
   x: number;
@@ -29,7 +30,7 @@ export interface Velocity {
 // small UNSCALED offset beside its marker, so the pet always stands right next to
 // the fire / bench / pool — never metres away — however far the cluster is spread.
 const ANCHORS: Record<Exclude<Place, "wander">, Vec2> = {
-  home: { x: -5 * WORLD_SCALE + 1.2, z: -2.5 * WORLD_SCALE + 0.7 }, // beside the Hollow's fire
+  home: { x: -1 * WORLD_SCALE + 1.2, z: -1 * WORLD_SCALE + 0.7 }, // CHANGED → beside the plaza hearth (village hub)
   workbench: { x: -4 * WORLD_SCALE + 0.8, z: 3.8 * WORLD_SCALE - 0.8 }, // beside the Workbench
   pool: { x: 5.5 * WORLD_SCALE - 1.1, z: 3.5 * WORLD_SCALE - 0.6 }, // at the inland pool's edge
 };
@@ -64,4 +65,61 @@ export function arrive(cur: Vec2, target: Vec2, maxSpeed: number): Velocity {
 
   const speed = maxSpeed * Math.min(1, dist / DECEL_DIST);
   return { vx: (dx / dist) * speed, vz: (dz / dist) * speed, dist };
+}
+
+/** PathFollower — turns "I want to be at <place>" into a sequence of road
+ *  waypoints (plaza → junction → entrance) so the companion walks the cobble
+ *  roads instead of beelining across the island. Pure state machine over the road
+ *  graph; the renderer feeds it the current position and steers `arrive()` toward
+ *  whatever waypoint it returns. `wander` and unknown places bypass it (direct). */
+const NODE_ARRIVE = 2.8; // switch waypoints this close — rounds corners, no dead stop
+
+export class PathFollower {
+  private waypoints: Vec2[] = [];
+  private idx = 0;
+
+  get onRoad(): boolean {
+    return this.waypoints.length > 0;
+  }
+
+  /** Plan a route from `cur` to the entrance of `place`. Returns true if a road
+   *  was laid (false → caller should target the place directly). */
+  planTo(cur: Vec2, place: string): boolean {
+    if (place === "wander") {
+      this.clear();
+      return false;
+    }
+    const entry = PLACE_ENTRY[place];
+    if (!entry) {
+      this.clear();
+      return false;
+    }
+    const ids = bfsPath(nearestNode(cur), entry);
+    if (!ids.length) {
+      this.clear();
+      return false;
+    }
+    this.waypoints = ids.map((id) => NODES[id]);
+    const first = this.waypoints[0];
+    if (Math.hypot(cur.x - first.x, cur.z - first.z) < NODE_ARRIVE) this.waypoints.shift();
+    this.idx = 0;
+    return this.waypoints.length > 0;
+  }
+
+  /** The current waypoint to walk toward, advancing as `cur` reaches each. Returns
+   *  null when the road is finished (caller falls back to the place anchor). */
+  step(cur: Vec2): Vec2 | null {
+    if (this.idx >= this.waypoints.length) return null;
+    const wp = this.waypoints[this.idx];
+    if (Math.hypot(cur.x - wp.x, cur.z - wp.z) <= NODE_ARRIVE) {
+      this.idx++;
+      return this.idx < this.waypoints.length ? this.waypoints[this.idx] : null;
+    }
+    return wp;
+  }
+
+  clear(): void {
+    this.waypoints = [];
+    this.idx = 0;
+  }
 }

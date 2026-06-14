@@ -23,9 +23,10 @@ const MEADOW_R = 4.5 * W; // open clearing in the middle — where the pet roams
 // Keep scatter off the pool and the three Place markers (placeDefs coords × scale).
 const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
   { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
-  { x: -5 * W, z: -2.5 * W, r: 2.4 }, // hollow
-  { x: 4.5 * W, z: -3.3 * W, r: 2.4 }, // garden
-  { x: -4 * W, z: 3.8 * W, r: 2.4 }, // workbench
+  { x: -1 * W, z: -1 * W, r: 5.5 }, // village plaza (hearth hub)
+  { x: -5 * W, z: -2.5 * W, r: 4.0 }, // hollow (tavern)
+  { x: 4.5 * W, z: -3.3 * W, r: 4.0 }, // garden (greenhouse)
+  { x: -4 * W, z: 3.8 * W, r: 4.0 }, // workbench (forge)
 ];
 
 function colorForHeight(y: number): THREE.Color {

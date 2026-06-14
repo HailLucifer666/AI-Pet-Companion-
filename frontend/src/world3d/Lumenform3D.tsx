@@ -13,7 +13,7 @@ import { useReducedMotion } from "motion/react";
 import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
-import { arrive, placeTarget, WALK_SPEED } from "./locomotion";
+import { arrive, placeTarget, WALK_SPEED, PathFollower, type Vec2 } from "./locomotion";
 import { activeLure, lure } from "./lure";
 import { petPos } from "./petPosition";
 import { glowBoost } from "./daylight";
@@ -75,6 +75,12 @@ export function Lumenform3D() {
   const vel = useRef({ vx: 0, vz: 0 });
   const heading = useRef(0);
 
+  // Road pathing: when the FSM picks a new place, plan a cobble-road route; the
+  // pet walks plaza → junction → entrance instead of beelining (reduced-motion +
+  // the cursor lure bypass it). Replanned only on place change (O(13) BFS).
+  const pathFollower = useRef(new PathFollower());
+  const lastPlace = useRef<string>("home");
+
   const setTip = (m: Mesh | null, e: number) => {
     if (m) (m.material as MeshStandardMaterial).emissiveIntensity = e;
   };
@@ -90,7 +96,20 @@ export function Lumenform3D() {
     const boost = glowBoost(sky.dayness);
 
     const lured = activeLure(lure, performance.now(), lumen.mode, reduced);
-    const target = lured ?? placeTarget(lumen.place, lumen.wanderSeed);
+
+    let target: Vec2;
+    if (lured) {
+      target = lured; // cursor lure overrides the road
+    } else if (reduced) {
+      target = placeTarget(lumen.place, lumen.wanderSeed); // reduced: snap to anchor, no road
+    } else {
+      if (lumen.place !== lastPlace.current) {
+        lastPlace.current = lumen.place;
+        pathFollower.current.planTo(pos.current, lumen.place);
+      }
+      const roadTarget = pathFollower.current.step(pos.current);
+      target = roadTarget ?? placeTarget(lumen.place, lumen.wanderSeed); // road, else direct anchor
+    }
 
     if (reduced) {
       const y = groundY(target.x, target.z) + LIFT;

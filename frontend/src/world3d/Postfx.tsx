@@ -19,7 +19,7 @@ export function Postfx() {
     <EffectComposer>
       <Bloom
         intensity={0.7}
-        luminanceThreshold={0.72}
+        luminanceThreshold={0.9}
         luminanceSmoothing={0.3}
         radius={0.6}
         mipmapBlur

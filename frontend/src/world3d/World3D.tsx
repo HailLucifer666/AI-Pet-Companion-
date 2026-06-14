@@ -11,6 +11,7 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
 import { ACESFilmicToneMapping, MOUSE, Vector3 } from "three";
 import { Island } from "./Island";
+import { Village3D } from "./Village3D";
 import { GlowMushrooms3D } from "./GlowMushrooms3D";
 import { Lumenform3D } from "./Lumenform3D";
 import { Crystals3D } from "./Crystals3D";
@@ -199,6 +200,7 @@ export function World3D() {
       <Stars radius={250} depth={60} count={1600} factor={4} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
 
       <Island />
+      <Village3D reduced={reduced} />
       <GlowMushrooms3D reduced={reduced} />
       <Lumenform3D />
       <Crystals3D />
