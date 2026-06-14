@@ -141,7 +141,7 @@ export function HatchRitual({ brain }: { brain: Brain }) {
   function enterDen(prompt?: string) {
     // Pet now exists → invalidate so the root gate swaps the ritual for the app.
     queryClient.invalidateQueries({ queryKey: queryKeys.pet });
-    navigate("/chat", prompt ? { state: { prompt } } : undefined);
+    navigate("/den", prompt ? { state: { prompt } } : undefined);
   }
 
   /* intro */

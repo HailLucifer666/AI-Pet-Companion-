@@ -34,7 +34,7 @@ function Shell() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route index element={<Navigate to="/chat" replace />} />
+        <Route index element={<Navigate to="/den" replace />} />
         <Route path="/chat" element={<ChatView />} />
         <Route path="/chat/:sessionId" element={<ChatView />} />
         <Route path="/research" element={<ResearchStub />} />
@@ -55,7 +55,7 @@ function Shell() {
           }
         />
         {import.meta.env.DEV && <Route path="/styleguide" element={<Styleguide />} />}
-        <Route path="*" element={<Navigate to="/chat" replace />} />
+        <Route path="*" element={<Navigate to="/den" replace />} />
       </Route>
     </Routes>
   );

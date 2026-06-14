@@ -11,6 +11,7 @@ import {
   Mail,
   MessageSquare,
   Settings,
+  Sprout,
   StickyNote,
   Telescope,
   Wrench,
@@ -109,6 +110,10 @@ export function AppShell() {
           >
             N
           </div>
+          {/* The Grove is home — the world the companion lives in (also the live
+              creature avatar at the rail's foot). */}
+          <RailLink to="/den" label="The Grove" icon={Sprout} />
+          <div className="my-1 h-px w-6 bg-ink-800" aria-hidden />
           {surfaces.map((s) => (
             <RailLink key={s.to} {...s} />
           ))}
