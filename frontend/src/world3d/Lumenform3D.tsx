@@ -31,7 +31,7 @@ export function Lumenform3D() {
   const reduced = useReducedMotion() ?? false;
   const stage = useWorldStore((s) => s.stage);
 
-  const baseScale = 0.72 + stage * 0.12; // grows with life stage
+  const baseScale = 0.95 + stage * 0.12; // grows with life stage — the companion is the subject
   const start = useMemo(() => placeTarget("home"), []);
 
   const group = useRef<Group>(null);
@@ -113,7 +113,7 @@ export function Lumenform3D() {
     if (body.current) body.current.scale.setScalar(1 + Math.sin(t * 2) * 0.04);
 
     const targetGlow =
-      gesture === "nap" ? 0.6 : gesture === "celebrate" ? 4 : working ? 3.2 : moving ? 2.2 : 1.8;
+      gesture === "nap" ? 0.6 : gesture === "celebrate" ? 2.8 : working ? 2.3 : moving ? 1.9 : 1.6;
     if (light.current) light.current.intensity += (targetGlow - light.current.intensity) * 0.08;
     if (mat.current) {
       const boost = glowBoost(sky.dayness); // blazes at night, eases off by day
@@ -132,7 +132,7 @@ export function Lumenform3D() {
           not a plain blob. The core (ref) carries the breath + mode glow. */}
       <mesh castShadow scale-y={0.92}>
         <icosahedronGeometry args={[0.52, 2]} />
-        <meshStandardMaterial color={WORLD.ember} transparent opacity={0.28} roughness={0.12} metalness={0.8} flatShading />
+        <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.25} transparent opacity={0.42} roughness={0.12} metalness={0.55} flatShading />
       </mesh>
       <mesh scale-y={0.92}>
         <icosahedronGeometry args={[0.5, 1]} />

@@ -37,7 +37,7 @@ const KEYS: Key[] = [
 /** How much to multiply an emissive object's glow for the time of day: ~1× at noon,
  *  rising toward night so crystals/pet/mushrooms blaze in the dark (the "full-glow
  *  night"). Pure → unit-tested. */
-export function glowBoost(dayness: number, boost = 1.7): number {
+export function glowBoost(dayness: number, boost = 1.25): number {
   const d = Math.max(0, Math.min(1, dayness));
   return 1 + (1 - d) * boost;
 }

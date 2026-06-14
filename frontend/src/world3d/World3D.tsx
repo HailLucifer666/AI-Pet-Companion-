@@ -49,9 +49,9 @@ const WHEEL_SENS = 0.0012; // wheel delta → fractional distance change
 // Distance the camera prefers for what the pet is doing: in close while it works,
 // back to take in the roam, mid at rest. Eased toward, never snapped.
 function autoDistance(working: boolean, moving: boolean): number {
-  if (working) return 11;
-  if (moving) return 20;
-  return 15;
+  if (working) return 10;
+  if (moving) return 16;
+  return 12;
 }
 
 const clampD = (d: number) => Math.max(MIN_D, Math.min(MAX_D, d));
@@ -71,7 +71,7 @@ function CameraRig({ reduced }: { reduced: boolean }) {
   const vel = useRef(new Vector3());
   const lastPetXZ = useRef(new Vector3());
   const offset = useRef(new Vector3());
-  const targetDist = useRef(19);
+  const targetDist = useRef(13);
   const manualUntil = useRef(0);
   const lastInput = useRef(0);
   const elapsed = useRef(0);

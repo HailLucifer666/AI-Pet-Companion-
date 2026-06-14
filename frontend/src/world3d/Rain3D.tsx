@@ -9,8 +9,9 @@ import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { petPos } from "./petPosition";
 
-const MAX = 800;
-const RADIUS = 16;
+const MAX = 360;
+const RADIUS = 20; // wider spread → rain veils the scene instead of pillaring on the pet
+const CORE_HOLE = 0.12; // keep a clear-ish core so streaks don't stack on the pet
 const FALL_H = 18; // column height; drops recycle to the top after passing the ground
 const RAIN_COLOR = 0xbcd4e6;
 
@@ -30,7 +31,7 @@ function buildDrops(): Drop[] {
   const r = mulberry32(0x9a1f);
   return Array.from({ length: MAX }, () => {
     const ang = r() * Math.PI * 2;
-    const rad = Math.sqrt(r()) * RADIUS;
+    const rad = Math.sqrt(CORE_HOLE + (1 - CORE_HOLE) * r()) * RADIUS;
     return {
       x: Math.cos(ang) * rad,
       z: Math.sin(ang) * rad,
@@ -55,8 +56,8 @@ export function Rain3D({
   const nextFlash = useRef(0);
   const light = useRef<THREE.PointLight>(null);
 
-  const active = rain === "heavy" ? MAX : rain === "light" ? 350 : 0;
-  const lengthScale = rain === "heavy" ? 1.4 : 1;
+  const active = rain === "heavy" ? MAX : rain === "light" ? 150 : 0;
+  const lengthScale = rain === "heavy" ? 1.15 : 1;
 
   useFrame((state, delta) => {
     if (reduced) return;
@@ -97,8 +98,8 @@ export function Rain3D({
     <group>
       {rain !== "none" && (
         <instancedMesh ref={mesh} args={[undefined, undefined, MAX]} frustumCulled={false}>
-          <boxGeometry args={[0.02, 0.7, 0.02]} />
-          <meshBasicMaterial color={RAIN_COLOR} transparent opacity={0.4} depthWrite={false} />
+          <boxGeometry args={[0.014, 0.4, 0.014]} />
+          <meshBasicMaterial color={RAIN_COLOR} transparent opacity={0.22} depthWrite={false} />
         </instancedMesh>
       )}
       {lightning && <pointLight ref={light} color={0xcfe2ff} intensity={0} distance={120} decay={1.4} />}

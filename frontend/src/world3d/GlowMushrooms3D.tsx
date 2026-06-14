@@ -15,7 +15,7 @@ import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
 const COUNT = 14;
-const LIT = 5; // only the first few carry a co-located point-light (perf)
+const LIT = 3; // only the first few carry a co-located point-light (perf)
 const CAP_BASE = 1.1; // base emissive; ×glowBoost at night
 const LIGHT_BASE = 0.32;
 const MEADOW_R = 4.8; // keep clear of the central roaming meadow

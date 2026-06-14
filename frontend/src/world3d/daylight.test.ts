@@ -44,13 +44,13 @@ describe("daylightAt", () => {
 describe("glowBoost — full-glow night", () => {
   it("is ~1x at noon and brightest at deep night", () => {
     expect(glowBoost(1)).toBeCloseTo(1);
-    expect(glowBoost(0)).toBeCloseTo(2.7);
+    expect(glowBoost(0)).toBeCloseTo(2.25);
     expect(glowBoost(0)).toBeGreaterThan(glowBoost(0.5));
     expect(glowBoost(0.5)).toBeGreaterThan(glowBoost(1));
   });
 
   it("clamps out-of-range dayness", () => {
     expect(glowBoost(2)).toBeCloseTo(1);
-    expect(glowBoost(-1)).toBeCloseTo(2.7);
+    expect(glowBoost(-1)).toBeCloseTo(2.25);
   });
 });

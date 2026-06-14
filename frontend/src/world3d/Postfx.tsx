@@ -18,10 +18,10 @@ export function Postfx() {
   return (
     <EffectComposer>
       <Bloom
-        intensity={1.0}
-        luminanceThreshold={0.55}
-        luminanceSmoothing={0.5}
-        radius={0.75}
+        intensity={0.7}
+        luminanceThreshold={0.72}
+        luminanceSmoothing={0.3}
+        radius={0.6}
         mipmapBlur
       />
     </EffectComposer>
