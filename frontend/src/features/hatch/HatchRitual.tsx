@@ -8,7 +8,7 @@
  * judged on. Honors reduced-motion: the egg simply *is*, no breathing.
  */
 
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
@@ -18,6 +18,7 @@ import { Button, Input, Select, Spinner, Textarea, toast } from "../../component
 import { Creature } from "../../components/creature/Creature";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { bloomFlash } from "../../world3d/bloomCinematic";
+import { playBirthChime } from "../../world3d/quickeningSound";
 
 // Lazy so three.js/r3f never enter the eager main bundle (HatchRitual is eagerly
 // imported by App). The 3D backdrop streams in; the questions show immediately.
@@ -206,8 +207,28 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
 
   const set = (k: keyof Answers, v: string) => setAnswers((a) => ({ ...a, [k]: v }));
 
+  // The one-shot birth chime. Created lazily under the "Hatch" gesture so the
+  // AudioContext is allowed to start; silent under reduced-motion; never throws
+  // into the hatch (audio is a flourish, the birth must always proceed).
+  const audioRef = useRef<AudioContext | null>(null);
+  function fireChime() {
+    if (reduced) return;
+    try {
+      const Ctor =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Ctor) return;
+      const ctx = audioRef.current ?? (audioRef.current = new Ctor());
+      if (ctx.state === "suspended") void ctx.resume();
+      playBirthChime(ctx);
+    } catch {
+      /* audio blocked/unsupported — ignore */
+    }
+  }
+
   async function doHatch() {
     setPhase("hatching");
+    fireChime();
     const body: HatchBody = {
       creature_name: answers.creature_name.trim(),
       user_name: answers.user_name.trim(),
