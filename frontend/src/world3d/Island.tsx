@@ -179,7 +179,7 @@ function Pool() {
         <circleGeometry args={[POOL.r - 0.1, 20]} />
         <meshStandardMaterial color={WORLD.waterDeep} roughness={0.5} flatShading />
       </mesh>
-      <mesh rotation-x={-Math.PI / 2} position-y={surface} receiveShadow>
+      <mesh rotation-x={-Math.PI / 2} position-y={surface} receiveShadow={false}>
         <circleGeometry args={[POOL.r, 22]} />
         <meshStandardMaterial color={WORLD.water} transparent opacity={0.78} roughness={0.3} metalness={0.15} />
       </mesh>

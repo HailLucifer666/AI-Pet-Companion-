@@ -89,6 +89,7 @@ export function Lumenform3D() {
   // the cursor lure bypass it). Replanned only on place change (O(13) BFS).
   const pathFollower = useRef(new PathFollower());
   const lastPlace = useRef<string>("home");
+  const placeChangeTime = useRef(0);
 
   const setTip = (m: Mesh | null, e: number) => {
     if (m) (m.material as MeshStandardMaterial).emissiveIntensity = e;
@@ -125,6 +126,7 @@ export function Lumenform3D() {
       if (lumen.place !== lastPlace.current) {
         lastPlace.current = lumen.place;
         pathFollower.current.planTo(pos.current, lumen.place);
+        placeChangeTime.current = t;
       }
       const roadTarget = pathFollower.current.step(pos.current);
       target = roadTarget ?? placeTarget(lumen.place, lumen.wanderSeed); // road, else direct anchor
@@ -151,8 +153,11 @@ export function Lumenform3D() {
       return;
     }
 
+    // Anticipation gaze: pause for 600ms before walking to a new place.
+    const anticipating = !lured && !fetchT && t - placeChangeTime.current < 0.6;
+    
     // Drift toward the target (eased start/stop/turn), then integrate position.
-    const want = arrive(pos.current, target, WALK_SPEED);
+    const want = anticipating ? { vx: 0, vz: 0 } : arrive(pos.current, target, WALK_SPEED);
     const a = 1 - Math.exp(-ACCEL * dt);
     vel.current.vx += (want.vx - vel.current.vx) * a;
     vel.current.vz += (want.vz - vel.current.vz) * a;
@@ -180,18 +185,26 @@ export function Lumenform3D() {
     if (moving) heading.current = Math.atan2(vel.current.vx, vel.current.vz);
     let d = heading.current - g.rotation.y;
     d = Math.atan2(Math.sin(d), Math.cos(d));
-    g.rotation.y += d * Math.min(1, TURN * dt);
+    g.rotation.y += d * (1 - Math.exp(-TURN * dt));
     const lean = Math.max(-0.16, Math.min(0.16, -d * 0.4));
-    g.rotation.z += (lean - g.rotation.z) * Math.min(1, 8 * dt);
+    g.rotation.z += (lean - g.rotation.z) * (1 - Math.exp(-8 * dt));
 
     // Gaze: the head/face turns toward your cursor when called, else dreamily at the camera.
+    // If anticipating a walk, look at the destination before moving.
     const headG = headGroup.current;
     if (headG) {
-      const lookX = lured ? lured.x : camera.position.x;
-      const lookZ = lured ? lured.z : camera.position.z;
+      let lookX = camera.position.x;
+      let lookZ = camera.position.z;
+      if (lured) {
+        lookX = lured.x;
+        lookZ = lured.z;
+      } else if (anticipating) {
+        lookX = target.x;
+        lookZ = target.z;
+      }
       const targetYaw = gazeYaw(lookX - pos.current.x, lookZ - pos.current.z, heading.current);
-      const yawSpeed = lured ? 4.5 : 1.8;
-      headG.rotation.y += (targetYaw - headG.rotation.y) * Math.min(1, yawSpeed * dt);
+      const yawSpeed = lured || anticipating ? 4.5 : 1.8;
+      headG.rotation.y += (targetYaw - headG.rotation.y) * (1 - Math.exp(-yawSpeed * dt));
     }
 
     // Emotion (derived from real cadence in the store's 700ms tick) → ease the

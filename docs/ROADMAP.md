@@ -5,6 +5,13 @@
 ## Vision (one line)
 An AI companion **pet that lives autonomously in a low-poly 3D game world** that runs on **everyone's PC incl. low-end** — fluid controls, the pet roams to places to do real work (task→Workbench, research→a research spot), grows over time. "AI in games."
 
+## The Mission (Locked 2026-06-15)
+**Combine clicky + hermes-agent + odysseus + vellum into NeuraClaw**
+- **Phase 1 — Proactivity & "grows with you" (hermes + vellum core):** Async scheduler, hourly heartbeat (cheap-model gated), nightly journal (`NOW.md`-style scratchpad), finish `mood`.
+- **Phase 2 — Productivity surfaces (odysseus-inspired UX):** Tasks, Calendar, Documents, Research, Email stubs -> real surfaces. Web-first, Radix UI, matching tools.
+- **Phase 3 — Deeper memory & multi-channel reach (hermes + vellum):** Richer memory (episodic, emotional, procedural), Telegram multi-channel gateway, actor identity tiers, subagents / MCP.
+- **Phase 4 — Tauri native desktop shell + clicky-style screen pointing:** Tauri wrapper, native notifications, global push-to-talk hotkey, screen pointing with `[POINT:x,y:label]` tool tags.
+
 ## Where we are now (2026-06-14) — current ≈ **V-2.x**
 **V-2 (pet) and V-3 (props) are both in active development; V-1 shipped.**
 

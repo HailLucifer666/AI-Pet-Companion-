@@ -12,14 +12,14 @@ import { daylightAt } from "./daylight";
 import { sky } from "./skyState";
 import type { WeatherFx } from "./weather";
 import { WORLD } from "./palette";
-import { ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
+import { WORLD_SCALE } from "./terrain";
 
 // Tuned for the close explorable camera on the big island: a hazy horizon that
 // dissolves the far world into mist (reinforcing "more world beyond"), rather than
 // showing the whole island crisply. Sea (radius ~1120) sits well past the fog.
 const FOG_NEAR = 80;
 const FOG_FAR = 300;
-const SHADOW_R = ISLAND_MAX_R; // ortho shadow frustum covers the whole island
+const SHADOW_R = 16; // ortho shadow frustum covers the core island (tightened from ±22)
 const OVERCAST = new Color(0x7a8290);
 
 // Reused work colors (a single Atmosphere instance lives per canvas).

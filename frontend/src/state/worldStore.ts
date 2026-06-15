@@ -29,7 +29,7 @@ import { deriveEmotion, moodWord, type EmotionVector } from "../world3d/emotion"
 const reduced =
   typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const idleRnd = mulberry32(0x10fc);
+let idleRnd = mulberry32(0x10fc);
 
 const MAX_PULSES = 14;
 let pulseId = 1;
@@ -165,6 +165,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
         .map((m) => makeCrystalSeed(m.id, m.type))
         .slice(-MAX_CRYSTALS);
       const total = petRes.pet?.xp ?? 0;
+      if (petRes.pet) idleRnd = mulberry32(petRes.pet.id);
       set({
         crystals,
         level: Math.floor(total / 100),

@@ -21,6 +21,7 @@ export interface LumenformState {
   gestureUntil: number; // ms epoch; 0 = none
   since: number; // ms epoch when the current activity began
   wanderSeed: number; // varies the wander target
+  lastGesture: Gesture; // anti-repeat
 }
 
 export type WorldEvent =
@@ -38,6 +39,7 @@ export const INITIAL: LumenformState = {
   gestureUntil: 0,
   since: 0,
   wanderSeed: 1,
+  lastGesture: "none",
 };
 
 const GESTURE_MS: Record<Exclude<Gesture, "none">, number> = {
@@ -53,6 +55,7 @@ function withGesture(state: LumenformState, gesture: Gesture, now: number): Lume
   return {
     ...state,
     gesture,
+    lastGesture: gesture === "none" ? state.lastGesture : gesture,
     gestureUntil: gesture === "none" ? 0 : now + GESTURE_MS[gesture],
   };
 }
@@ -113,21 +116,27 @@ export function scheduleIdle(
   if (idleMs < 6000) return state;
 
   const roll = rnd();
-  // In the user's quiet hours the companion settles down and naps sooner.
+  let nextGesture: Gesture = "none";
   if (night && idleMs > 15_000 && roll < 0.7) {
-    return withGesture({ ...state, since: now }, "nap", now);
+    nextGesture = "nap";
+  } else if (idleMs > 60_000 && roll < 0.5) {
+    nextGesture = "nap";
+  } else if (roll < 0.34) {
+    nextGesture = "wander";
+  } else if (roll < 0.62) {
+    nextGesture = "gaze";
+  } else if (roll < 0.8) {
+    nextGesture = "play";
   }
-  if (idleMs > 60_000 && roll < 0.5) {
-    return withGesture({ ...state, since: now }, "nap", now);
+
+  if (nextGesture !== "none" && nextGesture === state.lastGesture) {
+    return state; // anti-repeat: skip and try again later
   }
-  if (roll < 0.34) {
+
+  if (nextGesture === "wander") {
     return withGesture({ ...state, place: "wander", wanderSeed: Math.floor(rnd() * 1e9) || 1, since: now }, "wander", now);
-  }
-  if (roll < 0.62) {
-    return withGesture({ ...state, since: now }, "gaze", now);
-  }
-  if (roll < 0.8) {
-    return withGesture({ ...state, since: now }, "play", now);
+  } else if (nextGesture !== "none") {
+    return withGesture({ ...state, since: now }, nextGesture, now);
   }
   return state; // sometimes just rest
 }

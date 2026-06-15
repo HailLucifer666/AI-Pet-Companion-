@@ -14,6 +14,7 @@ import { MindsEye } from "./MindsEye";
 import { MemoryPeek } from "./MemoryPeek";
 import { DenGreeting } from "./DenGreeting";
 import { PetChat } from "./PetChat";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus";
 import { lure, lureControl } from "../../world3d/lure";
 import { hasWebGL } from "../../world3d/quality";
@@ -169,7 +170,13 @@ export default function DenView() {
 
   return (
     <div ref={setHost} className="relative h-full w-full overflow-hidden bg-ink-950">
-      {webgl ? <World3D /> : <WorldFallback />}
+      {webgl ? (
+        <ErrorBoundary fallback={<WorldFallback />}>
+          <World3D />
+        </ErrorBoundary>
+      ) : (
+        <WorldFallback />
+      )}
       <div className="den-atmosphere" aria-hidden />
       <div className="pointer-events-none absolute left-5 top-4 select-none">
         <p className="font-display text-sm font-medium tracking-wide text-ink-300/90">The Grove</p>

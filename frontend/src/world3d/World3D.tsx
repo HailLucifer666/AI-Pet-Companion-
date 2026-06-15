@@ -201,11 +201,19 @@ export function World3D() {
     return () => clearInterval(id);
   }, []);
 
+  // Pause-on-blur: drop frameloop to demand when the tab is hidden to save power.
+  const [blurred, setBlurred] = useState(false);
+  useEffect(() => {
+    const onVis = () => setBlurred(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
   return (
     <Canvas
       shadows={q.shadows}
       dpr={q.dpr}
-      frameloop={reduced ? "demand" : "always"}
+      frameloop={(reduced || blurred) ? "demand" : "always"}
       camera={{ position: [0, 20, 24], fov: 42, near: 0.1, far: 400 }}
       gl={{ antialias: false, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >

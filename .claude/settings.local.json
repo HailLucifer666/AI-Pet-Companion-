@@ -12,7 +12,12 @@
       "Bash(git stash *)",
       "Bash(git merge *)",
       "Bash(./.venv/Scripts/python.exe -m pytest -q)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'feat\\(models\\): live model discovery + in-app model selector' -m 'Discover every model each provider advertises \\(OpenAI GET /v1/models\\) and let *)",
+      "Bash(git --no-pager stash list)",
+      "PowerShell($env:HF_HUB_DISABLE_XET='1'; & \"f:\\\\AI Pet Companion !\\\\.venv\\\\Scripts\\\\python.exe\" -m pytest \"f:\\\\AI Pet Companion !\\\\backend\" -q 2>&1 | Select-Object -Last 6; echo \"===RUFF===\"; & \"f:\\\\AI Pet Companion !\\\\.venv\\\\Scripts\\\\python.exe\" -m ruff check \"f:\\\\AI Pet Companion !\\\\backend\\\\src\\\\neuraclaw\\\\core\\\\tooltags.py\" \"f:\\\\AI Pet Companion !\\\\backend\\\\src\\\\neuraclaw\\\\core\\\\agent.py\" \"f:\\\\AI Pet Companion !\\\\backend\\\\src\\\\neuraclaw\\\\config.py\" \"f:\\\\AI Pet Companion !\\\\backend\\\\src\\\\neuraclaw\\\\core\\\\context.py\" \"f:\\\\AI Pet Companion !\\\\backend\\\\tests\\\\test_tooltags.py\" \"f:\\\\AI Pet Companion !\\\\backend\\\\tests\\\\test_agent.py\" 2>&1 | Select-Object -Last 8)",
+      "PowerShell(& \"f:\\\\AI Pet Companion !\\\\.venv\\\\Scripts\\\\python.exe\" -c \"from neuraclaw.api.app import create_app; create_app\\(\\); from neuraclaw.core import tooltags; print\\('boots OK; parse:', tooltags.parse_tool_tags\\('[[play_music {\\\\\"query\\\\\":\\\\\"x\\\\\"}]]'\\)\\)\")"
     ]
   }
 }
