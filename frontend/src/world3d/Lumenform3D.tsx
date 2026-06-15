@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
-import type { Group, Mesh, MeshStandardMaterial, PointLight } from "three";
+import { Color, type Group, type Mesh, type MeshStandardMaterial, type PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { arrive, placeTarget, WALK_SPEED, PathFollower, type Vec2 } from "./locomotion";
@@ -19,6 +19,7 @@ import { petPos } from "./petPosition";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 import { WORLD } from "./palette";
+import { deriveEmotion, emotionGlow, type EmotionVector } from "./emotion";
 import { PetBubble } from "./PetBubble";
 import { FaceScreen } from "./pet/FaceScreen";
 import { gazeYaw, glowIntensity, shadowScale } from "./petAnim";
@@ -75,6 +76,13 @@ export function Lumenform3D() {
   const vel = useRef({ vx: 0, vz: 0 });
   const heading = useRef(0);
 
+  // Emotion (derived from real agent cadence) eases frame-to-frame and colours the
+  // glow: brighter when activated, warmer on a real win. Two anchored ember tones —
+  // never drifts off-palette.
+  const emo = useRef<EmotionVector>({ arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 });
+  const emberBase = useMemo(() => new Color(WORLD.botGlow), []);
+  const emberHot = useMemo(() => new Color(WORLD.emberHi), []);
+
   // Road pathing: when the FSM picks a new place, plan a cobble-road route; the
   // pet walks plaza → junction → entrance instead of beelining (reduced-motion +
   // the cursor lure bypass it). Replanned only on place change (O(13) BFS).
@@ -89,7 +97,8 @@ export function Lumenform3D() {
     const g = group.current;
     if (!g) return;
     const dt = Math.min(delta, 0.05);
-    const { lumen } = useWorldStore.getState();
+    const st = useWorldStore.getState();
+    const lumen = st.lumen;
     const t = state.clock.elapsedTime;
     const working = lumen.mode === "work";
     const gesture = lumen.gesture;
@@ -175,15 +184,39 @@ export function Lumenform3D() {
       headG.rotation.y += (targetYaw - headG.rotation.y) * Math.min(1, yawSpeed * dt);
     }
 
-    // Glow: the point light on its state ceiling; antenna tips pulse (cyan/ember bloom).
+    // Emotion (real agent cadence) → ease the vector, then let it colour the glow.
+    const now = performance.now();
+    const recentEvents = st.pulses.reduce((n, p) => (now - p.bornMs < 6000 ? n + 1 : n), 0);
+    const lastEventMs = st.pulses.length ? now - Math.max(...st.pulses.map((p) => p.bornMs)) : Infinity;
+    const emoTarget = deriveEmotion({
+      mode: lumen.mode,
+      gesture,
+      recentEvents,
+      msSinceActivity: lastEventMs,
+      msSinceBloom: st.bloomAt ? now - st.bloomAt : Infinity,
+      msSinceForge: st.forgeAt ? now - st.forgeAt : Infinity,
+    });
+    const ek = 1 - Math.exp(-1.8 * dt); // emotion drifts gently, not twitchy
+    emo.current.arousal += (emoTarget.arousal - emo.current.arousal) * ek;
+    emo.current.valence += (emoTarget.valence - emo.current.valence) * ek;
+    emo.current.curiosity += (emoTarget.curiosity - emo.current.curiosity) * ek;
+    emo.current.confidence += (emoTarget.confidence - emo.current.confidence) * ek;
+    const { lightMul, warmth } = emotionGlow(emo.current);
+
+    // Glow: the point light on its state ceiling, scaled by arousal + warmed by mood;
+    // antenna tips pulse (cyan/ember bloom).
     const glowK = 1 - Math.exp(-5 * dt);
-    const lightTarget = glowIntensity(t, gesture, working, moving);
-    if (light.current) light.current.intensity += (lightTarget - light.current.intensity) * glowK;
+    const lightTarget = glowIntensity(t, gesture, working, moving) * lightMul;
+    if (light.current) {
+      light.current.intensity += (lightTarget - light.current.intensity) * glowK;
+      light.current.color.copy(emberBase).lerp(emberHot, warmth);
+    }
     let tipE: number;
     if (gesture === "nap") tipE = 0.4;
     else if (working) tipE = 1.3 + Math.sin(t * 6) * 0.5;
     else if (gesture === "celebrate") tipE = 1.6 + Math.sin(t * 8) * 0.4;
     else tipE = 1.1 + Math.sin(t * 3) * 0.4;
+    tipE *= 0.9 + emo.current.arousal * 0.3; // tips burn a touch hotter when activated
     setTip(tipL.current, tipE * boost);
     setTip(tipR.current, tipE * boost);
 
