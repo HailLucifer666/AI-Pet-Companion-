@@ -73,6 +73,8 @@ class ToolResult:
 class Registry:
     tools: dict[str, ToolDef] = field(default_factory=dict)
     max_auto_risk: Risk = Risk.WRITE
+    # Tools allowed to auto-run regardless of tier (explicit, named allowlist).
+    auto_approve: set[str] = field(default_factory=set)
 
     def register(self, tool: ToolDef) -> None:
         if tool.name in self.tools:
@@ -88,8 +90,9 @@ class Registry:
         tool = self.tools.get(name)
         if tool is None:
             return ToolResult(name, f"Unknown tool {name!r}", ok=False)
-        if tool.risk > self.max_auto_risk:
-            # Phase 2 brings the approval flow; until then high-risk tools are refused.
+        if tool.risk > self.max_auto_risk and name not in self.auto_approve:
+            # Phase 2 brings the approval flow; until then high-risk tools are refused
+            # unless explicitly named in trust.auto_approve_tools (least-privilege opt-in).
             return ToolResult(
                 name,
                 f"Tool {name!r} requires user approval (risk {tool.risk.name}),"

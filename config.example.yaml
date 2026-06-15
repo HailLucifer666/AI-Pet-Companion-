@@ -41,6 +41,19 @@ trust:
   # Highest tool risk run without asking: 0=READ, 1=WRITE (workspace-scoped),
   # 2=EXECUTE (shell), 3=NETWORK_SENSITIVE. Approval flow arrives in Phase 2.
   max_auto_risk: 1
+  # Named tools allowed to auto-run regardless of tier — a least-privilege
+  # opt-in for safe, constrained actions. (run_shell is deliberately NOT here.)
+  auto_approve_tools:
+    - open_url
+    - open_app
+    - play_music
+    - control_playback
+
+# Local actions the companion may take (open_url / open_app tools).
+actions:
+  url_schemes: [http, https]   # never file:/javascript:/custom protocol handlers
+  apps:                        # friendly name -> URI or executable on PATH
+    spotify: "spotify:"        # e.g. add  notepad: notepad.exe
 
 agent:
   max_steps: 20            # tool-call loop budget per turn

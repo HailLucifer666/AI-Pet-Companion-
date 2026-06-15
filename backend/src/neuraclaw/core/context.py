@@ -52,6 +52,9 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
     parts.append(
         "## Tools\n"
         "Use tools when they help. Use `remember` for durable facts the user shares."
+        " You can act on this machine — open links and apps (`open_url`, `open_app`)."
+        " When the user asks for one of these, call the tool instead of saying you can't;"
+        " if it returns a setup or error message, relay that to the user."
         " Never fabricate tool output. After tools finish, answer the user directly."
     )
     return "\n\n".join(parts)

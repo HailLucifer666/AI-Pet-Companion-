@@ -38,6 +38,10 @@ class TrustConfig(BaseModel):
     # Highest risk tier dispatched without approval:
     # 0=READ, 1=WRITE (workspace-scoped), 2=EXECUTE, 3=NETWORK_SENSITIVE.
     max_auto_risk: int = Field(default=1, ge=0, le=3)
+    # Named tools allowed to auto-run *regardless of tier* — least-privilege
+    # opt-in for safe, constrained high-tier actions (e.g. open_url, play_music)
+    # without unlocking arbitrary EXECUTE like run_shell. Names only; never a wildcard.
+    auto_approve_tools: list[str] = Field(default_factory=list)
 
 
 class AgentConfig(BaseModel):
@@ -51,6 +55,17 @@ class PetConfig(BaseModel):
     ignore_ladder: bool = False
 
 
+class ActionsConfig(BaseModel):
+    """Local-action allowlists for the open_url / open_app tools."""
+
+    # URL schemes the agent may open in the default browser. http/https only by
+    # default — never file:/javascript:/data:/custom protocol handlers.
+    url_schemes: list[str] = Field(default_factory=lambda: ["http", "https"])
+    # Friendly name -> launch target (a URI like "spotify:" or an executable on
+    # PATH like "notepad.exe"). open_app refuses any name not listed here.
+    apps: dict[str, str] = Field(default_factory=dict)
+
+
 class Config(BaseModel):
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
     roles: dict[str, list[str]] = Field(default_factory=dict)
@@ -59,6 +74,7 @@ class Config(BaseModel):
     trust: TrustConfig = Field(default_factory=TrustConfig)
     agent: AgentConfig = Field(default_factory=AgentConfig)
     pet: PetConfig = Field(default_factory=PetConfig)
+    actions: ActionsConfig = Field(default_factory=ActionsConfig)
 
 
 def _config_path() -> Path:
