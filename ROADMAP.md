@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`5babd12`) · **Current:** V-2.5, V-2h (emotion-glow + HUD mood word), W-7 Widening core, **W-8 complete** shipped → W-6 Quickening (needs workflow) next.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`5ce4315`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening (first cut)** shipped. The headline beats all land — remaining work is polish + the V-4 milestone.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -51,6 +51,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-8 (part) | **Daily greeting** — on Den entry the pet speaks a line built from the real `/api/den` digest (memories/skills/XP-today) in its 3-D bubble (`greeting.ts` pure-tested) | `1c4c412` |
 | W-8 (play) | **Fetch play** — throw a spark, the pet dashes out + carries it home (`fetchPlay.ts` pure-tested); zero-XP charm, work always wins. **W-8 complete** | `6397571` |
 | V-2h (HUD) | **Mood word** — one real emotion source (worldStore tick) drives the glow + a named mood in the Coil HUD (`moodWord` pure-tested) | `5babd12` |
+| W-6 Quickening | **In-world first-run cinematic** — dark grove → questions warm the sky → first dawn at hatch (`quickeningRamp` pure-tested, dedicated backdrop, ErrorBoundary). Layered over HatchRitual; onboarding never breaks (no-WebGL/reduced/error all fall back) | `5ce4315` |
 | W-7 (core) | **The Widening** (`widening.ts`, pure-tested) — real `pet.stage` widens the camera survey range + horizon fog per stage + a warm stage-up flash | `7fb90cd` |
 
 ### In progress 🔨
@@ -59,7 +60,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 ### Pending ⏳
 | Slice | What | Effort |
 |-------|------|--------|
-| W-6 Quickening | **in-world egg-hatch cinematic** — replaces the DOM hatch ritual (first-run-flow rework; ~10 coupling hazards — run its own scope workflow) | **L** |
+| W-6 polish | Quickening laterCuts — per-region light bursts · 3D egg mesh · dawn burst-flash · camera dolly · emergence particles · soft sound (first cut shipped `5ce4315`) | **M** |
 | V-2.5 (rest) | placeRegistry consolidation (one source for place coords/anchors/road-nodes) — deferred: high test-churn, invisible; the robustness wins (GPU ladder + 2D fallback) already shipped | **S** |
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
