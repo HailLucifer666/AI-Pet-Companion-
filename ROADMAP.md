@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`f8b3f05`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a Sight complete** (multimodal backend + vision signal + capture UI — needs a backend restart + live eyeball). Every headline beat lands — remaining V-4 work is voice polish + the Tauri native shell + deferred refactors.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`a8de26d`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a Sight complete** (multimodal backend + vision signal + capture UI — needs a backend restart + live eyeball), **in-app model selection complete** (live discovery + per-turn model override). Every headline beat lands — remaining V-4 work is voice polish + the Tauri native shell + deferred refactors.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -61,6 +61,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | V-4a (backend) | **Multimodal chat plumbing** — optional `ChatRequest.image_b64` + pure `build_user_content()` (text→multimodal array); `run_turn` attaches the image to the current turn only (never persisted); route auto-picks a `vision` role; provider unchanged. Pure core + injection unit-tested. Foundation for Sight & Voice — no capture UI yet | `fc80847` |
 | V-4a (backend) | **`GET /api/vision`** — vision-brain availability + **remote signal** (does a captured screen leave the device?) via pure `resolve_vision()` over the `vision` role chain; the truthful basis for the capture-UI privacy warning. Pure core unit-tested | `37c5f65` |
 | V-4a (frontend) | **Sight capture UI** — 👁 in PetChat captures one screen frame (`useScreenCapture`, feature-detected) → attaches to the next chat turn (multimodal); gated on a real vision brain; **amber privacy warning when the model is remote** (`/api/vision`), reassurance when local; image never persisted. **Live-eyeball only** (getDisplayMedia) — smoke confirms gating+render | `f8b3f05` |
+| Models | **Live model discovery + in-app model selector** — `GET /api/models/available` lists every model each provider actually advertises (OpenAI `GET /v1/models`, concurrent, honest reachable); a picker in Chat + Settings pins one model for a turn (`Router.chat_stream_explicit` — no failover, still gated by `no_tools_models`; `/api/chat` `model` ref validated, 400 on bad). Default **Auto (role routing)**; persisted (`useModelStore`). Adversarially reviewed (ChatView streamed-error wipe + honest reachable fixed) | `a8de26d` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_

@@ -19,10 +19,10 @@ NeuraClaw is a **local-first personal AI companion** that lives on your machine:
 | `SOUL.md` | The companion's identity template (user-editable, hot-reloaded into the system prompt) |
 
 ## Current state (2026-06-15) — **see `ROADMAP.md` (repo root) for the live version + next work**
-- **Version ≈ V-2.x / W-6.** The 3D world is a living **bioluminescent medieval village**: a robot pet rests at a plaza hearth and walks cobble roads to the forge/greenhouse on real events; real day/night + weather + visible sun & moon; reactive core (XP gate fills/blooms, mycelium pulses, memory crystals + Mind's Eye web); voice chat. **Cinematics shipped: Blooming (level-up) + Forging (skill draft).**
+- **Version ≈ V-4a.** The 3D world is a living **bioluminescent medieval village**: a robot pet rests at a plaza hearth and walks cobble roads to the forge/greenhouse on real events; real day/night + weather + visible sun & moon; reactive core (XP gate fills/blooms, mycelium pulses, memory crystals + Mind's Eye web); voice chat. **Shipped since W-6 Forging:** the **Quickening** (in-world hatch cinematic), **W-7 Widening** core, **W-8** (clickable memory crystals · skill monuments · daily greeting · fetch play), **V-2.5** (GPU-tier quality ladder + 2D no-WebGL fallback), **V-2h** (emotion glow + HUD mood word), **V-4a Sight** (multimodal chat + `/api/vision` + screen-capture UI), and **in-app model selection** (live discovery + per-turn model override).
 - **World engine = react-three-fiber + three** (`frontend/src/world3d/`). PixiJS mentions in older docs are **superseded** — `frontend/src/world/` is legacy/dead except `crystalSeed.ts` + `LumenformFSM.ts` (reused).
-- **Baselines (must stay green):** pytest green, **176 vitest**, `tsc --noEmit` clean, `npm run build` passes, world chunk **≤350 kB gz** (currently ~312).
-- **Next:** the **Quickening** (in-world hatch cinematic — run its own scope workflow) + the **V-2.5 hardening track** (GPU-tier quality ladder, placeRegistry consolidation, 2D fallback). Latest tip: `a12dfd1`.
+- **Baselines (must stay green):** pytest green (**98**), **237 vitest**, `tsc --noEmit` clean, `npm run build` passes, world chunk **≤350 kB gz** (currently ~312).
+- **Next:** V-4 rest (voice in/out polish, Tauri native shell + desktop pointing — see `docs/SIGHT-AND-VOICE.md`), placeRegistry consolidation, V-3 GLB prop/pet polish, and separate W-7 realms II/III (needs a post-village design rethink). Latest tip: `a8de26d`.
 
 ## Run & verify (Windows / PowerShell; Bash tool also available)
 ```
