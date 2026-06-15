@@ -1,9 +1,78 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, queryKeys } from "../../lib/api";
-import { Badge, Card, Spinner } from "../../components/ui";
+import { Badge, Button, Card, Spinner } from "../../components/ui";
 import { ModelSelector } from "../../components/ModelSelector";
 
 const RISK_NAMES = ["READ", "WRITE", "EXECUTE", "NETWORK_SENSITIVE"];
+
+function SpotifyCard() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: queryKeys.spotify,
+    queryFn: api.spotifyStatus,
+    retry: false,
+  });
+  const disconnect = useMutation({
+    mutationFn: api.spotifyDisconnect,
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.spotify }),
+  });
+  const callbackState = new URLSearchParams(window.location.search).get("spotify");
+
+  return (
+    <Card>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display font-medium">Spotify</h2>
+        {data?.connected && (
+          <Badge tone={data.premium ? "ok" : "warn"}>
+            {data.premium ? "Premium" : "Premium needed"}
+          </Badge>
+        )}
+      </div>
+      <p className="mt-0.5 text-xs text-ink-500">
+        Lets the companion play and control your music (the{" "}
+        <code className="rounded bg-ink-850 px-1">play_music</code> tool). Playback control needs
+        Spotify Premium and an open device.
+      </p>
+
+      {isLoading ? (
+        <div className="mt-3">
+          <Spinner />
+        </div>
+      ) : !data?.configured ? (
+        <p className="mt-3 text-sm text-ink-300">
+          Add <code className="rounded bg-ink-850 px-1">SPOTIFY_CLIENT_ID</code> and{" "}
+          <code className="rounded bg-ink-850 px-1">SPOTIFY_CLIENT_SECRET</code> to{" "}
+          <code className="rounded bg-ink-850 px-1">.env</code>, add the redirect URI{" "}
+          <code className="rounded bg-ink-850 px-1">http://127.0.0.1:8090/api/spotify/callback</code>{" "}
+          to your Spotify app, then restart.
+        </p>
+      ) : data.connected ? (
+        <div className="mt-3 flex items-center gap-3 text-sm">
+          <span className="min-w-0 flex-1 truncate text-ink-300">
+            Connected{data.display_name ? ` as ${data.display_name}` : ""}
+            {data.active_device ? ` · ${data.active_device}` : ""}
+          </span>
+          <Button
+            variant="ghost"
+            onClick={() => disconnect.mutate()}
+            disabled={disconnect.isPending}
+          >
+            Disconnect
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-3">
+          <Button onClick={() => (window.location.href = "/api/spotify/login")}>
+            Connect Spotify
+          </Button>
+          {callbackState === "error" && (
+            <p className="mt-2 text-sm text-danger">Connection failed — please try again.</p>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
 
 export function SettingsView() {
   const { data, isLoading } = useQuery({ queryKey: queryKeys.settings, queryFn: api.settings });
@@ -42,6 +111,8 @@ export function SettingsView() {
           ))}
         </div>
       </Card>
+
+      <SpotifyCard />
 
       <Card>
         <h2 className="font-display font-medium">Active model</h2>

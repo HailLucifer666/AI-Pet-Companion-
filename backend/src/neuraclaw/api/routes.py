@@ -3,10 +3,11 @@
 import asyncio
 import json
 import logging
+import secrets
 import uuid
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from .. import __version__
@@ -15,6 +16,8 @@ from ..core import agent
 from ..core.synapse import sse_stream, synapse as _synapse
 from ..core.vision import resolve_vision
 from ..db.connection import vec_version
+from ..integrations import spotify
+from ..integrations.spotify import SpotifyClient, SpotifyError
 from ..memory import extractor, store
 from ..pet import hatch as hatch_svc, xp
 from ..providers import parse_ref
@@ -116,6 +119,64 @@ async def set_keys(body: KeysRequest, request: Request):
         raise HTTPException(400, str(e))
     brain = await _detect_brain(request.app.state.config)
     return {"ok": True, "set": names, "brain": brain}
+
+
+# ── Spotify (OAuth connect, for the play_music / control_playback tools) ──
+
+# In-memory CSRF states for the login handshake (single-user local app; a fresh
+# state per login, validated once on callback). Reset on restart is harmless.
+_spotify_states: set[str] = set()
+
+
+def _spotify_redirect_uri(config) -> str:
+    return f"http://{config.server.host}:{config.server.port}/api/spotify/callback"
+
+
+@api_router.get("/spotify/status")
+async def spotify_status(request: Request):
+    """Connection + account snapshot for the Settings card. Never returns tokens."""
+    client = SpotifyClient(request.app.state.db)
+    return await client.status()
+
+
+@api_router.get("/spotify/login")
+async def spotify_login(request: Request):
+    """Begin the OAuth handshake — redirect the browser to Spotify's consent page."""
+    config = request.app.state.config
+    if not spotify.configured():
+        raise HTTPException(
+            400, "Spotify app credentials missing — set SPOTIFY_CLIENT_ID/SECRET in .env."
+        )
+    state = secrets.token_urlsafe(24)
+    _spotify_states.add(state)
+    return RedirectResponse(spotify.authorize_url(_spotify_redirect_uri(config), state))
+
+
+@api_router.get("/spotify/callback")
+async def spotify_callback(
+    request: Request,
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+):
+    """OAuth return: validate state (CSRF), exchange code for tokens, store, bounce to Settings."""
+    if error or not code or not state or state not in _spotify_states:
+        return RedirectResponse("/settings?spotify=error")
+    _spotify_states.discard(state)
+    config = request.app.state.config
+    try:
+        toks = await spotify.exchange_code(code, _spotify_redirect_uri(config))
+    except SpotifyError:
+        return RedirectResponse("/settings?spotify=error")
+    await spotify.save_tokens(request.app.state.db, toks)
+    return RedirectResponse("/settings?spotify=connected")
+
+
+@api_router.post("/spotify/disconnect")
+async def spotify_disconnect(request: Request):
+    """Forget the user's Spotify tokens."""
+    await spotify.clear_tokens(request.app.state.db)
+    return {"ok": True}
 
 
 # ── Pet / Den ─────────────────────────────────────────────────────────

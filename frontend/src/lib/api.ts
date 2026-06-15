@@ -160,6 +160,17 @@ export interface Vision {
   provider: string | null;
 }
 
+/** Spotify connection snapshot for the Settings card. Never carries tokens.
+ *  `configured` = app credentials present in .env; `connected` = the user has
+ *  authorized via OAuth; `premium` is required for playback control. */
+export interface SpotifyStatus {
+  connected: boolean;
+  configured: boolean;
+  premium?: boolean;
+  display_name?: string | null;
+  active_device?: string | null;
+}
+
 export interface HatchBody {
   creature_name: string;
   user_name: string;
@@ -208,6 +219,9 @@ export const api = {
 
   skills: () => get<{ skills: Skill[] }>("/skills"),
 
+  spotifyStatus: () => get<SpotifyStatus>("/spotify/status"),
+  spotifyDisconnect: () => request<{ ok: boolean }>("POST", "/spotify/disconnect"),
+
   sessions: () => get<{ sessions: SessionSummary[] }>("/sessions"),
   sessionMessages: (id: string) =>
     get<{ messages: Message[] }>(`/sessions/${encodeURIComponent(id)}/messages`),
@@ -248,6 +262,7 @@ export const queryKeys = {
   den: ["den"] as const,
   weather: ["weather"] as const,
   skills: ["skills"] as const,
+  spotify: ["spotify"] as const,
   sessions: ["sessions"] as const,
   sessionMessages: (id: string) => ["sessions", id, "messages"] as const,
   memory: (q: string, type: string) => ["memory", q, type] as const,

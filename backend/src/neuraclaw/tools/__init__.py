@@ -1,5 +1,5 @@
 from ..config import Config
-from .builtin import actions, files, knowledge, shell, web
+from .builtin import actions, files, knowledge, shell, spotify_tool, web
 from .registry import Registry, Risk, ToolContext, ToolResult
 
 __all__ = ["Registry", "Risk", "ToolContext", "ToolResult", "build_registry"]
@@ -15,4 +15,5 @@ def build_registry(config: Config) -> Registry:
     web.register(registry)
     knowledge.register(registry)
     actions.register(registry)
+    spotify_tool.register(registry)
     return registry
