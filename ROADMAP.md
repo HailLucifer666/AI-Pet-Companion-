@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`768979d`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening + 3D egg / dawn burst-flash / emergence motes** shipped. The headline beats all land — remaining work is polish + the V-4 milestone.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`7e2bbed`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening + 3D egg / dawn burst-flash / emergence motes / camera dolly** shipped. The headline beats all land — remaining work is polish + the V-4 milestone.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -55,6 +55,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-7 (core) | **The Widening** (`widening.ts`, pure-tested) — real `pet.stage` widens the camera survey range + horizon fog per stage + a warm stage-up flash | `7fb90cd` |
 | W-6 polish | **3D egg in the Quickening** (glowing ovoid in the dark grove — warms per question, hot-bursts at hatch, vanishes on reveal) + **dawn burst-flash** (cubic-out gold veil at the hatch moment via `bloomFlash`, both modes); 2D egg suppressed in cinematic; reduced-motion calm | `efb772b` |
 | W-6 polish | **Emergence motes** — a one-shot fountain of warm additive sparks erupts from the egg at hatch and rises into the dawn as the companion appears, then fades (~2.4s); reduced-motion emits none | `768979d` |
+| W-6 polish | **Camera dolly** — the Quickening camera pushes toward the egg through the questions, presses into the hatch burst, eases back for the dawn (always egg-centred); reduced-motion snaps per phase | `7e2bbed` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -62,7 +63,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 ### Pending ⏳
 | Slice | What | Effort |
 |-------|------|--------|
-| W-6 polish (rest) | Quickening laterCuts — per-region light bursts · camera dolly during questions · soft sound (first cut `5ce4315`; 3D egg + dawn burst-flash `efb772b`; emergence motes `768979d`) | **S** |
+| W-6 polish (rest) | Quickening laterCuts — per-region light bursts · soft sound (first cut `5ce4315`; 3D egg + dawn burst-flash `efb772b`; emergence motes `768979d`; camera dolly `7e2bbed`) | **S** |
 | V-2.5 (rest) | placeRegistry consolidation (one source for place coords/anchors/road-nodes) — deferred: high test-churn, invisible; the robustness wins (GPU ladder + 2D fallback) already shipped | **S** |
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
