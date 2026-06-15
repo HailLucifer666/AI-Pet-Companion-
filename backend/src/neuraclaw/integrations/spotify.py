@@ -143,6 +143,52 @@ async def exchange_code(code: str, redirect_uri: str) -> TokenSet:
     return _token_set_from_payload(resp.json())
 
 
+# ── App token (client credentials) — public search, no user login/Premium ──
+
+_app_token: dict[str, float | str] = {"token": "", "expires_at": 0.0}
+
+
+async def app_token() -> str:
+    """Client-credentials token for app-only calls (search). No user, no Premium."""
+    if _app_token["token"] and float(_app_token["expires_at"]) > time.time() + 30:
+        return str(_app_token["token"])
+    async with _http() as http:
+        resp = await http.post(
+            TOKEN_URL,
+            data={"grant_type": "client_credentials"},
+            headers={"Authorization": _basic_auth()},
+        )
+    if resp.status_code != 200:
+        raise SpotifyError("Spotify app credentials rejected — check SPOTIFY_CLIENT_ID/SECRET.")
+    data = resp.json()
+    _app_token["token"] = data["access_token"]
+    _app_token["expires_at"] = time.time() + float(data.get("expires_in", 3600))
+    return str(_app_token["token"])
+
+
+async def search_track_public(query: str) -> dict | None:
+    """Resolve a song to a track (id/uri/name/artist) via app-only search."""
+    token = await app_token()
+    async with _http() as http:
+        resp = await http.get(
+            f"{API_BASE}/search",
+            params={"q": query, "type": "track", "limit": 1},
+            headers={"Authorization": f"Bearer {token}"},
+        )
+    if resp.status_code != 200:
+        raise SpotifyError("Couldn't search Spotify right now.")
+    items = resp.json().get("tracks", {}).get("items", [])
+    if not items:
+        return None
+    t = items[0]
+    return {
+        "id": t["id"],
+        "uri": t["uri"],
+        "name": t["name"],
+        "artist": ", ".join(a["name"] for a in t.get("artists", [])),
+    }
+
+
 # ── Authenticated client ──────────────────────────────────────────────
 
 
