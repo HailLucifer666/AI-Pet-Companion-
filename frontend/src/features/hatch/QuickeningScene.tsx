@@ -17,12 +17,12 @@ import {
   AdditiveBlending,
   Color,
   Fog,
+  MeshStandardMaterial,
   Vector3,
   type BufferAttribute,
   type DirectionalLight,
   type Group,
   type HemisphereLight,
-  type MeshStandardMaterial,
   type Points,
   type PointLight,
   type PointsMaterial,
@@ -289,6 +289,90 @@ function DollyRig({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduc
   return null;
 }
 
+/* ── Region kindling ─────────────────────────────────────────────────────
+ * The master-plan beat: each answer lights a region of the dark grove. Five
+ * ember cairns ring the mid-grove behind the egg; as each question is answered
+ * the matching one bursts (cubic-out) then settles to a steady warm glow, and
+ * the last kindles as the brain-check is reached — so by the dawn the whole
+ * grove is alive. Pure emissive (no dynamic lights). Reduced-motion: the
+ * answered regions are simply lit, no burst. */
+const N_REGIONS = 5;
+const REGION_FLASH = 0.9; // seconds
+
+function regionsLit(phase: HatchPhase, qi: number): number {
+  if (phase === "intro") return 0;
+  if (phase === "questions") return Math.min(qi, N_REGIONS); // one per answer given
+  return N_REGIONS; // brain / hatching / revealed → all alight
+}
+
+function RegionKindle({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: boolean }) {
+  const prevLit = useRef(0);
+  const flashIdx = useRef(-1);
+  const flashStart = useRef(0);
+  const eased = useRef<number[]>(new Array(N_REGIONS).fill(0));
+
+  const regions = useMemo(() => {
+    const out: [number, number, number][] = [];
+    for (let i = 0; i < N_REGIONS; i++) {
+      const a = -0.9 + (1.8 * i) / (N_REGIONS - 1); // fan ~±51° behind the egg
+      out.push([Math.sin(a) * 5.0, 0.3, -3.0 - Math.cos(a) * 1.3]);
+    }
+    return out;
+  }, []);
+
+  const mats = useMemo(
+    () =>
+      regions.map(
+        () =>
+          new MeshStandardMaterial({
+            color: 0x1a1206,
+            emissive: new Color(WORLD.ember),
+            emissiveIntensity: 0,
+            roughness: 0.55,
+            toneMapped: false,
+          }),
+      ),
+    [regions],
+  );
+  useEffect(() => () => mats.forEach((m) => m.dispose()), [mats]);
+
+  useFrame((state, delta) => {
+    const target = regionsLit(phase, qi);
+    if (target > prevLit.current) {
+      flashIdx.current = target - 1;
+      flashStart.current = state.clock.elapsedTime;
+    }
+    prevLit.current = target;
+    const k = reduced ? 1 : 1 - Math.exp(-3 * delta);
+    for (let i = 0; i < N_REGIONS; i++) {
+      const want = i < target ? 1 : 0;
+      eased.current[i] += (want - eased.current[i]) * k;
+      let e = eased.current[i] * 1.5; // steady glow
+      if (!reduced && i === flashIdx.current) {
+        const ft = state.clock.elapsedTime - flashStart.current;
+        if (ft < REGION_FLASH) e += Math.pow(1 - ft / REGION_FLASH, 3) * 2.4; // burst
+      }
+      mats[i].emissiveIntensity = e;
+    }
+  });
+
+  return (
+    <>
+      {regions.map((p, i) => (
+        <group key={i} position={p}>
+          <mesh material={mats[i]}>
+            <icosahedronGeometry args={[0.34, 0]} />
+          </mesh>
+          {/* soft glow pooled on the ground beneath the ember */}
+          <mesh material={mats[i]} rotation-x={-Math.PI / 2} position-y={-0.28}>
+            <circleGeometry args={[0.95, 24]} />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+}
+
 export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }) {
   const reduced = useReducedMotion() ?? false;
   return (
@@ -300,6 +384,7 @@ export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }
       >
         <DollyRig phase={phase} qi={qi} reduced={reduced} />
         <Dawn phase={phase} qi={qi} reduced={reduced} />
+        <RegionKindle phase={phase} qi={qi} reduced={reduced} />
         <Egg3D phase={phase} qi={qi} reduced={reduced} />
         <EmergenceMotes phase={phase} reduced={reduced} />
         <Stars radius={70} depth={30} count={700} factor={3} saturation={0.2} fade speed={reduced ? 0 : 0.25} />
