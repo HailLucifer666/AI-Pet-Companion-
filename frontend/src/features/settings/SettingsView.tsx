@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api, queryKeys } from "../../lib/api";
 import { Badge, Card, Spinner } from "../../components/ui";
+import { ModelSelector } from "../../components/ModelSelector";
 
 const RISK_NAMES = ["READ", "WRITE", "EXECUTE", "NETWORK_SENSITIVE"];
 
@@ -39,6 +40,18 @@ export function SettingsView() {
               )}
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card>
+        <h2 className="font-display font-medium">Active model</h2>
+        <p className="mt-0.5 text-xs text-ink-500">
+          What new messages use. <strong className="text-ink-300">Auto</strong> follows the
+          resilient role chains below; picking one model pins it (no failover). The list is
+          discovered live from your providers — no restart needed.
+        </p>
+        <div className="mt-3">
+          <ModelSelector className="w-full max-w-md" />
         </div>
       </Card>
 

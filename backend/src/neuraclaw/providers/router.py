@@ -105,6 +105,45 @@ class Router:
                 errors.append(str(e))
         raise ProviderError(f"All providers failed for role {role!r}: {errors}")
 
+    async def chat_stream_explicit(
+        self,
+        provider_name: str,
+        model: str,
+        messages: list[dict[str, Any]],
+        *,
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[Delta]:
+        """Stream from one explicit provider/model, bypassing role failover.
+
+        Backs the user-facing model override. There is intentionally NO failover —
+        a single concrete model was chosen, so a ``ProviderError`` propagates rather
+        than silently switching models. Tool restrictions are still enforced via
+        ``_check_tools`` (the override cannot bypass ``no_tools_models``).
+        """
+        provider = self._providers.get(provider_name)
+        if provider is None:
+            raise ProviderError(f"Unknown provider {provider_name!r}")
+        self._check_tools(model, tools)
+        start = time.monotonic()
+        async for delta in provider.chat_stream(messages, model=model, tools=tools):
+            if delta.done and delta.response:
+                await self._log_usage(provider_name, model, "explicit", delta.response, start)
+            yield delta
+
+    async def list_provider_models(self, provider_name: str) -> list[dict[str, Any]] | None:
+        """A provider's advertised models, or ``None`` if it is unknown or unreachable.
+
+        ``None`` (down / keyless / unknown) is kept distinct from ``[]`` (reachable but
+        advertises no models) so the discovery endpoint can report reachability honestly.
+        """
+        provider = self._providers.get(provider_name)
+        if provider is None:
+            return None
+        try:
+            return await provider.list_models()
+        except Exception:  # noqa: BLE001 — best-effort; None signals unreachable
+            return None
+
     async def _log_usage(
         self, provider: str, model: str, role: str, resp: ChatResponse, start: float
     ) -> None:

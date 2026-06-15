@@ -83,6 +83,21 @@ export interface Settings {
   trust: { max_auto_risk: number };
 }
 
+/** One discoverable model. `ref` is the canonical "provider/model" string the
+ *  chat sends back as an override; `id` is the provider-local id. */
+export interface ModelInfo {
+  id: string;
+  ref: string;
+}
+export interface ProviderModels {
+  reachable: boolean;
+  models: ModelInfo[];
+}
+/** Live per-provider model discovery (real `GET /v1/models` results). */
+export interface ModelsAvailable {
+  providers: Record<string, ProviderModels>;
+}
+
 export interface Pet {
   id: number;
   name: string;
@@ -179,6 +194,7 @@ const get = <T,>(path: string) => request<T>("GET", path);
 export const api = {
   health: () => get<Health>("/health"),
   models: () => get<{ roles: Record<string, string[]> }>("/models"),
+  modelsAvailable: () => get<ModelsAvailable>("/models/available"),
   settings: () => get<Settings>("/settings"),
   setKeys: (keys: Record<string, string>) =>
     request<{ ok: boolean; set: string[]; brain: Brain }>("POST", "/settings/keys", { keys }),
@@ -225,6 +241,7 @@ export const api = {
 export const queryKeys = {
   health: ["health"] as const,
   models: ["models"] as const,
+  modelsAvailable: ["models", "available"] as const,
   settings: ["settings"] as const,
   pet: ["pet"] as const,
   vision: ["vision"] as const,

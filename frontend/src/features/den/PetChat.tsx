@@ -16,6 +16,7 @@ import { streamSSE } from "../../lib/sse";
 import { useScreenCapture } from "../../lib/useScreenCapture";
 import { speechSnippet, useVoice } from "../../lib/useVoice";
 import { useWorldStore } from "../../state/worldStore";
+import { useModelStore, modelOverride } from "../../state/useModelStore";
 import { cx } from "../../components/ui";
 
 const STAGE_NAMES = ["", "Hatchling", "Juvenile", "Adult", "Elder"]; // backend ladder.py canon
@@ -87,11 +88,20 @@ export function PetChat() {
 
       const controller = new AbortController();
       abortRef.current = controller;
+      // Read the shared model selection at send time (no dropdown in the bubble,
+      // but a choice made in Chat/Settings applies here too).
+      const model = modelOverride(useModelStore.getState().selectedModel);
       let acc = "";
       try {
         for await (const ev of streamSSE(
           "/api/chat",
-          { message: shown, session_id: sessionRef.current, role: "primary", image_b64: image ?? undefined },
+          {
+            message: shown,
+            session_id: sessionRef.current,
+            role: "primary",
+            image_b64: image ?? undefined,
+            model,
+          },
           { signal: controller.signal },
         )) {
           if (ev.type === "session") {

@@ -14,19 +14,28 @@ from neuraclaw.tools import build_registry
 
 
 class ScriptedRouter:
-    """Yields pre-scripted responses, one per chat_stream call."""
+    """Yields pre-scripted responses, one per chat_stream / chat_stream_explicit call."""
 
     def __init__(self, responses: list[ChatResponse]):
         self.responses = list(responses)
         self.calls: list[list[dict]] = []
+        self.explicit_calls: list[tuple[str, str]] = []
 
-    async def chat_stream(self, role, messages, *, tools=None):
-        self.calls.append(messages)
-        resp = self.responses.pop(0)
+    async def _emit(self, resp):
         for chunk in resp.text.split(" "):
             if chunk:
                 yield Delta(text=chunk + " ")
         yield Delta(done=True, response=resp)
+
+    async def chat_stream(self, role, messages, *, tools=None):
+        self.calls.append(messages)
+        async for d in self._emit(self.responses.pop(0)):
+            yield d
+
+    async def chat_stream_explicit(self, provider_name, model, messages, *, tools=None):
+        self.explicit_calls.append((provider_name, model))
+        async for d in self._emit(self.responses.pop(0)):
+            yield d
 
 
 async def fake_embed(texts: list[str]) -> list[list[float]]:
@@ -114,6 +123,37 @@ async def test_step_budget_exhaustion(db, tmp_path):
     assert "2 steps" in events[-1].text
 
 
+async def test_model_override_routes_through_explicit_path(db, tmp_path):
+    """A concrete `model` ref bypasses role routing (chat_stream_explicit), no role call."""
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="explicit answer")])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hello",
+            model="openrouter/anthropic/claude-sonnet-4.6",
+        )
+    )
+    assert events[-1].type == "done"
+    assert "explicit answer" in events[-1].text
+    assert router.explicit_calls == [("openrouter", "anthropic/claude-sonnet-4.6")]
+    assert router.calls == []  # the role-based path was not used
+
+
+async def test_no_model_uses_role_path(db, tmp_path):
+    """Without a model override, the role chat_stream path is used (explicit untouched)."""
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="role answer")])
+    await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hello",
+        )
+    )
+    assert router.explicit_calls == []
+    assert len(router.calls) == 1
+
+
 async def test_system_prompt_contains_soul(db, tmp_path):
     config = make_config()
     router = ScriptedRouter([ChatResponse(text="ok")])
@@ -129,7 +169,10 @@ async def test_system_prompt_contains_soul(db, tmp_path):
     # (newline-normalized) rather than a brand literal, so persona rewrites of
     # SOUL.md don't break this test — it verifies the soul is injected, not its wording.
     soul = (Path(__file__).resolve().parents[2] / "SOUL.md").read_text(encoding="utf-8")
-    norm = lambda s: s.replace("\r\n", "\n").replace("\r", "\n").strip()
+
+    def norm(s: str) -> str:
+        return s.replace("\r\n", "\n").replace("\r", "\n").strip()
+
     assert norm(soul) in norm(system["content"])
 
 

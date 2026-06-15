@@ -9,7 +9,7 @@ from typing import Any
 import aiosqlite
 
 from ..config import WORKSPACE_DIR, Config
-from ..providers import ProviderError, Router, ToolsUnsupportedError
+from ..providers import ProviderError, Router, ToolsUnsupportedError, parse_ref
 from ..tools import Registry, ToolContext
 from ..tools.registry import args_summary
 from . import context
@@ -54,9 +54,14 @@ async def run_turn(
     user_text: str,
     role: str = "primary",
     image_b64: str | None = None,
+    model: str | None = None,
     synapse: Synapse | None = None,
 ) -> AsyncIterator[AgentEvent]:
     """Run one agent turn. The user message must already be persisted.
+
+    `role` selects a failover chain (the resilient default). When `model` is a
+    concrete "provider/model" ref it overrides the role entirely — that single
+    model is used with NO failover (it is still subject to `no_tools_models`).
 
     When `synapse` is provided, the turn's lifecycle is mirrored onto the bus
     so the whole UI (the creature, any surface) reacts to real activity.
@@ -65,6 +70,8 @@ async def run_turn(
     (text + image) content array so a vision model can see the attached screen.
     The image is sent to the model but never persisted to history.
     """
+    # Resolve the model override once; None means use role routing.
+    explicit = parse_ref(model) if model else None
     system = await context.build_system_prompt(db, user_text)
     history = await context.load_history(db, session_id, config.agent)
     messages: list[dict[str, Any]] = [{"role": "system", "content": system}, *history]
@@ -90,15 +97,20 @@ async def run_turn(
 
     for _step in range(config.agent.max_steps):
         response = None
+        stream = (
+            router.chat_stream_explicit(explicit[0], explicit[1], messages, tools=tools)
+            if explicit
+            else router.chat_stream(role, messages, tools=tools)
+        )
         try:
-            async for delta in router.chat_stream(role, messages, tools=tools):
+            async for delta in stream:
                 if delta.text:
                     yield AgentEvent(type="delta", text=delta.text)
                 if delta.done:
                     response = delta.response
         except ToolsUnsupportedError:
-            # Chain has no tool-capable model: degrade to plain chat, once.
-            log.warning("role %r lacks tool support; retrying without tools", role)
+            # Selected model/chain has no tool support: degrade to plain chat, once.
+            log.warning("%r lacks tool support; retrying without tools", model or role)
             tools = None
             continue
         except ProviderError as e:

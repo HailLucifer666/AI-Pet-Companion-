@@ -17,6 +17,7 @@ from ..core.vision import resolve_vision
 from ..db.connection import vec_version
 from ..memory import extractor, store
 from ..pet import hatch as hatch_svc, xp
+from ..providers import parse_ref
 from ..skillsys import loader as skill_loader
 from ..weather import fetch_weather
 
@@ -49,6 +50,29 @@ async def weather():
 async def models(request: Request):
     config = request.app.state.config
     return {"roles": config.roles}
+
+
+@api_router.get("/models/available")
+async def models_available(request: Request):
+    """Every model each provider advertises live (OpenAI ``GET /v1/models``).
+
+    Providers are probed concurrently with a short per-provider timeout; one that
+    is unreachable or keyless returns ``reachable: false`` with no models. No error
+    or key text is ever exposed — only the boolean and the real model list.
+    """
+    router = request.app.state.router
+    config = request.app.state.config
+
+    async def probe(name: str) -> tuple[str, dict]:
+        try:
+            models = await asyncio.wait_for(router.list_provider_models(name), timeout=4.0)
+        except Exception:  # noqa: BLE001 — timeout or anything else => unreachable
+            models = None
+        # `models is None` => unreachable; `[]` => reachable but advertises nothing.
+        return name, {"reachable": models is not None, "models": models or []}
+
+    results = await asyncio.gather(*(probe(name) for name in config.providers))
+    return {"providers": dict(results)}
 
 
 @api_router.get("/settings")
@@ -206,6 +230,8 @@ class ChatRequest(BaseModel):
     # Optional screen/image the companion should look at. Base64 (raw or a data:
     # URL). Sent to the vision model for this turn only — never written to history.
     image_b64: str | None = Field(default=None, max_length=15_000_000)
+    # Optional concrete "provider/model" override; None => role-based routing.
+    model: str | None = None
 
 
 def _sse(event: dict) -> str:
@@ -225,6 +251,15 @@ async def chat(req: ChatRequest, request: Request):
     # An attached image needs a vision-capable model: prefer a configured `vision`
     # role, else keep the requested one (e.g. a vision-capable `primary`).
     role = "vision" if req.image_b64 and "vision" in config.roles else req.role
+
+    # An explicit model override (when set) wins over role routing in run_turn.
+    if req.model is not None:
+        try:
+            provider_name, _ = parse_ref(req.model)
+        except ValueError:
+            raise HTTPException(400, f"Invalid model ref {req.model!r}")
+        if provider_name not in config.providers:
+            raise HTTPException(400, f"Unknown model ref {req.model!r}")
 
     session_id = req.session_id or str(uuid.uuid4())
     cur = await db.execute("SELECT id FROM sessions WHERE id = ?", (session_id,))
@@ -254,6 +289,7 @@ async def chat(req: ChatRequest, request: Request):
             user_text=req.message,
             role=role,
             image_b64=req.image_b64,
+            model=req.model,
             synapse=_synapse,
         ):
             if event.type == "delta":

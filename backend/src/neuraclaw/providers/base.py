@@ -56,6 +56,10 @@ class Provider(Protocol):
         tools: list[dict[str, Any]] | None = None,
     ) -> AsyncIterator[Delta]: ...
 
+    async def list_models(self) -> list[dict[str, Any]]:
+        """Models this provider advertises ([] if none; raises if unreachable)."""
+        ...
+
 
 class ProviderError(Exception):
     """Raised when a provider call fails; router catches this for failover."""

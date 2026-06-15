@@ -17,6 +17,8 @@ import {
 import { api, queryKeys, type SessionSummary } from "../../lib/api";
 import { streamSSE } from "../../lib/sse";
 import { useUndoableDelete } from "../../lib/useUndoableDelete";
+import { useModelStore, modelOverride } from "../../state/useModelStore";
+import { ModelSelector } from "../../components/ModelSelector";
 import {
   Badge,
   Button,
@@ -215,6 +217,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     embedded ? setLocalSession(id) : navigate(id ? `/chat/${id}` : "/chat");
   const [input, setInput] = useState("");
   const [role, setRole] = useState("primary");
+  const selectedModel = useModelStore((s) => s.selectedModel);
   const [stream, setStream] = useState<StreamState>(idleStream);
   const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -253,7 +256,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     try {
       for await (const event of streamSSE(
         "/api/chat",
-        { message, session_id: sessionId ?? null, role },
+        { message, session_id: sessionId ?? null, role, model: modelOverride(selectedModel) },
         { signal: controller.signal },
       )) {
         if (event.type === "session" && !sessionId) {
@@ -293,7 +296,10 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
         await queryClient.invalidateQueries({
           queryKey: queryKeys.sessionMessages(newSessionId),
         });
-        setStream(idleStream);
+        // Keep a surfaced error visible (the reply lives in reloaded history, but
+        // a failed/errored turn — common for a pinned model with no failover —
+        // persists nothing, so the error banner must survive the reset).
+        setStream((s) => (s.error ? { ...idleStream, error: s.error } : idleStream));
         if (newSessionId !== sessionId) goToSession(newSessionId);
       }
     }
@@ -357,8 +363,9 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
               value={role}
               onValueChange={setRole}
               options={roles.map((r) => ({ value: r, label: r }))}
-              className="w-28 shrink-0"
+              className="w-24 shrink-0"
             />
+            <ModelSelector className="w-44 shrink-0" />
             <Textarea
               rows={Math.min(6, Math.max(1, input.split("\n").length))}
               placeholder="Message… (Enter to send, Shift+Enter for newline)"

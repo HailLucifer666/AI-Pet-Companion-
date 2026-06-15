@@ -115,9 +115,11 @@ export function Select({
           className,
         )}
       >
-        <RSelect.Value placeholder={placeholder} />
+        <span className="min-w-0 flex-1 truncate text-left">
+          <RSelect.Value placeholder={placeholder} />
+        </span>
         <RSelect.Icon>
-          <ChevronDown className="size-4 text-ink-500" />
+          <ChevronDown className="size-4 shrink-0 text-ink-500" />
         </RSelect.Icon>
       </RSelect.Trigger>
       <RSelect.Portal>
