@@ -4,7 +4,9 @@
  *  with the 2D version). The rail still reaches every surface directly. */
 
 import { useEffect, useMemo, useState } from "react";
+import { useReducedMotion } from "motion/react";
 import { World3D } from "../../world3d/World3D";
+import { bloomFlash } from "../../world3d/bloomCinematic";
 import { SurfaceOverlay } from "./SurfaceOverlay";
 import { DenHud } from "./DenHud";
 import { CoilRing } from "./CoilRing";
@@ -38,6 +40,44 @@ function SeePetButton() {
 }
 
 const STAGE_NAMES = ["", "Hatchling", "Juvenile", "Adult", "Elder"]; // 1..4 (backend ladder.py canon)
+const WIDEN_MS = 1400;
+
+/** The Widening moment: a brief warm veil sweeps the screen when the companion
+ *  reaches a new life stage (real pet.stage). The world's survey range + horizon
+ *  fog have just opened (World3D/Atmosphere). Cubic-out fade via bloomFlash;
+ *  reduced-motion shows no flash (the wider world is still there, just no sweep). */
+function WideningFlash() {
+  const reduced = useReducedMotion() ?? false;
+  const wideningAt = useWorldStore((s) => s.wideningAt);
+  const [op, setOp] = useState(0);
+
+  useEffect(() => {
+    if (!wideningAt || reduced) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = () => {
+      const f = bloomFlash(performance.now() - start, WIDEN_MS);
+      setOp(f * 0.5);
+      if (f > 0.001) raf = requestAnimationFrame(tick);
+      else setOp(0);
+    };
+    tick();
+    return () => cancelAnimationFrame(raf);
+  }, [wideningAt, reduced]);
+
+  if (op <= 0) return null;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-40"
+      style={{
+        opacity: op,
+        background:
+          "radial-gradient(circle at 50% 45%, var(--color-claw-200), var(--color-claw-500) 38%, transparent 72%)",
+      }}
+    />
+  );
+}
 
 /** Shown when WebGL can't start (no/blocked GPU). The 3D Grove can't render, but
  *  the companion is still alive — so we state its REAL stage/level/progress and
@@ -128,6 +168,7 @@ export default function DenView() {
       </button>
       <MindsEye open={mindOpen} onClose={() => setMindOpen(false)} />
       {webgl && <MemoryPeek />}
+      <WideningFlash />
       <SurfaceOverlay container={host} />
     </div>
   );

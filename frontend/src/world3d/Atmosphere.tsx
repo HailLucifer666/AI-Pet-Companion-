@@ -33,12 +33,14 @@ export function Atmosphere({
   reduced,
   shadows = true,
   shadowMapSize = 2048,
+  fogFar = FOG_FAR,
 }: {
   hour: number;
   fx: WeatherFx;
   reduced: boolean;
   shadows?: boolean;
   shadowMapSize?: number;
+  fogFar?: number;
 }) {
   const scene = useThree((s) => s.scene);
   const dir = useRef<DirectionalLight>(null);
@@ -66,7 +68,7 @@ export function Atmosphere({
     if (fog instanceof Fog) {
       fog.color.lerp(skyTarget, k);
       fog.near += (FOG_NEAR * fx.fogScale - fog.near) * k;
-      fog.far += (FOG_FAR * fx.fogScale - fog.far) * k;
+      fog.far += (fogFar * fx.fogScale - fog.far) * k; // fogFar widens with the pet's stage (The Widening)
     }
 
     if (dir.current) {

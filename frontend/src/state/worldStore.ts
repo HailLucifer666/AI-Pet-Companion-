@@ -61,6 +61,7 @@ interface WorldStore {
   pulses: Pulse[];
   bloomAt: number; // performance.now() of the last level-up (the gate blooms)
   forgeAt: number; // performance.now() of the last skill draft (the forge erupts)
+  wideningAt: number; // performance.now() of the last stage-up (the world widens)
   threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
   recencyById: Record<number, number | null>; // memory_id → last-mattered epoch ms (compost)
   speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
@@ -72,6 +73,7 @@ interface WorldStore {
   prunePulses: () => void;
   bloom: () => void;
   forge: () => void;
+  widen: () => void;
   setSpeech: (text: string) => void;
   refreshThreads: () => Promise<void>;
   hydrate: () => Promise<void>;
@@ -88,6 +90,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   pulses: [],
   bloomAt: 0,
   forgeAt: 0,
+  wideningAt: 0,
   threads: [],
   recencyById: {},
   speech: "",
@@ -130,6 +133,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
   bloom: () => set(() => ({ bloomAt: nowMs() })),
 
   forge: () => set(() => ({ forgeAt: nowMs() })),
+
+  widen: () => set(() => ({ wideningAt: nowMs() })),
 
   setSpeech: (text) => set(() => ({ speech: text })),
 
@@ -210,6 +215,7 @@ export function connect(): void {
   disconnect = connectSynapse((ev) => {
     if (ev.type === "pet.stage") {
       store.setStage(Number(ev.stage) || 1);
+      store.widen(); // the world opens up as the companion matures (The Widening)
       return;
     }
     if (ev.type === "xp.awarded") {

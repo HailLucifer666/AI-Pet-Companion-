@@ -32,6 +32,8 @@ import { petPos } from "./petPosition";
 import { cameraFocus } from "./cameraFocus";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { detectGpuTier, qualityFlags } from "./quality";
+import { stageReveal } from "./widening";
+import { useWorldStore } from "../state/worldStore";
 
 interface ControlsLike {
   target: Vector3;
@@ -44,7 +46,7 @@ const ZOOM_RATE = 5; // how briskly the camera glides to its target distance
 const IDLE_AFTER = 6; // seconds hands-off before the camera drifts in a slow orbit
 const IDLE_DRIFT = 0.04; // rad/sec — a slow cinematic orbit around the pet
 const MIN_D = 6; // closest zoom — a close-up of the companion ("see my pet")
-const MAX_D = 120; // farthest — pull back to survey a swath of the big island (not fit it all)
+const MAX_D = 150; // absolute ceiling (= stage-4 survey range); the per-stage cap (The Widening) is enforced in the rig
 const DEFAULT_DIST = 22; // resting distance — close to the pet, the world spilling off-screen
 const WHEEL_SENS = 0.0012; // wheel delta → fractional distance change
 const FOLLOW_K = 4.5; // follow ease rate (frame-rate-independent) — tight, never sloppy
@@ -61,7 +63,7 @@ const clampD = (d: number) => Math.max(MIN_D, Math.min(MAX_D, d));
  *  the zoom; after a drag the camera holds your framing, then glides back to the pet.
  *  Camera-terrain clearance stops it clipping through hills at close zoom. Reduced-
  *  motion → snap-follow, no eased zoom or drift. */
-function CameraRig({ reduced }: { reduced: boolean }) {
+function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) {
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls) as unknown as ControlsLike | null;
@@ -142,10 +144,13 @@ function CameraRig({ reduced }: { reduced: boolean }) {
       followed.current.copy(controls.target); // stay synced so follow resumes without a jump
     }
 
-    // Ease the camera's distance toward the wheel-set target (the buttery zoom).
+    // Ease the camera's distance toward the wheel-set target (the buttery zoom),
+    // capped to the current stage's survey range — The Widening opens it as the pet grows.
+    const cap = Math.min(MAX_D, maxDist);
+    if (targetDist.current > cap) targetDist.current = cap;
     const curDist = offset.current.length() || 1;
     const zk = reduced ? 1 : 1 - Math.exp(-ZOOM_RATE * dt);
-    offset.current.setLength(curDist + (clampD(targetDist.current) - curDist) * zk);
+    offset.current.setLength(curDist + (Math.max(MIN_D, Math.min(cap, targetDist.current)) - curDist) * zk);
 
     // Idle cinematic orbit: hands off long enough → drift slowly around the pet.
     if (!interacting.current && !reduced && t - lastInput.current > IDLE_AFTER) {
@@ -179,6 +184,11 @@ export function World3D() {
   // (bloom, MSAA, shadows, extra lights, dpr) first on weak hardware so fps holds.
   const q = useMemo(() => qualityFlags(detectGpuTier()), []);
 
+  // The Widening: the world opens as the companion matures (real pet.stage). Each
+  // stage widens the survey range + pushes the horizon fog back.
+  const stage = useWorldStore((s) => s.stage);
+  const reveal = stageReveal(stage);
+
   // The sky tracks the real local clock; re-read each minute.
   const [hour, setHour] = useState(() => localHour(new Date()));
   useEffect(() => {
@@ -195,7 +205,7 @@ export function World3D() {
       gl={{ antialias: false, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >
       {/* Sky, light + fog — driven by real time of day × real weather. */}
-      <Atmosphere hour={hour} fx={fx} reduced={reduced} shadows={q.shadows} shadowMapSize={q.shadowMapSize} />
+      <Atmosphere hour={hour} fx={fx} reduced={reduced} shadows={q.shadows} shadowMapSize={q.shadowMapSize} fogFar={reveal.fogFar} />
 
       {/* The sun + moon disc, riding the same day/night light arc. */}
       <Sky3D hour={hour} reduced={reduced} />
@@ -216,7 +226,7 @@ export function World3D() {
       <Clouds3D amount={fx.clouds} reduced={reduced} />
       <Rain3D rain={fx.rain} lightning={fx.lightning} reduced={reduced} />
 
-      <CameraRig reduced={reduced} />
+      <CameraRig reduced={reduced} maxDist={reveal.surveyDist} />
       <CursorLure reduced={reduced} />
       <OrbitControls
         makeDefault
