@@ -28,6 +28,25 @@
 
 ---
 
+## V-4a · Sight (screen capture → vision) — LIVE-ONLY (getDisplayMedia can't be headless-tested)
+
+> **Restart the backend first** (`./.venv/Scripts/python.exe -m neuraclaw`) — the
+> `/api/vision` endpoint + `image_b64` chat field only go live after a restart. Without
+> it the 👁 button stays hidden (correct fallback). A vision-capable model must be
+> configured + reachable (the `vision` role) for the button to appear at all.
+
+| ✓ | Item | How to trigger | Pass criteria | Notes |
+|---|------|----------------|---------------|-------|
+| [ ] | **👁 button gating** | open PetChat (top-right "Talk to…") | the eye button shows only when a vision brain is available; hidden otherwise (no blind sends) | `canSee` = capture.supported && /api/vision.available |
+| [ ] | **Screen capture** | click 👁 → pick a screen/window | one frame captured, shows as a thumbnail above the input; OS share stops immediately (no lingering capture indicator) | `useScreenCapture` stops tracks after one frame |
+| [ ] | **⚠ PRIVACY — remote warning** | with a hosted vision model (e.g. Sonnet) | thumbnail shows an **amber** "⚠ Will be sent to {model} — this screenshot leaves your device" | **must be accurate** — verify it only says "leaves device" for a remote model |
+| [ ] | **PRIVACY — local reassurance** | with a local Ollama vision model | thumbnail says "Stays on your device ({model})" — and confirm the screen truly doesn't leave | flip `vision` role to ollama/llama3.2-vision |
+| [ ] | **Vision reply** | send with a screenshot attached | the companion describes what's on screen; the island still reacts (pet→bench, fire, etc.) | image sent for that turn only, never persisted |
+| [ ] | **Image not persisted** | after a vision turn, reopen Chat surface | the stored message is the text only — no base64 blob in history | backend strips image from persistence |
+| [ ] | **Remove + image-only send** | capture, then click the ✕ on the thumbnail; also try sending with no text | ✕ clears the attachment; sending with only a screenshot works (defaults to "What's on my screen?") | |
+
+---
+
 ## Carried live-tune flags (prior slices — re-confirm during the walk)
 
 | ✓ | Item | Pass criteria | Notes |

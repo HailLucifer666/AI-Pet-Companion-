@@ -135,6 +135,16 @@ export interface Weather {
   city?: string | null;
 }
 
+/** The vision brain: can the companion see a screen, and does doing so send it
+ *  off-device? `remote:true` means a captured screen leaves this machine — the UI
+ *  must warn before capture. (`GET /api/vision`, resolved from the `vision` role.) */
+export interface Vision {
+  available: boolean;
+  remote: boolean;
+  model: string | null;
+  provider: string | null;
+}
+
 export interface HatchBody {
   creature_name: string;
   user_name: string;
@@ -174,6 +184,7 @@ export const api = {
     request<{ ok: boolean; set: string[]; brain: Brain }>("POST", "/settings/keys", { keys }),
 
   pet: () => get<PetResponse>("/pet"),
+  vision: () => get<Vision>("/vision"),
   den: () => get<DenDigest>("/den"),
   hatch: (body: HatchBody) => request<{ pet: Pet }>("POST", "/hatch", body),
 
@@ -216,6 +227,7 @@ export const queryKeys = {
   models: ["models"] as const,
   settings: ["settings"] as const,
   pet: ["pet"] as const,
+  vision: ["vision"] as const,
   den: ["den"] as const,
   weather: ["weather"] as const,
   skills: ["skills"] as const,

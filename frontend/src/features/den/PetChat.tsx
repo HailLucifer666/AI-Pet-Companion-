@@ -10,9 +10,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bot, Mic, Send, Square, Volume2, VolumeX, X } from "lucide-react";
+import { Bot, Eye, Mic, Send, Square, Volume2, VolumeX, X } from "lucide-react";
 import { api, queryKeys } from "../../lib/api";
 import { streamSSE } from "../../lib/sse";
+import { useScreenCapture } from "../../lib/useScreenCapture";
 import { speechSnippet, useVoice } from "../../lib/useVoice";
 import { useWorldStore } from "../../state/worldStore";
 import { cx } from "../../components/ui";
@@ -37,6 +38,7 @@ export function PetChat() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [muted, setMuted] = useState(false);
+  const [shot, setShot] = useState<string | null>(null); // a captured screen, pending attach
 
   const sessionRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -45,6 +47,9 @@ export function PetChat() {
 
   const qc = useQueryClient();
   const voice = useVoice();
+  const capture = useScreenCapture();
+  const vision = useQuery({ queryKey: queryKeys.vision, queryFn: api.vision });
+  const canSee = capture.supported && vision.data?.available === true;
   const setSpeech = useWorldStore((s) => s.setSpeech);
   const working = useWorldStore((s) => s.lumen.mode === "work");
   const stage = useWorldStore((s) => s.stage);
@@ -64,10 +69,17 @@ export function PetChat() {
   const send = useCallback(
     async (text: string) => {
       const message = text.trim();
-      if (!message || running) return;
+      if ((!message && !shot) || running) return;
+      const image = shot; // attach the pending screen capture, if any
+      const shown = message || "What's on my screen?";
+      setShot(null);
       setInput("");
       setError(null);
-      setTurns((t) => [...t, { id: turnId++, role: "you" as const, text: message }].slice(-MAX_TURNS));
+      setTurns((t) =>
+        [...t, { id: turnId++, role: "you" as const, text: image ? `🖼 ${shown}` : shown }].slice(
+          -MAX_TURNS,
+        ),
+      );
       setStream("");
       setRunning(true);
       voice.cancelSpeech();
@@ -79,7 +91,7 @@ export function PetChat() {
       try {
         for await (const ev of streamSSE(
           "/api/chat",
-          { message, session_id: sessionRef.current, role: "primary" },
+          { message: shown, session_id: sessionRef.current, role: "primary", image_b64: image ?? undefined },
           { signal: controller.signal },
         )) {
           if (ev.type === "session") {
@@ -113,8 +125,16 @@ export function PetChat() {
         }
       }
     },
-    [running, muted, voice, setSpeech, clearSpeechSoon, qc],
+    [running, shot, muted, voice, setSpeech, clearSpeechSoon, qc],
   );
+
+  // Capture one frame of a user-picked screen → hold it as the next message's
+  // attachment. Gated on a real vision brain (canSee) so we never send a screen
+  // to a model that can't see it.
+  const showScreen = useCallback(async () => {
+    const img = await capture.captureFrame();
+    if (img) setShot(img);
+  }, [capture]);
 
   const stop = useCallback(() => abortRef.current?.abort(), []);
 
@@ -219,6 +239,28 @@ export function PetChat() {
 
       {/* Input */}
       <div className="border-t border-ink-800/70 px-3 py-2">
+        {shot && (
+          <div className="mb-2 flex items-start gap-2 rounded-lg border border-ink-700/70 bg-ink-950/50 p-2">
+            <img src={shot} alt="Captured screen" className="h-12 w-20 shrink-0 rounded object-cover" />
+            <p
+              className={cx(
+                "min-w-0 flex-1 text-[11px] leading-snug",
+                vision.data?.remote ? "font-medium text-claw-300" : "text-ink-400",
+              )}
+            >
+              {vision.data?.remote
+                ? `⚠ Will be sent to ${vision.data?.model ?? "a remote model"} — this screenshot leaves your device.`
+                : `Stays on your device (${vision.data?.model ?? "local model"}).`}
+            </p>
+            <button
+              onClick={() => setShot(null)}
+              aria-label="Remove screenshot"
+              className="rounded p-0.5 text-ink-500 hover:bg-ink-800/70 hover:text-ink-200"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        )}
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value.slice(0, MAX_CHARS))}
@@ -257,6 +299,23 @@ export function PetChat() {
                 {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
               </button>
             )}
+            {canSee && (
+              <button
+                onClick={() => void showScreen()}
+                disabled={capture.capturing}
+                aria-label="Show the companion your screen"
+                title="Show your screen"
+                className={cx(
+                  "rounded-lg p-2 transition-colors disabled:opacity-50",
+                  shot
+                    ? "bg-claw-600/30 text-claw-300"
+                    : "text-ink-400 hover:bg-ink-800/70 hover:text-ink-100",
+                  capture.capturing && "animate-pulse",
+                )}
+              >
+                <Eye className="size-4" />
+              </button>
+            )}
             <span className="ml-1 text-[10px] tabular-nums text-ink-600">
               {input.length}/{MAX_CHARS}
             </span>
@@ -272,7 +331,7 @@ export function PetChat() {
           ) : (
             <button
               onClick={() => void send(input)}
-              disabled={!input.trim()}
+              disabled={!input.trim() && !shot}
               aria-label="Send"
               className="rounded-lg bg-claw-600 p-2 text-ink-950 transition-colors hover:bg-claw-500 disabled:opacity-40"
             >
