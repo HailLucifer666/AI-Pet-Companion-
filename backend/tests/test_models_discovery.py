@@ -1,11 +1,11 @@
-"""Model discovery + explicit (override) routing — no role failover, tools still gated."""
+"""Model discovery + explicit (override) routing â€” no role failover, tools still gated."""
 
 import pytest
 
-from neuraclaw.config import Config, ProviderConfig
-from neuraclaw.providers import ProviderError, Router, ToolsUnsupportedError
-from neuraclaw.providers.base import ChatResponse, Delta
-from neuraclaw.providers.openai_compat import OpenAICompatProvider
+from ai_pet_companion.config import Config, ProviderConfig
+from ai_pet_companion.providers import ProviderError, Router, ToolsUnsupportedError
+from ai_pet_companion.providers.base import ChatResponse, Delta
+from ai_pet_companion.providers.openai_compat import OpenAICompatProvider
 
 
 def make_config(**overrides) -> Config:
@@ -21,7 +21,7 @@ def make_config(**overrides) -> Config:
     return Config.model_validate(base)
 
 
-# ── OpenAICompatProvider.list_models ──────────────────────────────────
+# â”€â”€ OpenAICompatProvider.list_models â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class _FakeModel:
@@ -65,7 +65,7 @@ async def test_list_models_raises_provider_error_on_failure():
         await prov.list_models()
 
 
-# ── Router.list_provider_models ───────────────────────────────────────
+# â”€â”€ Router.list_provider_models â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 class FakeStreamProvider:
@@ -109,7 +109,7 @@ async def test_list_provider_models_distinguishes_empty_from_unreachable():
     assert await router.list_provider_models("c") == []  # reachable but empty
 
 
-# ── Router.chat_stream_explicit ───────────────────────────────────────
+# â”€â”€ Router.chat_stream_explicit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 async def _drain(gen):
@@ -147,7 +147,7 @@ async def test_chat_stream_explicit_enforces_no_tools_models():
 
 
 async def test_chat_stream_explicit_has_no_failover():
-    """A failing explicit model raises — it must NOT fall back to another provider."""
+    """A failing explicit model raises â€” it must NOT fall back to another provider."""
 
     class Failing:
         name = "a"
@@ -157,7 +157,7 @@ async def test_chat_stream_explicit_has_no_failover():
 
         async def chat_stream(self, messages, *, model, tools=None):
             raise ProviderError("a down")
-            yield  # pragma: no cover — makes this an async generator
+            yield  # pragma: no cover â€” makes this an async generator
 
     router = Router(make_config())
     b = FakeStreamProvider("b")

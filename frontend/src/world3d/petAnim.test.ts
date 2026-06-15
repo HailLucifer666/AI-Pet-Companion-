@@ -41,7 +41,7 @@ describe("headNodY", () => {
 });
 
 describe("gazeYaw", () => {
-  it("is 0 straight ahead and clamps hard turns to ±0.55", () => {
+  it("is 0 straight ahead and clamps hard turns to Â±0.55", () => {
     expect(gazeYaw(0, 1, 0)).toBe(0);
     expect(gazeYaw(1, 0, 0)).toBe(0.55);
     for (const [dx, dz, h] of [
@@ -78,7 +78,7 @@ describe("legLift", () => {
   it("lifts diagonal pairs together while moving, micro-shifts at rest", () => {
     expect(legLift(0, 1, true, 0)).toBe(0);
     expect(legLift(Math.PI / 2 / 7, 1, true, 0)).toBeCloseTo(0.08);
-    expect(legLift(Math.PI / 2 / 7, 1, true, 1)).toBe(0); // opposite phase → max(0,negative)
+    expect(legLift(Math.PI / 2 / 7, 1, true, 1)).toBe(0); // opposite phase â†’ max(0,negative)
     expect(legLift(0, 0, false, 2)).toBeCloseTo(Math.sin(1.4) * 0.008);
   });
 });

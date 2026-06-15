@@ -11,16 +11,16 @@ import { MemoryView } from "./features/memory/MemoryView";
 import { NotesView } from "./features/notes/NotesView";
 import { SettingsView } from "./features/settings/SettingsView";
 import {
-  DocumentsStub,
   EmailStub,
   ResearchStub,
   SkillsStub,
 } from "./features/stubs";
+import { DocumentsView } from "./features/documents/DocumentsView";
 import { TasksView } from "./features/tasks/TasksView";
 import { CalendarView } from "./features/calendar/CalendarView";
 import { Styleguide } from "./features/styleguide/Styleguide";
 
-// The world (Pixi) is heavy — lazy-load it so it never touches the main bundle.
+// The world (Pixi) is heavy â€” lazy-load it so it never touches the main bundle.
 const DenView = lazy(() => import("./features/den/DenView"));
 
 function DenLoading() {
@@ -39,7 +39,7 @@ function Shell() {
         <Route path="/chat" element={<ChatView />} />
         <Route path="/chat/:sessionId" element={<ChatView />} />
         <Route path="/research" element={<ResearchStub />} />
-        <Route path="/documents" element={<DocumentsStub />} />
+        <Route path="/documents" element={<DocumentsView />} />
         <Route path="/notes" element={<NotesView />} />
         <Route path="/tasks" element={<TasksView />} />
         <Route path="/calendar" element={<CalendarView />} />
@@ -62,7 +62,7 @@ function Shell() {
   );
 }
 
-/** First-run gate: no pet yet → the hatch ritual; otherwise the full app.
+/** First-run gate: no pet yet â†’ the hatch ritual; otherwise the full app.
  *  If the backend is unreachable we fall through to the shell (which shows the
  *  offline status) rather than trapping the user on a blank ritual. */
 export function App() {

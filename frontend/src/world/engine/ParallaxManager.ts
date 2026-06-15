@@ -1,4 +1,4 @@
-/** ParallaxManager — turns one camera position into depth-scaled layer offsets.
+/** ParallaxManager â€” turns one camera position into depth-scaled layer offsets.
  *  Far layers (small depth) barely move; near layers (large depth) shift most,
  *  giving the Grove its sense of volume. */
 

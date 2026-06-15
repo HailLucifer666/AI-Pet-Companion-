@@ -8,7 +8,7 @@ import {
 
 const at = (over: Partial<LumenformState> = {}): LumenformState => ({ ...INITIAL, ...over });
 
-describe("reduceLumenform — real events drive work", () => {
+describe("reduceLumenform â€” real events drive work", () => {
   it("starts resting at home", () => {
     expect(INITIAL.place).toBe("home");
     expect(INITIAL.mode).toBe("rest");
@@ -53,7 +53,7 @@ describe("reduceLumenform — real events drive work", () => {
   });
 });
 
-describe("scheduleIdle — a small private life", () => {
+describe("scheduleIdle â€” a small private life", () => {
   it("is suppressed under reduced-motion", () => {
     const s = at({ since: 0 });
     expect(scheduleIdle(s, 999_999, () => 0, true)).toBe(s);
@@ -76,7 +76,7 @@ describe("scheduleIdle — a small private life", () => {
     expect(next.place).toBe("home"); // wander returns home
   });
 
-  it("picks an activity once it has rested long enough (low roll → wander)", () => {
+  it("picks an activity once it has rested long enough (low roll â†’ wander)", () => {
     const s = at({ since: 0 });
     const next = scheduleIdle(s, 7000, () => 0, false);
     expect(next.gesture).toBe("wander");

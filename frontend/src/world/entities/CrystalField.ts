@@ -1,7 +1,7 @@
-/** CrystalField — memories made visible. Each kept memory plants a light-crystal
+/** CrystalField â€” memories made visible. Each kept memory plants a light-crystal
  *  on the Grove floor; forgetting one folds it back into the earth. Geometry and
  *  position are derived *deterministically* from the memory id (a memory always
- *  grows the same crystal in the same spot — see makeCrystalSeed), and the five
+ *  grows the same crystal in the same spot â€” see makeCrystalSeed), and the five
  *  memory types grow five distinct species so the garden reads at a glance. Shape
  *  is the primary cue (accessible without color); a glow tint is the secondary cue.
  *  Capped so a long session can't grow the scene unbounded.
@@ -82,20 +82,20 @@ export class CrystalField {
     const { claw300 } = this.palette;
     const s = range(r, 0.85, 1.2); // per-crystal size jitter
 
-    // Shared bioluminescent halo — every species glows.
+    // Shared bioluminescent halo â€” every species glows.
     node.addChild(new Graphics().circle(0, -10 * s, 22 * s).fill({ color: tint, alpha: 0.12 }));
 
     const body = new Graphics();
     switch (spec.kind) {
       case "monolith": {
-        // identity — a tall standing slab, unmistakable and rooted.
+        // identity â€” a tall standing slab, unmistakable and rooted.
         const w = 7 * s;
         const ht = 30 * s;
         body.poly([-w, 0, -w, -ht * 0.9, 0, -ht, w, -ht * 0.9, w, 0]).fill({ color: tint, alpha: 0.92 });
         break;
       }
       case "gem": {
-        // preference — a faceted round gem.
+        // preference â€” a faceted round gem.
         const rad = 11 * s;
         body
           .poly([0, -rad * 1.6, rad, -rad * 0.6, rad * 0.6, rad * 0.5, -rad * 0.6, rad * 0.5, -rad, -rad * 0.6])
@@ -103,7 +103,7 @@ export class CrystalField {
         break;
       }
       case "grove": {
-        // project — a small cluster of three shards.
+        // project â€” a small cluster of three shards.
         for (const dx of [-6 * s, 0, 6 * s]) {
           const ht = range(r, 14, 26) * s;
           body.poly([dx, 0, dx - 3 * s, -ht * 0.6, dx, -ht, dx + 3 * s, -ht * 0.55]).fill({ color: tint, alpha: 0.88 });
@@ -111,13 +111,13 @@ export class CrystalField {
         break;
       }
       case "spire": {
-        // event — a thin tall needle.
+        // event â€” a thin tall needle.
         const ht = 34 * s;
         body.poly([0, 0, -3 * s, -ht * 0.5, 0, -ht, 3 * s, -ht * 0.5]).fill({ color: tint, alpha: 0.9 });
         break;
       }
       case "quartz": {
-        // fact — a short hexagonal prism.
+        // fact â€” a short hexagonal prism.
         const w = 9 * s;
         const ht = 18 * s;
         body

@@ -43,7 +43,7 @@ export function Styleguide() {
       <header>
         <h1 className="text-2xl font-bold">Styleguide</h1>
         <p className="text-sm text-ink-500">
-          NeuraClaw primitives. If a surface needs something not on this page, it gets added
+          AI Pet Companion primitives. If a surface needs something not on this page, it gets added
           here first.
         </p>
       </header>
@@ -57,8 +57,8 @@ export function Styleguide() {
       </Section>
 
       <Section title="Inputs">
-        <Input placeholder="Single line…" className="max-w-60" />
-        <Textarea placeholder="Multi line…" rows={3} className="max-w-60" />
+        <Input placeholder="Single lineâ€¦" className="max-w-60" />
+        <Textarea placeholder="Multi lineâ€¦" rows={3} className="max-w-60" />
         <Select
           ariaLabel="Model role"
           value={role}
@@ -78,7 +78,7 @@ export function Styleguide() {
           onOpenChange={setDialogOpen}
           trigger={<Button variant="ghost">Open dialog</Button>}
           title="Confirm something"
-          description="This is the overlay plane — layered above the page with its own shadow."
+          description="This is the overlay plane â€” layered above the page with its own shadow."
           footer={
             <>
               <Button variant="ghost" onClick={() => setDialogOpen(false)}>
@@ -93,7 +93,7 @@ export function Styleguide() {
         <Popover trigger={<Button variant="ghost">Open popover</Button>}>
           <p className="max-w-52">A floating overlay anchored to its trigger, with arrow-free edge.</p>
         </Popover>
-        <Tooltip label="A styled tooltip — no native title" side="top">
+        <Tooltip label="A styled tooltip â€” no native title" side="top">
           <Button variant="ghost">Hover me</Button>
         </Tooltip>
       </Section>
@@ -152,7 +152,7 @@ export function Styleguide() {
         </div>
       </Section>
 
-      <Section title="Motion — list stagger + hover lift">
+      <Section title="Motion â€” list stagger + hover lift">
         <div className="flex w-full flex-wrap gap-3">
           {["plan", "stream", "tool", "persist"].map((t, i) => (
             <motion.div
@@ -185,7 +185,7 @@ export function Styleguide() {
           <EmptyState
             icon={Rocket}
             title="Nothing here yet"
-            description="This is how every unbuilt surface greets you — designed, not apologetic."
+            description="This is how every unbuilt surface greets you â€” designed, not apologetic."
             action={<Button variant="ghost">Do something</Button>}
           />
         </div>

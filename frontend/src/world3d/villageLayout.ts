@@ -3,11 +3,11 @@
  *  coordinate is ever written twice and the whole village re-scales with
  *  `WORLD_SCALE` automatically. Pure (no three, no React) → unit-testable. */
 
-import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeDefs";
+import { PLACES_3D, PLAZA_POS } from "./placeRegistry";
 
 export type BuildingKind = "tavern" | "workshop" | "greenhouse";
 
-const KIND_MAP: Record<PlaceKind, BuildingKind> = {
+const KIND_MAP: Record<string, BuildingKind> = {
   hollow: "tavern",
   workbench: "workshop",
   garden: "greenhouse",
@@ -34,7 +34,7 @@ const [px, , pz] = PLAZA_POS;
 
 export const BUILDING_DEFS: BuildingDef[] = PLACES_3D.map((p) => ({
   id: p.id,
-  kind: KIND_MAP[p.kind],
+  kind: KIND_MAP[p.id],
   pos: p.pos,
   rotationY: Math.atan2(px - p.pos[0], pz - p.pos[2]),
 }));

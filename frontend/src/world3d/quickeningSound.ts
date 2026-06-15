@@ -1,10 +1,10 @@
-/** quickeningSound — the Quickening's one-shot birth chime. A soft rising major
+/** quickeningSound â€” the Quickening's one-shot birth chime. A soft rising major
  *  arpeggio that blooms into a chord at the moment of hatching. Synthesised live
  *  with Web Audio oscillators (no asset, no dependency, nothing committed), so it
  *  costs nothing and ships nowhere. The voice schedule is pure + unit-testable;
  *  the player is a thin impure wrapper around a real AudioContext.
  *
- *  Played once when the egg hatches — after the user has clicked "Hatch", so the
+ *  Played once when the egg hatches â€” after the user has clicked "Hatch", so the
  *  AudioContext can start under a gesture (autoplay policy). Reduced-motion gets
  *  silence (the caller gates it); audio is a flourish and never blocks the hatch. */
 
@@ -15,11 +15,11 @@ export interface ChimeVoice {
   delay: number;
 }
 
-export const CHIME_GAIN = 0.075; // gentle — a cue, not a fanfare
+export const CHIME_GAIN = 0.075; // gentle â€” a cue, not a fanfare
 export const CHIME_ATTACK = 0.04; // seconds to peak
 export const CHIME_RELEASE = 1.8; // seconds to fade to silence
 
-/** A C-major swell (C5 · E5 · G5 · C6), each voice entering a beat after the last
+/** A C-major swell (C5 Â· E5 Â· G5 Â· C6), each voice entering a beat after the last
  *  so it reads as a rising bloom rather than a single stab. */
 export function birthChimeVoices(): ChimeVoice[] {
   return [
@@ -31,7 +31,7 @@ export function birthChimeVoices(): ChimeVoice[] {
 }
 
 /** Schedule the chime on a live AudioContext. Wrap each voice in its own gain
- *  envelope (attack → exponential release) and route through a soft master gain. */
+ *  envelope (attack â†’ exponential release) and route through a soft master gain. */
 export function playBirthChime(ctx: AudioContext, gain = CHIME_GAIN): void {
   const now = ctx.currentTime;
   const master = ctx.createGain();

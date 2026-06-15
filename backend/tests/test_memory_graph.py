@@ -1,6 +1,6 @@
 """graph_edges: threshold filter + per-node top-K + dedup for the Memory Web."""
 
-from neuraclaw.memory.store import graph_edges
+from ai_pet_companion.memory.store import graph_edges
 
 
 def test_drops_pairs_below_threshold():
@@ -20,7 +20,7 @@ def test_top_k_is_a_union_no_node_orphaned():
     keys = {(a, b) for a, b, _ in edges}
     assert (1, 2) in keys  # node 1's and node 2's strongest
     assert (2, 3) in keys  # node 3's strongest
-    assert (1, 3) not in keys  # neither endpoint ranks it #1 → pruned
+    assert (1, 3) not in keys  # neither endpoint ranks it #1 â†’ pruned
 
 
 def test_dedups_and_orders_and_carries_similarity():

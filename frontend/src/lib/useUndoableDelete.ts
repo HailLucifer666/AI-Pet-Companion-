@@ -1,5 +1,5 @@
 /** Undoable delete: optimistic removal + a 5s undo toast. The real delete is
- *  deferred until the toast expires, so "Undo" is a clean cancel — no
+ *  deferred until the toast expires, so "Undo" is a clean cancel â€” no
  *  resurrection-with-a-new-id. Timers are cancelled on unmount. */
 
 import { useCallback, useEffect, useRef } from "react";

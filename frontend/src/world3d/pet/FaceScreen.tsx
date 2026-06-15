@@ -1,12 +1,13 @@
-/** FaceScreen — the robot's screen-face: an emissive plane on the head front that
+/** FaceScreen â€” the robot's screen-face: an emissive plane on the head front that
  *  draws two expressive eyes onto a CanvasTexture. The expression comes from the
  *  pure `expressionFor` over the live FSM (worldStore.lumen), so the face reacts to
  *  real events. `meshBasicMaterial` + `toneMapped:false` keeps the cyan eyes HDR-bright
  *  so the world's bloom makes the screen glow. Cheap: one small canvas, redrawn only
  *  when the expression changes. Reduced-motion: still shows the correct expression. */
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import { useWorldStore } from "../../state/worldStore";
 import { WORLD } from "../palette";
 import { expressionFor, type Expression } from "./face";
@@ -44,7 +45,7 @@ function bar(ctx: CanvasRenderingContext2D, cx: number, cy: number, half: number
   ctx.stroke();
 }
 
-function drawFace(ctx: CanvasRenderingContext2D, expr: Expression): void {
+function drawFace(ctx: CanvasRenderingContext2D, expr: Expression, blink: number): void {
   ctx.clearRect(0, 0, W, H);
   // The dark screen panel.
   ctx.fillStyle = "#0b0e16";
@@ -62,14 +63,16 @@ function drawFace(ctx: CanvasRenderingContext2D, expr: Expression): void {
   const cx2 = W * 0.66;
   const cy = H * 0.5;
 
+  const blinkScale = Math.max(0.05, 1 - blink);
+
   switch (expr) {
     case "resting":
-      ellipse(ctx, cx1, cy, 24, 38);
-      ellipse(ctx, cx2, cy, 24, 38);
+      ellipse(ctx, cx1, cy, 24, 38 * blinkScale);
+      ellipse(ctx, cx2, cy, 24, 38 * blinkScale);
       break;
     case "curious":
-      ellipse(ctx, cx1, cy - 8, 32, 46);
-      ellipse(ctx, cx2, cy - 8, 32, 46);
+      ellipse(ctx, cx1, cy - 8, 32, 46 * blinkScale);
+      ellipse(ctx, cx2, cy - 8, 32, 46 * blinkScale);
       break;
     case "working":
       ctx.lineWidth = 18;
@@ -77,13 +80,13 @@ function drawFace(ctx: CanvasRenderingContext2D, expr: Expression): void {
       bar(ctx, cx2, cy, 26);
       break;
     case "happy":
-      ctx.lineWidth = 16;
+      ctx.lineWidth = 16 * blinkScale;
       arc(ctx, cx1, cy + 14, 30);
       arc(ctx, cx2, cy + 14, 30);
       break;
     case "playful":
-      ellipse(ctx, cx1, cy - 6, 28, 42);
-      ellipse(ctx, cx2, cy + 8, 28, 42);
+      ellipse(ctx, cx1, cy - 6, 28, 42 * blinkScale);
+      ellipse(ctx, cx2, cy + 8, 28, 42 * blinkScale);
       break;
     case "lowpower":
       ctx.globalAlpha = 0.5;
@@ -96,7 +99,7 @@ function drawFace(ctx: CanvasRenderingContext2D, expr: Expression): void {
   ctx.shadowBlur = 0;
 }
 
-export function FaceScreen({ width = 0.34 }: { width?: number }) {
+export function FaceScreen({ width = 0.34, blinkRef }: { width?: number; blinkRef?: React.MutableRefObject<number> }) {
   const mode = useWorldStore((s) => s.lumen.mode);
   const gesture = useWorldStore((s) => s.lumen.gesture);
   const expr = expressionFor({ mode, gesture });
@@ -112,15 +115,28 @@ export function FaceScreen({ width = 0.34 }: { width?: number }) {
     return { texture: tex, ctx: c };
   }, []);
 
+  const lastBlink = useRef(0);
+  
+  useFrame(() => {
+    if (!ctx || !blinkRef) return;
+    const current = blinkRef.current;
+    if (Math.abs(current - lastBlink.current) > 0.05) {
+      lastBlink.current = current;
+      drawFace(ctx, expr, current);
+      texture.needsUpdate = true;
+    }
+  });
+
   useEffect(() => {
     if (!ctx) return;
-    drawFace(ctx, expr);
+    const blink = blinkRef ? blinkRef.current : 0;
+    drawFace(ctx, expr, blink);
     texture.needsUpdate = true;
-  }, [ctx, texture, expr]);
+  }, [ctx, texture, expr, blinkRef]);
 
   useEffect(() => () => texture.dispose(), [texture]);
 
-  // Sit just proud of the head sphere's front (r≈0.25) so the screen is never
+  // Sit just proud of the head sphere's front (râ‰ˆ0.25) so the screen is never
   // occluded by the head, and tilt it a hair upward to face the camera.
   return (
     <mesh position={[0, 0.04, 0.255]} rotation-x={-0.12}>

@@ -1,4 +1,4 @@
-/** Deterministic PRNG. Same seed → same world, every launch (snapshot-stable).
+/** Deterministic PRNG. Same seed â†’ same world, every launch (snapshot-stable).
  *  mulberry32: tiny, fast, good-enough distribution for layout/particles. */
 
 export function mulberry32(seed: number): () => number {

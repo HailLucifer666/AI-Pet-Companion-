@@ -3,7 +3,7 @@ import type { MemoryType } from "../lib/api";
 import { CRYSTAL_COLOR, crystalPosition } from "./crystalPlacement";
 
 describe("crystalPosition", () => {
-  it("is deterministic — same memory, same spot every launch", () => {
+  it("is deterministic â€” same memory, same spot every launch", () => {
     expect(crystalPosition(42)).toEqual(crystalPosition(42));
   });
 

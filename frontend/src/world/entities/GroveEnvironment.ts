@@ -1,4 +1,4 @@
-/** The Grove — the world's first place. Wholly procedural, tokens-only:
+/** The Grove â€” the world's first place. Wholly procedural, tokens-only:
  *  a warm moon, a stand of glow-mushrooms, the Hollow's fire, a still pool, and
  *  drifting fireflies. Seeded so it's the *same* Grove every launch. Heavy redraws
  *  happen on layout (resize); per-frame work is just cheap motion (skipped under
@@ -9,7 +9,7 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { Palette } from "../engine/TokenBridge";
 import { mulberry32, range } from "../engine/rng";
 import { TIER_SETTINGS, type Tier } from "../engine/FpsDegrader";
-import { PLACES } from "../places";
+import { PLACES } from "../../world3d/placeRegistry";
 
 const SEED = 0xc1a5fe; // fixed identity of this place
 const MAX_FIREFLIES = TIER_SETTINGS.high.fireflies;
@@ -133,8 +133,8 @@ export class GroveEnvironment {
 
   private drawWorkbench(w: number, h: number): void {
     const { ink850, ink800, claw600 } = this.palette;
-    const x = PLACES.workbench.nx * w;
-    const y = PLACES.workbench.ny * h;
+    const x = PLACES.workbench.nx! * w;
+    const y = PLACES.workbench.ny! * h;
     this.workbench
       .clear()
       .circle(x, y - 6, 26)

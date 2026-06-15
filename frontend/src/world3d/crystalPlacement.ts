@@ -1,8 +1,8 @@
-/** crystalPlacement — pure placement + color for memory crystals in the 3D Grove.
+/** crystalPlacement â€” pure placement + color for memory crystals in the 3D Grove.
  *
  *  Reuses the shared crystalSeed determinism (a memory keeps its id/species/seed)
  *  and derives a fixed 3D spot on the island from that seed: same memory always
- *  grows in the same place, on grass, every launch. No three imports → testable.
+ *  grows in the same place, on grass, every launch. No three imports â†’ testable.
  */
 
 import type { MemoryType } from "../lib/api";

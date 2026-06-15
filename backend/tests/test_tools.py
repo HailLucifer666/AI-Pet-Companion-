@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 from pydantic import BaseModel
 
-from neuraclaw.config import MIGRATIONS_DIR, Config
-from neuraclaw.db import migrate, open_db
-from neuraclaw.tools import build_registry
-from neuraclaw.tools.registry import Registry, Risk, ToolContext, tool
+from ai_pet_companion.config import MIGRATIONS_DIR, Config
+from ai_pet_companion.db import migrate, open_db
+from ai_pet_companion.tools import build_registry
+from ai_pet_companion.tools.registry import Registry, Risk, ToolContext, tool
 
 
 @pytest.fixture
@@ -94,8 +94,8 @@ async def test_invocations_are_audited(ctx):
 
 
 async def test_growth_ladder_refuses_web_below_stage(ctx):
-    """Stage-1 pet → web tools locked with a growth message (no network call)."""
-    from neuraclaw.pet import xp
+    """Stage-1 pet â†’ web tools locked with a growth message (no network call)."""
+    from ai_pet_companion.pet import xp
 
     await xp.ensure_pet(ctx.db, name="Claw")  # stage 1
     registry = make_registry()
@@ -106,8 +106,8 @@ async def test_growth_ladder_refuses_web_below_stage(ctx):
 
 async def test_growth_ladder_override_unlocks(ctx):
     """pet.ignore_ladder bypasses the gate (charm never blocks work)."""
-    from neuraclaw.pet import xp
-    from neuraclaw.tools.registry import ToolContext
+    from ai_pet_companion.pet import xp
+    from ai_pet_companion.tools.registry import ToolContext
 
     await xp.ensure_pet(ctx.db, name="Claw")  # still stage 1
     config = Config.model_validate({"pet": {"ignore_ladder": True}})

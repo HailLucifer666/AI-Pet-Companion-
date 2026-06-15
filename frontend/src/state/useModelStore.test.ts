@@ -39,7 +39,7 @@ describe("useModelStore", () => {
   it("setSelectedModel updates state and persists to localStorage", () => {
     useModelStore.getState().setSelectedModel("nim/meta/llama-3.3-70b-instruct");
     expect(useModelStore.getState().selectedModel).toBe("nim/meta/llama-3.3-70b-instruct");
-    expect(localStorage.getItem("neuraclaw-selected-model")).toBe(
+    expect(localStorage.getItem("AI Pet Companion-selected-model")).toBe(
       "nim/meta/llama-3.3-70b-instruct",
     );
   });

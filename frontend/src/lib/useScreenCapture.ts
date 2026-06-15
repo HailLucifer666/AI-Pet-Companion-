@@ -1,15 +1,15 @@
-/** useScreenCapture — grab ONE frame of a screen/window the user picks, as a
+/** useScreenCapture â€” grab ONE frame of a screen/window the user picks, as a
  *  JPEG data-URL, so the companion can "look at" it. Browser-only (getDisplayMedia),
  *  feature-detected. The capture sheet is the OS's own picker (explicit consent),
  *  the call must run inside a user gesture, and the share track is stopped the
- *  instant the frame is grabbed — nothing keeps recording. Privacy beyond this
+ *  instant the frame is grabbed â€” nothing keeps recording. Privacy beyond this
  *  (does the frame leave the device?) depends on the vision model: see GET /api/vision.
  *
- *  Cannot be exercised headlessly (needs a real picker + gesture) — verify live. */
+ *  Cannot be exercised headlessly (needs a real picker + gesture) â€” verify live. */
 
 import { useCallback, useState } from "react";
 
-const MAX_W = 1600; // downscale wide screens — smaller payload, plenty for vision
+const MAX_W = 1600; // downscale wide screens â€” smaller payload, plenty for vision
 const JPEG_QUALITY = 0.85;
 
 const supported =

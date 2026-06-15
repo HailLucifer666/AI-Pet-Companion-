@@ -1,7 +1,7 @@
-/** face — the companion robot's data-driven expression. Pure: it maps the live
+/** face â€” the companion robot's data-driven expression. Pure: it maps the live
  *  FSM state (the SAME real-event-driven state that moves the pet) to a screen
  *  expression, so the face reacts to real computation, never faked. No three /
- *  canvas imports → unit-tested. The FaceScreen component renders the result. */
+ *  canvas imports â†’ unit-tested. The FaceScreen component renders the result. */
 
 export type Expression = "resting" | "curious" | "working" | "happy" | "playful" | "lowpower";
 

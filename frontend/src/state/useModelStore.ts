@@ -1,16 +1,16 @@
-/** useModelStore — the user's chosen chat model, shared across every chat
+/** useModelStore â€” the user's chosen chat model, shared across every chat
  *  surface (Chat, the Den's PetChat, Settings).
  *
  *  "auto" (the default) means role routing: the resilient failover chains from
  *  config.yaml, tried top to bottom. Any other value is a concrete
- *  "provider/model" ref that pins that single model for the turn — no failover.
+ *  "provider/model" ref that pins that single model for the turn â€” no failover.
  *  The choice is persisted in localStorage so it survives reloads (per-machine,
  *  like the rest of local state). */
 
 import { create } from "zustand";
 import type { ModelsAvailable } from "../lib/api";
 
-const STORAGE_KEY = "neuraclaw-selected-model";
+const STORAGE_KEY = "AI Pet Companion-selected-model";
 export const AUTO_MODEL = "auto";
 
 function readInitial(): string {
@@ -33,7 +33,7 @@ export const useModelStore = create<ModelStore>((set) => ({
     try {
       if (typeof localStorage !== "undefined") localStorage.setItem(STORAGE_KEY, ref);
     } catch {
-      /* quota / private mode — keep the selection in memory only */
+      /* quota / private mode â€” keep the selection in memory only */
     }
     set({ selectedModel: ref });
   },

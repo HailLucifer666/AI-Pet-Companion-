@@ -1,8 +1,8 @@
-/** useVoice — free, browser-native voice for the Den's pet chat.
+/** useVoice â€” free, browser-native voice for the Den's pet chat.
  *
  *  STT: the Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`) turns
  *  speech into text that fills the message box. TTS: `speechSynthesis` speaks the
- *  companion's reply aloud. Both are feature-detected — unsupported browsers
+ *  companion's reply aloud. Both are feature-detected â€” unsupported browsers
  *  (some embedded webviews) simply hide the affordances and the glass chat still
  *  works by typing. No external services, no keys, nothing leaves the device.
  */
@@ -21,7 +21,7 @@ export function speechSnippet(text: string, max = 90): string {
   return `… ${tail.slice(start)}`.trim();
 }
 
-/* ── Minimal Web Speech typings (not in the standard DOM lib) ────────── */
+/* ———— Minimal Web Speech typings (not in the standard DOM lib) ——————————— */
 
 interface SpeechResultEvent {
   results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean }>;
@@ -108,7 +108,7 @@ export function useVoice(): VoiceApi {
       window.speechSynthesis.cancel(); // never let two replies overlap
       const u = new SpeechSynthesisUtterance(line);
       u.rate = 1;
-      u.pitch = 1.05; // a touch bright — the companion's voice
+      u.pitch = 1.05; // a touch bright â€” the companion's voice
       window.speechSynthesis.speak(u);
     },
     [ttsSupported],

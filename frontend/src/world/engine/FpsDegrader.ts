@@ -1,4 +1,4 @@
-/** FpsDegrader — keeps the Grove at 60fps by shedding detail when the frame
+/** FpsDegrader â€” keeps the Grove at 60fps by shedding detail when the frame
  *  budget slips. Monotonic-down with hysteresis: it degrades on sustained low
  *  FPS and only recovers after a sustained run of good frames, so it never
  *  oscillates (flicker is worse than a slightly simpler scene). Decision logic

@@ -1,4 +1,4 @@
-/** WorldEngine — the imperative owner of the Pixi Application and the Grove.
+/** WorldEngine â€” the imperative owner of the Pixi Application and the Grove.
  *
  *  Deliberately NOT @pixi/react: React's StrictMode double-mounts in dev, and a
  *  raw class with a `destroyed` flag + cleanup-first teardown is the reliable way
@@ -94,13 +94,13 @@ export class WorldEngine {
       this.parallax.apply(0, 0);
       lumen.update(0, 0, app.screen.width, app.screen.height);
       crystals.update(0);
-      app.render(); // a single, still frame — "static but alive"
+      app.render(); // a single, still frame â€” "static but alive"
     } else {
       app.ticker.add(this.onTick);
     }
   }
 
-  /** Pull the latest world state into the scene (store → engine, read-only). */
+  /** Pull the latest world state into the scene (store â†’ engine, read-only). */
   private syncWorld(s: ReturnType<typeof useWorldStore.getState>): void {
     if (!this.app || !this.lumen || !this.crystals) return;
     this.lumen.setStage(s.stage);
@@ -113,7 +113,7 @@ export class WorldEngine {
     if (this.reduced && this.app) {
       this.lumen?.update(0, 0, this.app.screen.width, this.app.screen.height);
       this.crystals?.update(0);
-      this.app.render(); // no ticker under reduced-motion → render on each change
+      this.app.render(); // no ticker under reduced-motion â†’ render on each change
     }
   }
 

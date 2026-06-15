@@ -1,11 +1,11 @@
-/** Village3D — the bioluminescent medieval hamlet that IS the world: a cobblestone
+/** Village3D â€” the bioluminescent medieval hamlet that IS the world: a cobblestone
  *  plaza with a hearth/bonfire (the pet's home), three procedural buildings around
  *  it (tavern=Hollow, forge=Workbench, greenhouse=Garden), and cobble roads spoking
  *  out to each. Dusk-recolored stone/timber/roofs (VILLAGE tokens) carry the dark;
- *  every window, lantern, glass pane and the hearth GLOWS in WORLD.ember/garden —
+ *  every window, lantern, glass pane and the hearth GLOWS in WORLD.ember/garden â€”
  *  the same emissive vocabulary as the pet, crystals and mushrooms, blooming via the
  *  shared `glowBoost(sky.dayness)` grade. Buildings are hand-built primitives (no
- *  GLBs in the first cut). One glow `useFrame`; ≤4 point lights. Real data only: the
+ *  GLBs in the first cut). One glow `useFrame`; â‰¤4 point lights. Real data only: the
  *  forge ember flares while a tool runs (`lumen.mode==='work'`), the hearth brightens
  *  while the pet is home. Reduced-motion: present and lit, no flicker. */
 
@@ -18,7 +18,7 @@ import { glowBoost } from "./daylight";
 import { bloomFlash } from "./bloomCinematic";
 import { sky } from "./skyState";
 import { WORLD, VILLAGE } from "./palette";
-import { PLAZA_POS } from "./placeDefs";
+import { PLAZA_POS } from "./placeRegistry";
 import { BUILDING_DEFS, VILLAGE_ROADS, type BuildingDef } from "./villageLayout";
 import { buildRoadGeometry } from "./roadGraph";
 import { skillMonumentPosition } from "./skillMonumentPlacement";
@@ -98,7 +98,7 @@ function useVillageMaterials() {
       1.25,
       { flicker: 1.1 },
     );
-    // Earned skill monuments: a steady ember glow (no flicker) — calm, not busy.
+    // Earned skill monuments: a steady ember glow (no flicker) â€” calm, not busy.
     const skillGlow = glow(
       new THREE.MeshStandardMaterial({ color: hex(WORLD.ember), emissive: hex(WORLD.ember), flatShading: true }),
       0.9,
@@ -274,7 +274,7 @@ function Campfire({ mats, y0 }: { mats: Mats; y0: number }) {
           <primitive object={mats.timber} attach="material" />
         </mesh>
       ))}
-      {/* layered warm flames — three small cones + a bright inner core */}
+      {/* layered warm flames â€” three small cones + a bright inner core */}
       <mesh position={[0.12, 0.62, 0.06]}>
         <coneGeometry args={[0.32, 0.7, 6]} />
         <primitive object={mats.flame} attach="material" />
@@ -387,7 +387,7 @@ function Roads({ mats }: { mats: Mats }) {
       const nx = dz / len,
         nz = -dx / len,
         off = r.width / 2 + 0.7;
-      const count = Math.max(2, Math.floor(len / 10)); // sparser — lit path, not a runway
+      const count = Math.max(2, Math.floor(len / 10)); // sparser â€” lit path, not a runway
       for (let i = 1; i < count; i++) {
         const t = i / count,
           cx = r.fromX + dx * t,
@@ -414,9 +414,9 @@ function Roads({ mats }: { mats: Mats }) {
 }
 
 /** Earned monuments: one small glowing obelisk per APPROVED skill, ringing the
- *  forge. Real-data — fed by the live active-skills list (useSkills, passed in).
+ *  forge. Real-data â€” fed by the live active-skills list (useSkills, passed in).
  *  Mounted inside the Village root group, so the shared glow traversal lights its
- *  ember caps at zero extra per-frame cost. No own point light (the ≤4 cap holds). */
+ *  ember caps at zero extra per-frame cost. No own point light (the â‰¤4 cap holds). */
 function SkillMonuments({ mats, skills, forgeX, forgeZ }: { mats: Mats; skills: Skill[]; forgeX: number; forgeZ: number }) {
   return (
     <group>
@@ -492,7 +492,7 @@ export function Village3D({ reduced, skills }: { reduced: boolean; skills: Skill
       ))}
       {forge && <SkillMonuments mats={mats} skills={skills} forgeX={forge.pos[0]} forgeZ={forge.pos[2]} />}
 
-      {/* ≤4 point lights — a HARD perf cap (the bioluminescent ground bounce). Skill
+      {/* â‰¤4 point lights â€” a HARD perf cap (the bioluminescent ground bounce). Skill
           monuments add none: they ride the forge's spill + the emissive bloom. */}
       <pointLight ref={hearthLight} position={[px, py + 0.9, pz]} color={hex(WORLD.ember)} intensity={5} distance={12} decay={2} />
       {forge && (

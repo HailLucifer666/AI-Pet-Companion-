@@ -124,7 +124,7 @@ function ProfileCard() {
           </div>
         ))}
         {data && data.profile.length === 0 && (
-          <p className="text-xs text-ink-500">Nothing yet — add name, timezone, role…</p>
+          <p className="text-xs text-ink-500">Nothing yet â€” add name, timezone, roleâ€¦</p>
         )}
       </div>
       <form
@@ -171,7 +171,7 @@ export function MemoryView() {
         </header>
         <div className="mb-3 flex gap-2">
           <Input
-            placeholder="Search memories…"
+            placeholder="Search memoriesâ€¦"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="max-w-xs"
@@ -199,7 +199,7 @@ export function MemoryView() {
             className="w-32"
           />
           <Input
-            placeholder="Add a memory the agent should keep…"
+            placeholder="Add a memory the agent should keepâ€¦"
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
           />
@@ -226,7 +226,7 @@ export function MemoryView() {
               title={q ? "No matches" : "No memories yet"}
               description={
                 q
-                  ? "Try different terms — search is semantic and keyword."
+                  ? "Try different terms â€” search is semantic and keyword."
                   : "Chat with the agent or add facts manually; durable ones land here."
               }
             />

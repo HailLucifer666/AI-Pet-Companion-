@@ -1,9 +1,9 @@
-/** SporeGate3D — the Spore Gate: a luminous low-poly arch at the back of the
+/** SporeGate3D â€” the Spore Gate: a luminous low-poly arch at the back of the
  *  meadow whose inner light *fills with real XP*. Its fill height tracks the
  *  companion's progress toward the next level (worldStore.xpFrac); on a level-up
- *  (pet.levelup) it blooms — a bright flash + a brief swell. Mycelium pulses from
+ *  (pet.levelup) it blooms â€” a bright flash + a brief swell. Mycelium pulses from
  *  real agent events stream into its glowing centre (GATE_POINT). Ember palette,
- *  brighter at night via glowBoost. Reduced-motion → fill sits at value, no flash. */
+ *  brighter at night via glowBoost. Reduced-motion â†’ fill sits at value, no flash. */
 
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -75,7 +75,7 @@ export function SporeGate3D() {
 
   return (
     <group ref={group} position={[GX, baseY, GZ]}>
-      {/* two pillars + a lintel — the arch frame */}
+      {/* two pillars + a lintel â€” the arch frame */}
       {[-1.1, 1.1].map((x) => (
         <mesh key={x} position={[x, 2.1, 0]} castShadow>
           <boxGeometry args={[0.34, 4.2, 0.34]} />
@@ -87,7 +87,7 @@ export function SporeGate3D() {
         <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={0.5} flatShading metalness={0.3} roughness={0.5} />
       </mesh>
 
-      {/* inner XP fill — a glowing curtain that climbs from the base with xpFrac */}
+      {/* inner XP fill â€” a glowing curtain that climbs from the base with xpFrac */}
       <mesh ref={fill} position={[0, 0.001, 0]} scale={[1, 0.001, 1]}>
         <boxGeometry args={[1.7, 1, 0.18]} />
         <meshStandardMaterial

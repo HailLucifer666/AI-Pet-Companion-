@@ -1,6 +1,6 @@
-/** fetchPlay — a tiny fetch minigame: throw a glowing spark and the companion
+/** fetchPlay â€” a tiny fetch minigame: throw a glowing spark and the companion
  *  dashes out to it, picks it up, and trots it back to where it set off. Pure
- *  charm (zero XP, fully ignorable) — work always wins, so a real tool run pulls
+ *  charm (zero XP, fully ignorable) â€” work always wins, so a real tool run pulls
  *  the pet off play. Mirrors lure.ts: a frame-write singleton + a pure transition
  *  function the renderer consumes. Reduced-motion: the pet doesn't chase. */
 
@@ -20,10 +20,10 @@ export interface FetchToy {
 export const fetchToy: FetchToy = { x: 0, z: 0, homeX: 0, homeZ: 0, phase: "idle" };
 
 const ARRIVE = 1.2; // how close counts as "reached the spark / got home"
-const GOLDEN = 2.399963; // golden angle — successive throws fan out nicely
+const GOLDEN = 2.399963; // golden angle â€” successive throws fan out nicely
 
 /** Where the pet should head next, and the phase after this step. Pure: given the
- *  toy state + the pet's planar position, advance outbound → return → idle. */
+ *  toy state + the pet's planar position, advance outbound â†’ return â†’ idle. */
 export function stepFetch(toy: FetchToy, petX: number, petZ: number): { target: Vec2 | null; phase: FetchPhase } {
   if (toy.phase === "outbound") {
     if (Math.hypot(petX - toy.x, petZ - toy.z) < ARRIVE) return { target: { x: toy.homeX, z: toy.homeZ }, phase: "return" };

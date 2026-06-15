@@ -31,7 +31,7 @@ export interface Memory {
   created_at: string;
 }
 
-/** An approved (active) self-drafted skill — one earned monument in the village. */
+/** An approved (active) self-drafted skill â€” one earned monument in the village. */
 export interface Skill {
   id: number;
   name: string;
@@ -96,6 +96,15 @@ export interface CalendarEvent {
   updated_at: string;
 }
 
+export interface Document {
+  id: number;
+  title: string;
+  content: string;
+  doc_type: "md" | "html" | "csv";
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Settings {
   providers: Record<
     string,
@@ -151,7 +160,7 @@ export interface XpEvent {
   created_at: string;
 }
 
-/** The Den digest: the companion + recent light + what's grown — feeds the daily greeting. */
+/** The Den digest: the companion + recent light + what's grown â€” feeds the daily greeting. */
 export interface DenDigest {
   pet: Pet | null;
   recent_xp: XpEvent[];
@@ -161,7 +170,7 @@ export interface DenDigest {
 
 export type WeatherCategory = "clear" | "cloudy" | "overcast" | "fog" | "rain" | "snow" | "storm";
 
-/** Real current weather for the Grove's sky (best-effort; `available:false` → the
+/** Real current weather for the Grove's sky (best-effort; `available:false` â†’ the
  *  sky falls back to clear + the real-clock day/night cycle). */
 export interface Weather {
   available: boolean;
@@ -173,7 +182,7 @@ export interface Weather {
 }
 
 /** The vision brain: can the companion see a screen, and does doing so send it
- *  off-device? `remote:true` means a captured screen leaves this machine — the UI
+ *  off-device? `remote:true` means a captured screen leaves this machine â€” the UI
  *  must warn before capture. (`GET /api/vision`, resolved from the `vision` role.) */
 export interface Vision {
   available: boolean;
@@ -281,9 +290,14 @@ export const api = {
   createEvent: (body: Partial<CalendarEvent>) => request<{ id: number }>("POST", "/events", body),
   updateEvent: (id: number, body: Partial<CalendarEvent>) => request<{ ok: boolean }>("PUT", `/events/${id}`, body),
   deleteEvent: (id: number) => request<{ ok: boolean }>("DELETE", `/events/${id}`),
+
+  documents: (q = "") => get<{ documents: Document[] }>(`/documents?q=${encodeURIComponent(q)}`),
+  createDocument: (body: Partial<Document>) => request<{ id: number }>("POST", "/documents", body),
+  updateDocument: (id: number, body: Partial<Document>) => request<{ ok: boolean }>("PUT", `/documents/${id}`, body),
+  deleteDocument: (id: number) => request<{ ok: boolean }>("DELETE", `/documents/${id}`),
 };
 
-/** react-query key conventions — one place, every surface follows it. */
+/** react-query key conventions â€” one place, every surface follows it. */
 export const queryKeys = {
   health: ["health"] as const,
   models: ["models"] as const,
@@ -303,4 +317,5 @@ export const queryKeys = {
   notes: (q: string) => ["notes", q] as const,
   tasks: (q: string) => ["tasks", q] as const,
   events: (q: string) => ["events", q] as const,
+  documents: (q: string) => ["documents", q] as const,
 };

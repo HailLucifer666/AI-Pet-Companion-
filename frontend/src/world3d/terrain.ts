@@ -1,14 +1,14 @@
-/** terrain — the island's shape, as pure math (no three, no GPU).
+/** terrain â€” the island's shape, as pure math (no three, no GPU).
  *
  *  A deterministic value-noise heightfield with a radial falloff so the land
- *  rises in the middle and sinks under the water at the edges → an island. Same
+ *  rises in the middle and sinks under the water at the edges â†’ an island. Same
  *  every launch. Island.tsx feeds these heights into a low-poly mesh; this stays
  *  pure so it can be unit-tested in Node.
  */
 
 import { mulberry32 } from "../world/engine/rng";
 
-// A fixed lattice of pseudo-random values for value noise (seeded → stable).
+// A fixed lattice of pseudo-random values for value noise (seeded â†’ stable).
 const PERM = (() => {
   const r = mulberry32(1337);
   const p = new Float32Array(512);
@@ -21,7 +21,7 @@ const smooth = (t: number) => t * t * (3 - 2 * t);
 
 // The village-plaza flat pad (see islandHeight): a level clearing so the cobble
 // disc, hearth and lanterns never get clipped by terrain noise.
-const PLAZA_H = 1.9; // matches the plateau base → seamless blend
+const PLAZA_H = 1.9; // matches the plateau base â†’ seamless blend
 const PLAZA_PAD_FLAT = 6.5; // dead-flat within this radius of the plaza
 const PLAZA_PAD_RAMP = 5.0; // smooth ramp back to natural terrain over this
 
@@ -60,13 +60,13 @@ export function fbm(x: number, z: number): number {
 
 /** Height at world (x, z); land peaks near the origin, sinks past `maxR`. The noise
  *  frequency is in absolute world units, so a larger island (bigger `maxR`) gets
- *  proportionally MORE rolling hills across it — richer terrain to roam, not a
+ *  proportionally MORE rolling hills across it â€” richer terrain to roam, not a
  *  stretched blob. A gentle height bump + a smaller water-dip keep the now much
  *  wider mid-island solidly above the waterline. */
 export function islandHeight(x: number, z: number, maxR: number): number {
   const dist = Math.hypot(x, z);
   const r = Math.min(1, dist / maxR);
-  const fall = Math.pow(Math.max(0, 1 - r), 1.7); // 1 at center → 0 at the rim
+  const fall = Math.pow(Math.max(0, 1 - r), 1.7); // 1 at center â†’ 0 at the rim
   const n = fbm((x + 100) * 0.16, (z + 100) * 0.16); // offset so noise isn't centered
   // Gently-rolling island (no central mountain): a low base rise + modest noise
   // hills, dipping below 0 (water) at the edges.
@@ -74,11 +74,11 @@ export function islandHeight(x: number, z: number, maxR: number): number {
   // Flatten the central village basin into a calm plateau so the hamlet sits on
   // even ground; blend back to the rolling hills past the inner radius.
   const innerR = maxR * 0.55;
-  const t = smooth(Math.min(1, dist / innerR)); // 0 at center → 1 at innerR+
+  const t = smooth(Math.min(1, dist / innerR)); // 0 at center â†’ 1 at innerR+
   const plateau = 1.9 + n * 0.5;
   const natural = lerp(plateau, rolling, t);
   // A dead-flat pad under the village plaza so the cobble disc, hearth and
-  // lanterns sit on truly level ground — the rolling noise no longer pokes up
+  // lanterns sit on truly level ground â€” the rolling noise no longer pokes up
   // through them. Plaza sits at (-W, -W); flat within PLAZA_PAD_FLAT, then a
   // smooth ramp back to the natural terrain.
   const W = WORLD_SCALE;
@@ -89,10 +89,10 @@ export function islandHeight(x: number, z: number, maxR: number): number {
 
 export const WATER_LEVEL = 0;
 
-/** Master spatial scale — every absolute world POSITION/DISTANCE multiplies by this
+/** Master spatial scale â€” every absolute world POSITION/DISTANCE multiplies by this
  *  (island radius, plane, sea, fog, shadow frustum, place/anchor/gate coords, scatter
- *  & weather radii). Object SIZES (tree/rock/pet scale, geometry dims) do NOT — so the
+ *  & weather radii). Object SIZES (tree/rock/pet scale, geometry dims) do NOT â€” so the
  *  world grows into a sprawling landscape full of normal-sized things, not a blow-up.
  *  Dial it to re-scale the whole world in one place (set to 1 to restore the original). */
 export const WORLD_SCALE = 5;
-export const ISLAND_MAX_R = 16 * WORLD_SCALE; // =80 — shared by terrain mesh + anything placed on it
+export const ISLAND_MAX_R = 16 * WORLD_SCALE; // =80 â€” shared by terrain mesh + anything placed on it

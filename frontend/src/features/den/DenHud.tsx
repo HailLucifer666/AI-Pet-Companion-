@@ -1,8 +1,8 @@
-/** DenHud — a small glass chip in the Grove's top-right that makes the world's
+﻿/** DenHud Ã¢â‚¬â€ a small glass chip in the Grove's top-right that makes the world's
  *  realness visible: the live local clock (your PC's time, the same signal that
  *  drives day/night) over the real current weather + city the backend resolved by
- *  IP from Open-Meteo. Weather unavailable → just the clock (the sky still falls
- *  back to the day/night cycle). Display only — reads existing real data, fakes
+ *  IP from Open-Meteo. Weather unavailable Ã¢â€ â€™ just the clock (the sky still falls
+ *  back to the day/night cycle). Display only Ã¢â‚¬â€ reads existing real data, fakes
  *  nothing. Static text, so reduced-motion needs no special case. */
 
 import { useEffect, useState } from "react";
@@ -21,23 +21,23 @@ const LABELS: Record<WeatherCategory, string> = {
   storm: "Storm",
 };
 
-/** A glyph per category; `clear`/`cloudy` swap sun⇄moon by the real is_day flag. */
+/** A glyph per category; `clear`/`cloudy` swap sunÃ¢â€¡â€žmoon by the real is_day flag. */
 function glyph(category: WeatherCategory, isDay: boolean): string {
   switch (category) {
     case "clear":
-      return isDay ? "☀️" : "🌙";
+      return isDay ? "Ã¢Ëœâ‚¬Ã¯Â¸Â" : "Ã°Å¸Å’â„¢";
     case "cloudy":
-      return isDay ? "⛅" : "☁️";
+      return isDay ? "Ã¢â€º…" : "Ã¢ËœÂÃ¯Â¸Â";
     case "overcast":
-      return "☁️";
+      return "Ã¢ËœÂÃ¯Â¸Â";
     case "fog":
-      return "🌫️";
+      return "Ã°Å¸Å’Â«Ã¯Â¸Â";
     case "rain":
-      return "🌧️";
+      return "Ã°Å¸Å’Â§Ã¯Â¸Â";
     case "snow":
-      return "🌨️";
+      return "Ã°Å¸Å’Â¨Ã¯Â¸Â";
     case "storm":
-      return "⛈️";
+      return "Ã¢â€ºË†Ã¯Â¸Â";
   }
 }
 
@@ -51,10 +51,10 @@ function WeatherLine({ weather }: { weather: Weather }) {
   }
   const parts = [
     `${glyph(weather.category, weather.is_day ?? true)} ${LABELS[weather.category]}`,
-    weather.temp_c != null ? `${Math.round(weather.temp_c)}°` : null,
+    weather.temp_c != null ? `${Math.round(weather.temp_c)}Ã‚Â°` : null,
     weather.city || null,
   ].filter(Boolean);
-  return <span>{parts.join(" · ")}</span>;
+  return <span>{parts.join(" Ã‚Â· ")}</span>;
 }
 
 export function DenHud() {

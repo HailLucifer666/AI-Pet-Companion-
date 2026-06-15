@@ -36,7 +36,7 @@ export const ChatStub = () => (
   <Stub
     icon={MessageSquare}
     title="Chat"
-    description="Talk to your agent. Streaming sessions land in Phase 1 — the backend /api/chat endpoint already works."
+    description="Talk to your agent. Streaming sessions land in Phase 1 â€” the backend /api/chat endpoint already works."
   />
 );
 export const ResearchStub = () => (
@@ -64,7 +64,7 @@ export const TasksStub = () => (
   <Stub
     icon={ListTodo}
     title="Tasks"
-    description="Lists, statuses, due dates — and the agent can file tasks for you. Arrives in Phase 3."
+    description="Lists, statuses, due dates â€” and the agent can file tasks for you. Arrives in Phase 3."
   />
 );
 export const CalendarStub = () => (

@@ -43,7 +43,7 @@ const surfaces: Surface[] = [
   { to: "/skills", label: "Skills", icon: Wrench },
 ];
 
-const NAV_COLLAPSED_KEY = "neuraclaw-nav-collapsed";
+const NAV_COLLAPSED_KEY = "AI Pet Companion-nav-collapsed";
 
 function readNavCollapsed(): boolean {
   try {
@@ -109,7 +109,7 @@ export function AppShell() {
     try {
       localStorage.setItem(NAV_COLLAPSED_KEY, navCollapsed ? "1" : "0");
     } catch {
-      /* localStorage unavailable (private mode) — collapse just won't persist */
+      /* localStorage unavailable (private mode) â€” collapse just won't persist */
     }
   }, [navCollapsed]);
 
@@ -138,11 +138,11 @@ export function AppShell() {
               <div className="flex h-full w-16 flex-col items-center gap-1 py-3">
                 <div
                   className="mb-3 flex size-10 items-center justify-center rounded-card bg-claw-600 font-display text-lg font-bold text-ink-950 glow-accent"
-                  title="NeuraClaw"
+                  title="AI Pet Companion"
                 >
                   N
                 </div>
-                {/* The Grove is home — the world the companion lives in (also the live
+                {/* The Grove is home â€” the world the companion lives in (also the live
                     creature avatar at the rail's foot). */}
                 <RailLink to="/den" label="The Grove" icon={Sprout} />
                 <div className="my-1 h-px w-6 bg-ink-800" aria-hidden />

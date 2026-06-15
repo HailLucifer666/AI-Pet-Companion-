@@ -1,9 +1,9 @@
-/** DenGreeting — when you enter the Den, the companion greets you in its 3-D
+/** DenGreeting â€” when you enter the Den, the companion greets you in its 3-D
  *  speech bubble with a line built from the REAL Den digest (memories held, skills
  *  learned, XP earned today) + the real local hour. Fires once per visit, after a
- *  short settle, then clears — but never stomps a chat reply you've started (it
+ *  short settle, then clears â€” but never stomps a chat reply you've started (it
  *  only clears the bubble if it's still showing the greeting). Renders nothing
- *  itself; it drives worldStore.speech → PetBubble. DOM-side (react-query lives
+ *  itself; it drives worldStore.speech â†’ PetBubble. DOM-side (react-query lives
  *  outside the Canvas). */
 
 import { useEffect, useRef } from "react";

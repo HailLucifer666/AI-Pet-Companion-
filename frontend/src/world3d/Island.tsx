@@ -1,27 +1,27 @@
-/** Island — the low-poly Grove. A faceted terrain mesh (per-face flat colors,
+/** Island â€” the low-poly Grove. A faceted terrain mesh (per-face flat colors,
  *  banded by height), a translucent sea, an inland pool, and deterministically
  *  scattered nature: real low-poly GLB trees, rocks, bushes and grass (Quaternius,
  *  CC0), each instanced (one draw call per submesh) so the island holds frame-rate
- *  on low-end GPUs. The placement is seeded — same island every launch. */
+ *  on low-end GPUs. The placement is seeded â€” same island every launch. */
 
 import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D, PLAZA_POS } from "./placeDefs";
+import { PLACES_3D, PLAZA_POS } from "./placeRegistry";
 import { WORLD } from "./palette";
 import { InstancedModel, type NaturePlacement } from "./nature/InstancedModel";
 import { NATURE_TREES, NATURE_ROCKS, NATURE_BUSHES, NATURE_GRASS, natureUrl } from "./nature/models";
 
 const W = WORLD_SCALE;
-const SIZE = 36 * W; // terrain plane — must fully contain the island (≥ 2 × MAX_R)
-const SEG = 200; // subdivision — kept dense enough that faces stay ~1.3 u over the bigger plane
+const SIZE = 36 * W; // terrain plane â€” must fully contain the island (â‰¥ 2 Ã— MAX_R)
+const SEG = 200; // subdivision â€” kept dense enough that faces stay ~1.3 u over the bigger plane
 const MAX_R = ISLAND_MAX_R;
 const FLOOR = -1.5;
 
 const POOL = { x: 5.5 * W, z: 3.5 * W, r: 2.0 }; // position scales out; the pond itself stays small
-const MEADOW_R = 4.5 * W; // open clearing in the middle — where the pet roams, no trees
-// Keep scatter off the pool and the three Place markers (placeDefs coords × scale).
+const MEADOW_R = 4.5 * W; // open clearing in the middle â€” where the pet roams, no trees
+// Keep scatter off the pool and the three Place markers (placeDefs coords Ã— scale).
 const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
   { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
   { x: PLAZA_POS[0], z: PLAZA_POS[2], r: 5.5 }, // village plaza (hearth hub)
@@ -47,7 +47,7 @@ function buildTerrain(): THREE.BufferGeometry {
     const y = Math.max(FLOOR, islandHeight(pos.getX(i), pos.getZ(i), MAX_R));
     pos.setY(i, y);
   }
-  // Non-indexed → each triangle is independent: flat normals + crisp per-face color.
+  // Non-indexed â†’ each triangle is independent: flat normals + crisp per-face color.
   const geo = plane.toNonIndexed();
   plane.dispose();
   const p = geo.attributes.position as THREE.BufferAttribute;
@@ -73,7 +73,7 @@ function clearOf(x: number, z: number): boolean {
 }
 
 const TREE_GAP = 2.2; // min spacing so pines read as scattered, never a wall
-const ROCK_GAP = 1.4; // rocks were clumping — space them too for a cleaner spread
+const ROCK_GAP = 1.4; // rocks were clumping â€” space them too for a cleaner spread
 
 function scatter(): { trees: Placement[]; rocks: Placement[] } {
   const r = mulberry32(0x9e07);
@@ -100,7 +100,7 @@ function scatter(): { trees: Placement[]; rocks: Placement[] } {
   return { trees, rocks };
 }
 
-/** Lower ground cover — bushes + grass tufts — on a separate seed so it never
+/** Lower ground cover â€” bushes + grass tufts â€” on a separate seed so it never
  *  shifts the tree/rock placement above. Sits in the low/outer band, off the
  *  meadow and the Place markers. */
 function scatterGround(): { bushes: Placement[]; grass: Placement[] } {
@@ -123,7 +123,7 @@ function scatterGround(): { bushes: Placement[]; grass: Placement[] } {
   return { bushes, grass };
 }
 
-// Per-category display scale (× each placement's own scale) — tunes the unit-
+// Per-category display scale (Ã— each placement's own scale) â€” tunes the unit-
 // normalised GLBs to island proportions.
 const TREE_BASE = 3.0;
 const ROCK_BASE = 1.1;
@@ -201,7 +201,7 @@ export function Island() {
         <meshStandardMaterial vertexColors flatShading roughness={0.95} metalness={0} />
       </mesh>
 
-      {/* The surrounding sea — vast enough that its edge is always far beyond the
+      {/* The surrounding sea â€” vast enough that its edge is always far beyond the
           fog, so the world never shows a hard cut at any camera angle. */}
       <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow={false}>
         <planeGeometry args={[320 * W, 320 * W]} />

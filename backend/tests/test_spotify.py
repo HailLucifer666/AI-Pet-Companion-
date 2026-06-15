@@ -9,12 +9,12 @@ from pathlib import Path
 import httpx
 import pytest
 
-from neuraclaw.config import MIGRATIONS_DIR, Config
-from neuraclaw.db import migrate, open_db
-from neuraclaw.integrations import spotify
-from neuraclaw.integrations.spotify import SpotifyClient, SpotifyError, TokenSet
-from neuraclaw.tools import build_registry
-from neuraclaw.tools.registry import ToolContext
+from ai_pet_companion.config import MIGRATIONS_DIR, Config
+from ai_pet_companion.db import migrate, open_db
+from ai_pet_companion.integrations import spotify
+from ai_pet_companion.integrations.spotify import SpotifyClient, SpotifyError, TokenSet
+from ai_pet_companion.tools import build_registry
+from ai_pet_companion.tools.registry import ToolContext
 
 SPOTIFY_CFG = {
     "trust": {"max_auto_risk": 1, "auto_approve_tools": ["play_music", "control_playback"]},
@@ -47,14 +47,14 @@ def creds(monkeypatch):
 @pytest.fixture
 def launches(monkeypatch) -> list[str]:
     calls: list[str] = []
-    monkeypatch.setattr("neuraclaw.tools.builtin.actions.spawn", lambda t: calls.append(t))
+    monkeypatch.setattr("ai_pet_companion.tools.builtin.actions.spawn", lambda t: calls.append(t))
     return calls
 
 
 @pytest.fixture
 def media(monkeypatch) -> list[str]:
     calls: list[str] = []
-    monkeypatch.setattr("neuraclaw.integrations.media_keys.send_media_key", lambda a: calls.append(a))
+    monkeypatch.setattr("ai_pet_companion.integrations.media_keys.send_media_key", lambda a: calls.append(a))
     return calls
 
 
@@ -62,13 +62,13 @@ def media(monkeypatch) -> list[str]:
 def events(monkeypatch) -> list[tuple]:
     evs: list[tuple] = []
     monkeypatch.setattr(
-        "neuraclaw.tools.builtin.spotify_tool.synapse.publish",
+        "ai_pet_companion.tools.builtin.spotify_tool.synapse.publish",
         lambda etype, **payload: evs.append((etype, payload)),
     )
     return evs
 
 
-# ── token store / refresh / search ────────────────────────────────────
+# â”€â”€ token store / refresh / search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 async def test_access_token_refreshes_when_expired(db, creds, monkeypatch):
@@ -111,7 +111,7 @@ async def test_search_track_public_uses_app_token(creds, monkeypatch):
     assert t == {"id": "abc", "uri": "spotify:track:abc", "name": "Calm Down", "artist": "Rema"}
 
 
-# ── play_music ─────────────────────────────────────────────────────────
+# â”€â”€ play_music â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 async def test_play_music_deeplinks_exact_track(ctx, creds, launches, events, monkeypatch):
@@ -152,7 +152,7 @@ async def test_play_music_webapi_when_linked(ctx, db, creds, events, monkeypatch
     assert events == [("spotify.playing", {"track": "Calm Down", "artist": "Rema"})]
 
 
-# ── control_playback ───────────────────────────────────────────────────
+# â”€â”€ control_playback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 async def test_control_playback_uses_media_keys(ctx, media):

@@ -1,6 +1,6 @@
-/** crystalSeed — the pure, render-free core of the memory garden.
+/** crystalSeed â€” the pure, render-free core of the memory garden.
  *
- *  A memory's crystal is fully determined by its id and type: same memory →
+ *  A memory's crystal is fully determined by its id and type: same memory â†’
  *  same species, same spot, every launch (the garden never reshuffles). This
  *  module holds only that logic so it can be unit-tested in Node without Pixi;
  *  CrystalField does the drawing.
@@ -33,7 +33,7 @@ export const SPECIES: Record<MemoryType, { kind: CrystalKind; tint: PaletteTint 
   fact: { kind: "quartz", tint: "claw400" },
 };
 
-/** Pure: a memory id + type → its fixed place and shape seed. */
+/** Pure: a memory id + type â†’ its fixed place and shape seed. */
 export function makeCrystalSeed(id: number, memoryType: MemoryType): CrystalSeed {
   const seed = id >>> 0 || 1;
   const r = mulberry32(seed);

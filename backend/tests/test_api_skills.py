@@ -2,16 +2,16 @@
 
 Tests the business logic (loader.list_active) directly against a migrated DB,
 matching the project's test style (test_db.py / test_agent.py) rather than the
-HTTP layer — the route is a one-line passthrough to this function.
+HTTP layer â€” the route is a one-line passthrough to this function.
 """
 
 from pathlib import Path
 
 import pytest
 
-from neuraclaw.config import MIGRATIONS_DIR
-from neuraclaw.db import migrate, open_db
-from neuraclaw.skillsys import loader
+from ai_pet_companion.config import MIGRATIONS_DIR
+from ai_pet_companion.db import migrate, open_db
+from ai_pet_companion.skillsys import loader
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ async def test_list_active_excludes_drafts(db):
 
 
 async def test_list_active_empty(db):
-    assert await loader.list_active(db) == []  # no active skills → [], not an error
+    assert await loader.list_active(db) == []  # no active skills â†’ [], not an error
 
 
 async def test_list_active_grows_on_approval(db):

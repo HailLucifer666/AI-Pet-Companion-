@@ -1,8 +1,8 @@
-/** Clouds3D — low-poly cloud puffs high over the Grove. One InstancedMesh of
+/** Clouds3D â€” low-poly cloud puffs high over the Grove. One InstancedMesh of
  *  flattened icosahedra (a few clusters), drifting very slowly. Their opacity
  *  eases toward the real cloud amount, so a clear sky shows almost none and an
  *  overcast/stormy sky fills in. Lit by the scene, so they darken at night with
- *  everything else. Reduced-motion → present but still. */
+ *  everything else. Reduced-motion â†’ present but still. */
 
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -10,7 +10,7 @@ import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { WORLD_SCALE } from "./terrain";
 
-const PUFFS = 60; // ~16 clusters of 3–4 puffs, spread over the bigger sky
+const PUFFS = 60; // ~16 clusters of 3â€“4 puffs, spread over the bigger sky
 const CLOUD_COLOR = 0xdfe6ee;
 
 const M = new THREE.Matrix4();
@@ -46,7 +46,7 @@ function buildPuffs(): Puff[] {
         x: cx + (r() - 0.5) * 4 * WORLD_SCALE,
         y: cy + (r() - 0.5) * 1.4 * 2,
         z: cz + (r() - 0.5) * 4 * WORLD_SCALE,
-        sx: (3.4 + r() * 2.4) * 2.5, // wider + flatter → a cloud sheet; bigger to read at distance
+        sx: (3.4 + r() * 2.4) * 2.5, // wider + flatter â†’ a cloud sheet; bigger to read at distance
         sy: 0.6 + r() * 0.45,
         sz: (3.4 + r() * 2.4) * 2.5,
       });
@@ -81,7 +81,7 @@ export function Clouds3D({ amount, reduced }: { amount: number; reduced: boolean
       group.current.position.z = Math.cos(t * 0.015) * 3 * WORLD_SCALE;
     }
     if (mat.current) {
-      const target = Math.min(0.55, amount); // wispy ceiling — soft cloud, not solid rock
+      const target = Math.min(0.55, amount); // wispy ceiling â€” soft cloud, not solid rock
       const k = reduced ? 1 : Math.min(1, delta * 1.2);
       mat.current.opacity += (target - mat.current.opacity) * k;
     }

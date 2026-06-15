@@ -1,4 +1,4 @@
-/** NeuraClaw UI primitives. Every surface builds from these — no raw divs-with-classes soup. */
+/** AI Pet Companion UI primitives. Every surface builds from these â€” no raw divs-with-classes soup. */
 
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -14,7 +14,7 @@ export function cx(...parts: Array<string | false | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
-/* ── Buttons ─────────────────────────────────────────────────────── */
+/* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 type ButtonVariant = "primary" | "ghost" | "danger";
 
@@ -68,7 +68,7 @@ export function IconButton({
   );
 }
 
-/* ── Inputs ──────────────────────────────────────────────────────── */
+/* â”€â”€ Inputs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 const fieldBase =
   "w-full rounded-ctl bg-ink-900 border border-ink-700 px-3 py-2 text-sm text-ink-100 " +
@@ -82,7 +82,7 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
   return <textarea className={cx(fieldBase, "resize-none", className)} {...props} />;
 }
 
-/* ── Select (Radix, fully styled — no native control) ────────────── */
+/* â”€â”€ Select (Radix, fully styled â€” no native control) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export interface SelectOption {
   value: string;
@@ -151,7 +151,7 @@ export function Select({
   );
 }
 
-/* ── Dialog (Radix, motion-on-open via CSS data-state) ───────────── */
+/* â”€â”€ Dialog (Radix, motion-on-open via CSS data-state) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function Dialog({
   open,
@@ -200,7 +200,7 @@ export function Dialog({
   );
 }
 
-/* ── Popover (Radix) ─────────────────────────────────────────────── */
+/* â”€â”€ Popover (Radix) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function Popover({
   trigger,
@@ -232,7 +232,7 @@ export function Popover({
   );
 }
 
-/* ── Tooltip (Radix — Provider mounted once in main.tsx) ─────────── */
+/* â”€â”€ Tooltip (Radix â€” Provider mounted once in main.tsx) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function Tooltip({
   label,
@@ -260,7 +260,7 @@ export function Tooltip({
   );
 }
 
-/* ── Surfaces ────────────────────────────────────────────────────── */
+/* â”€â”€ Surfaces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
   return <div className={cx("surface-raised rounded-card p-4", className)}>{children}</div>;
@@ -270,7 +270,7 @@ export function Divider() {
   return <hr className="border-ink-800" />;
 }
 
-/* ── Feedback ────────────────────────────────────────────────────── */
+/* â”€â”€ Feedback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 type BadgeTone = "neutral" | "accent" | "ok" | "warn" | "danger";
 
@@ -328,7 +328,7 @@ export function Kbd({ children }: { children: ReactNode }) {
   );
 }
 
-/* ── Skeleton ────────────────────────────────────────────────────── */
+/* â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function Skeleton({ className }: { className?: string }) {
   return (
@@ -345,7 +345,7 @@ export function Skeleton({ className }: { className?: string }) {
   );
 }
 
-/* ── Empty state ─────────────────────────────────────────────────── */
+/* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function EmptyState({
   icon: Icon,
@@ -370,7 +370,7 @@ export function EmptyState({
   );
 }
 
-/* ── Toasts (Radix Toast + zustand store, fire from anywhere) ────── */
+/* â”€â”€ Toasts (Radix Toast + zustand store, fire from anywhere) â”€â”€â”€â”€â”€â”€ */
 
 export interface ToastAction {
   label: string;

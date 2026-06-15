@@ -1,9 +1,9 @@
-/** PetChat — a glass chat bubble in the Grove's top-right (under the clock) for
+/** PetChat â€” a glass chat bubble in the Grove's top-right (under the clock) for
  *  talking to the companion. It speaks to the REAL agent over the same
  *  `POST /api/chat` SSE stream the Chat surface uses, so a message here also
  *  drives the world (the pet walks to the bench, the fire flares, a crystal
- *  sprouts, XP ticks — all via the Synapse bus). The streamed reply renders in
- *  the panel AND over the pet's head in 3-D (worldStore.speech → PetBubble).
+ *  sprouts, XP ticks â€” all via the Synapse bus). The streamed reply renders in
+ *  the panel AND over the pet's head in 3-D (worldStore.speech â†’ PetBubble).
  *  Voice is free + local: the mic transcribes speech to text, and the reply is
  *  spoken aloud (Web Speech, feature-detected). Nothing faked, nothing leaves
  *  the device beyond the existing chat call. */
@@ -77,7 +77,7 @@ export function PetChat() {
       setInput("");
       setError(null);
       setTurns((t) =>
-        [...t, { id: turnId++, role: "you" as const, text: image ? `🖼 ${shown}` : shown }].slice(
+        [...t, { id: turnId++, role: "you" as const, text: image ? `ðŸ–¼ ${shown}` : shown }].slice(
           -MAX_TURNS,
         ),
       );
@@ -138,7 +138,7 @@ export function PetChat() {
     [running, shot, muted, voice, setSpeech, clearSpeechSoon, qc],
   );
 
-  // Capture one frame of a user-picked screen → hold it as the next message's
+  // Capture one frame of a user-picked screen â†’ hold it as the next message's
   // attachment. Gated on a real vision brain (canSee) so we never send a screen
   // to a model that can't see it.
   const showScreen = useCallback(async () => {
@@ -165,7 +165,7 @@ export function PetChat() {
 
   const toggleMute = useCallback(() => {
     setMuted((m) => {
-      if (!m) voice.cancelSpeech(); // muting now → cut any ongoing speech
+      if (!m) voice.cancelSpeech(); // muting now â†’ cut any ongoing speech
       return !m;
     });
   }, [voice]);
@@ -193,7 +193,7 @@ export function PetChat() {
 
   return (
     <div className="pointer-events-auto absolute right-5 top-[4.5rem] z-40 flex w-[min(22rem,calc(100vw-2.5rem))] origin-top-right animate-[pop-in_180ms_ease-out] flex-col overflow-hidden rounded-2xl border border-ink-700/60 bg-ink-900/85 shadow-2xl shadow-ink-950/60 backdrop-blur-xl">
-      {/* Header — the companion's identity + live status */}
+      {/* Header â€” the companion's identity + live status */}
       <div className="flex items-center justify-between gap-2 border-b border-ink-800/70 px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span
@@ -204,7 +204,7 @@ export function PetChat() {
           <span className="rounded-full bg-ink-800/70 px-2 py-0.5 text-[10px] uppercase tracking-wider text-ink-400">
             {stageName}
           </span>
-          {working && <span className="text-[11px] text-claw-300/90">thinking…</span>}
+          {working && <span className="text-[11px] text-claw-300/90">thinkingâ€¦</span>}
         </div>
         <button
           onClick={() => setOpen(false)}
@@ -219,7 +219,7 @@ export function PetChat() {
       <div ref={scrollRef} className="max-h-[38vh] min-h-[3rem] space-y-2 overflow-auto px-4 py-3">
         {turns.length === 0 && !stream && !error && (
           <p className="text-center text-xs leading-relaxed text-ink-500">
-            Say hello — your words reach the agent, and the island answers.
+            Say hello â€” your words reach the agent, and the island answers.
           </p>
         )}
         {turns.map((t) => (
@@ -259,7 +259,7 @@ export function PetChat() {
               )}
             >
               {vision.data?.remote
-                ? `⚠ Will be sent to ${vision.data?.model ?? "a remote model"} — this screenshot leaves your device.`
+                ? `âš  Will be sent to ${vision.data?.model ?? "a remote model"} â€” this screenshot leaves your device.`
                 : `Stays on your device (${vision.data?.model ?? "local model"}).`}
             </p>
             <button
@@ -281,7 +281,7 @@ export function PetChat() {
             }
           }}
           rows={2}
-          placeholder={voice.listening ? "Listening…" : "Ask, share, or just chat…"}
+          placeholder={voice.listening ? "Listeningâ€¦" : "Ask, share, or just chatâ€¦"}
           className="max-h-28 w-full resize-none bg-transparent text-sm leading-relaxed text-ink-100 placeholder-ink-500 outline-none"
         />
         <div className="mt-1 flex items-center justify-between">

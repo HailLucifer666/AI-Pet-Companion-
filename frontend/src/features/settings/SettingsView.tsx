@@ -50,7 +50,7 @@ function SpotifyCard() {
         <div className="mt-3 flex items-center gap-3 text-sm">
           <span className="min-w-0 flex-1 truncate text-ink-300">
             Connected{data.display_name ? ` as ${data.display_name}` : ""}
-            {data.active_device ? ` · ${data.active_device}` : ""}
+            {data.active_device ? ` Â· ${data.active_device}` : ""}
           </span>
           <Button
             variant="ghost"
@@ -66,7 +66,7 @@ function SpotifyCard() {
             Connect Spotify
           </Button>
           {callbackState === "error" && (
-            <p className="mt-2 text-sm text-danger">Connection failed — please try again.</p>
+            <p className="mt-2 text-sm text-danger">Connection failed â€” please try again.</p>
           )}
         </div>
       )}
@@ -119,7 +119,7 @@ export function SettingsView() {
         <p className="mt-0.5 text-xs text-ink-500">
           What new messages use. <strong className="text-ink-300">Auto</strong> follows the
           resilient role chains below; picking one model pins it (no failover). The list is
-          discovered live from your providers — no restart needed.
+          discovered live from your providers â€” no restart needed.
         </p>
         <div className="mt-3">
           <ModelSelector className="w-full max-w-md" />

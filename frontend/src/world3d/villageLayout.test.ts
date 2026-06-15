@@ -11,14 +11,14 @@ const onLand = (x: number, z: number) => {
 
 describe("village layout", () => {
   it("derives one building per place, facing the plaza", () => {
-    expect(BUILDING_DEFS.map((b) => b.id).sort()).toEqual(["garden", "hollow", "workbench"]);
+    expect(BUILDING_DEFS.map((b) => b.id).sort()).toEqual(["garden", "home", "workbench"]);
     for (const b of BUILDING_DEFS) {
       expect(onLand(b.pos[0], b.pos[2])).toBe(true);
       expect(Number.isFinite(b.rotationY)).toBe(true);
     }
   });
 
-  it("derives one road per building, plaza→building", () => {
+  it("derives one road per building, plazaâ†’building", () => {
     expect(VILLAGE_ROADS).toHaveLength(3);
     for (const r of VILLAGE_ROADS) {
       // both ends + the midpoint sit on land

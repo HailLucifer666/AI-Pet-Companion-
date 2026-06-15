@@ -1,4 +1,4 @@
-/** Atmosphere — the Grove's sky + light, driven by the real clock (day/night) and
+/** Atmosphere â€” the Grove's sky + light, driven by the real clock (day/night) and
  *  real weather. It owns scene.background + fog and the scene lights, and each
  *  frame eases them toward the target from `daylightAt(hour)` blended with the
  *  weather flags (clouds grey the sky, rain/overcast dim the sun, fog draws in).
@@ -19,7 +19,7 @@ import { WORLD_SCALE } from "./terrain";
 // showing the whole island crisply. Sea (radius ~1120) sits well past the fog.
 const FOG_NEAR = 80;
 const FOG_FAR = 300;
-const SHADOW_R = 16; // ortho shadow frustum covers the core island (tightened from ±22)
+const SHADOW_R = 16; // ortho shadow frustum covers the core island (tightened from Â±22)
 const OVERCAST = new Color(0x7a8290);
 
 // Reused work colors (a single Atmosphere instance lives per canvas).
@@ -58,7 +58,7 @@ export function Atmosphere({
     sky.dayness = base.dayness; // shared with the glowing things (pet/crystals/mushrooms)
     const k = reduced ? 1 : 1 - Math.exp(-1.5 * delta);
 
-    // Cloud cover greys the sky — but deep night stays dark (scale by dayness).
+    // Cloud cover greys the sky â€” but deep night stays dark (scale by dayness).
     const greyAmt = fx.clouds * 0.45 * (0.3 + base.dayness * 0.7);
     skyTarget.set(base.sky).lerp(OVERCAST, greyAmt);
 
@@ -75,7 +75,7 @@ export function Atmosphere({
       dir.current.color.lerp(tmpSun.set(base.sun), k);
       dir.current.intensity += (base.sunIntensity * (1 - fx.dim) - dir.current.intensity) * k;
       // Push the sun out beyond the (now big) island so its ortho shadow camera sees
-      // the whole island in front of it — the light DIRECTION is unchanged.
+      // the whole island in front of it â€” the light DIRECTION is unchanged.
       dir.current.position.x += (base.sunDir[0] * WORLD_SCALE - dir.current.position.x) * k;
       dir.current.position.y += (base.sunDir[1] * WORLD_SCALE - dir.current.position.y) * k;
       dir.current.position.z += (base.sunDir[2] * WORLD_SCALE - dir.current.position.z) * k;
@@ -86,9 +86,9 @@ export function Atmosphere({
     }
     if (amb.current) {
       amb.current.color.lerp(tmpAmb.set(base.ambient), k);
-      // Scale ambient with daylight so night stays moody (≈0.30 — lifted a touch so
+      // Scale ambient with daylight so night stays moody (â‰ˆ0.30 â€” lifted a touch so
       // shapes read clean, not muddy) while the emissive crystals/pet/mushrooms still
-      // own it; day fills to ≈0.64.
+      // own it; day fills to â‰ˆ0.64.
       const ambTarget = (0.3 + base.dayness * 0.34) * (1 - fx.dim * 0.4);
       amb.current.intensity += (ambTarget - amb.current.intensity) * k;
     }
@@ -117,7 +117,7 @@ export function Atmosphere({
         shadow-camera-far={SHADOW_R * 6}
         shadow-bias={-0.0002}
       />
-      {/* Cool back-rim — lifts the low-poly silhouettes out of the fog. */}
+      {/* Cool back-rim â€” lifts the low-poly silhouettes out of the fog. */}
       <directionalLight ref={rim} color={WORLD.rim} intensity={0.55} position={[-14, 7, -16]} />
     </>
   );

@@ -3,7 +3,7 @@ import { activeLure, type Lure } from "./lure";
 
 const at = (over: Partial<Lure> = {}): Lure => ({ x: 2, z: -3, until: 1000, ...over });
 
-describe("activeLure — answering the user's call", () => {
+describe("activeLure â€” answering the user's call", () => {
   it("walks to the cursor point while resting and the call is live", () => {
     expect(activeLure(at(), 500, "rest", false)).toEqual({ x: 2, z: -3 });
   });

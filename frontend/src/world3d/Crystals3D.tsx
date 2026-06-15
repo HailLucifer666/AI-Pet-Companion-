@@ -1,8 +1,8 @@
-/** Crystals3D — the memory garden in 3D. One faceted, emissive crystal per kept
+/** Crystals3D â€” the memory garden in 3D. One faceted, emissive crystal per kept
  *  memory, its species (shape) and spot fixed by the memory id. Reads the live
  *  worldStore.crystals (hydrated from REST on Den open, then planted/folded by the
  *  Synapse stream), so the garden is exactly what the companion remembers. Each
- *  crystal pops in on mount and turns slowly. Reduced-motion → static, full size. */
+ *  crystal pops in on mount and turns slowly. Reduced-motion â†’ static, full size. */
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -18,7 +18,7 @@ import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
 const BASE = 0.7;
-const CRYSTAL_EMISSIVE = 0.95; // base glow; ×glowBoost so crystals blaze at night
+const CRYSTAL_EMISSIVE = 0.95; // base glow; Ã—glowBoost so crystals blaze at night
 
 function Shape({ seed, matRef }: { seed: CrystalSeed; matRef: React.RefObject<MeshStandardMaterial> }) {
   const kind = (SPECIES[seed.memoryType] ?? SPECIES.fact).kind;
@@ -143,7 +143,7 @@ function Crystal({ seed, fresh }: { seed: CrystalSeed; fresh: number }) {
 export function Crystals3D() {
   const crystals = useWorldStore((s) => s.crystals);
   const recencyById = useWorldStore((s) => s.recencyById);
-  const nowMs = Date.now(); // recency moves over days — once per render is plenty
+  const nowMs = Date.now(); // recency moves over days â€” once per render is plenty
   return (
     <group>
       {crystals.map((c) => (

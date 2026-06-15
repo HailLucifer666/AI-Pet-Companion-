@@ -1,10 +1,10 @@
-/** InstancedModel — draw one GLB model across many placements with InstancedMesh
+/** InstancedModel â€” draw one GLB model across many placements with InstancedMesh
  *  (one draw call per submesh, however many placements). The model is loaded once,
- *  unit-normalised (largest dimension → 1, centred on XZ, base sat on y=0 — the same
+ *  unit-normalised (largest dimension â†’ 1, centred on XZ, base sat on y=0 â€” the same
  *  formula the preview used), and each of its meshes (trunk + foliage, etc.) becomes
- *  an InstancedMesh. Per-instance matrix = placement · normalize · submeshLocal.
+ *  an InstancedMesh. Per-instance matrix = placement Â· normalize Â· submeshLocal.
  *  Original GLB materials/albedo are kept; the world lighting + bloom set the mood.
- *  Mirrors the raw-InstancedMesh pattern already used in Island.tsx — no new deps. */
+ *  Mirrors the raw-InstancedMesh pattern already used in Island.tsx â€” no new deps. */
 
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
@@ -75,7 +75,7 @@ function PartMesh({
       Q.setFromAxisAngle(YAXIS, p.rot);
       const sc = p.scale * baseScale;
       S.set(sc, sc, sc);
-      M.compose(P, Q, S).multiply(base); // placement · normalize · submeshLocal
+      M.compose(P, Q, S).multiply(base); // placement Â· normalize Â· submeshLocal
       mesh.setMatrixAt(i, M);
     });
     mesh.instanceMatrix.needsUpdate = true;

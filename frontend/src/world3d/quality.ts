@@ -1,11 +1,11 @@
-/** quality.ts — the GPU-tier quality ladder. The world targets 60fps, but the
+/** quality.ts â€” the GPU-tier quality ladder. The world targets 60fps, but the
  *  bioluminescent grade (selective bloom, MSAA, soft shadows, co-located mushroom
  *  lights) is exactly what a weak GPU chokes on. So we read the GL renderer string
- *  once, sort it into a tier, and derive a flag set the render layer consumes —
+ *  once, sort it into a tier, and derive a flag set the render layer consumes â€”
  *  dropping the expensive flourishes first on low-end hardware while keeping the
  *  scene (and all its REAL data) intact.
  *
- *  The string→tier and tier→flags maps are PURE + unit-tested; only the WebGL
+ *  The stringâ†’tier and tierâ†’flags maps are PURE + unit-tested; only the WebGL
  *  reads (detectGpuTier / hasWebGL) touch the DOM, and they're thin + guarded.
  *  Reduced-motion remains a separate, harder floor (it kills bloom regardless). */
 
@@ -22,14 +22,14 @@ export interface QualityFlags {
   stars: number; // deep-sky star count
 }
 
-// Weak/software/mobile-class renderers → the low tier (no bloom, no shadows).
+// Weak/software/mobile-class renderers â†’ the low tier (no bloom, no shadows).
 // `\D*` skips the "(TM)"/"(R)" noise real ANGLE strings wedge before the model number.
 const LOW = /(swiftshader|llvmpipe|software|basic render|virgl|mali|adreno\D*[1-5]\d{2}|powervr|videocore|intel.*(hd graphics [2-5]\d{2}|gma))/;
-// Strong discrete or modern integrated GPUs → the high tier (the full grade).
+// Strong discrete or modern integrated GPUs â†’ the high tier (the full grade).
 const HIGH = /(nvidia|geforce|rtx|gtx|radeon|apple m\d|iris.{0,8}xe|\barc\b)/;
 
-/** Sort a GL `UNMASKED_RENDERER` string into a tier. Unknown/empty → "medium"
- *  (the safe middle — never assume a weak machine without evidence). */
+/** Sort a GL `UNMASKED_RENDERER` string into a tier. Unknown/empty â†’ "medium"
+ *  (the safe middle â€” never assume a weak machine without evidence). */
 export function tierFromRenderer(renderer: string | null | undefined): Tier {
   if (!renderer) return "medium";
   const r = renderer.toLowerCase();
@@ -52,7 +52,7 @@ export function qualityFlags(tier: Tier): QualityFlags {
 }
 
 /** Read the GL renderer string from a throwaway context. Returns null when WebGL
- *  is unavailable or the debug-renderer extension is blocked (→ caller gets the
+ *  is unavailable or the debug-renderer extension is blocked (â†’ caller gets the
  *  "medium" default). Never throws. */
 function readRenderer(): string | null {
   try {
@@ -71,7 +71,7 @@ export function detectGpuTier(): Tier {
   return tierFromRenderer(readRenderer());
 }
 
-/** True when a WebGL context can be created at all — the gate for the 2D fallback. */
+/** True when a WebGL context can be created at all â€” the gate for the 2D fallback. */
 export function hasWebGL(): boolean {
   try {
     const canvas = document.createElement("canvas");

@@ -1,14 +1,14 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
-/* ── NeuraClaw design system — "Bioluminescent Terminal" ──────────────
+/* â”€â”€ AI Pet Companion design system â€” "Bioluminescent Terminal" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    A dark instrument panel something alive inhabits. Deep layered ink
    surfaces with subtle radial atmosphere; one warm ember accent ("claw")
-   that *means* the creature — its glow intensity tracks agent activity
-   via --activity (0→1, set live by Synapse in 0.2b). Space Grotesk for
-   moments, Inter for the instrument. Tokens only — no hardcoded colors. */
+   that *means* the creature â€” its glow intensity tracks agent activity
+   via --activity (0â†’1, set live by Synapse in 0.2b). Space Grotesk for
+   moments, Inter for the instrument. Tokens only â€” no hardcoded colors. */
 
 @theme {
-  /* Ink — deep, near-neutral with a faint cool cast. OKLch for even steps. */
+  /* Ink â€” deep, near-neutral with a faint cool cast. OKLch for even steps. */
   --color-ink-950: oklch(15% 0.014 264);
   --color-ink-900: oklch(19% 0.016 264);
   --color-ink-850: oklch(22% 0.017 264);
@@ -18,7 +18,7 @@
   --color-ink-300: oklch(72% 0.012 264);
   --color-ink-100: oklch(93% 0.006 264);
 
-  /* Claw — the living ember. Warm amber, the one accent that means *it*. */
+  /* Claw â€” the living ember. Warm amber, the one accent that means *it*. */
   --color-claw-700: oklch(54% 0.16 62);
   --color-claw-600: oklch(63% 0.18 65);
   --color-claw-500: oklch(73% 0.18 72);
@@ -37,19 +37,19 @@
   --radius-card: 0.75rem;
   --radius-overlay: 0.875rem;
 
-  /* Elevation — every surface declares its plane. Inner top-highlight +
+  /* Elevation â€” every surface declares its plane. Inner top-highlight +
      tiered ambient shadow give real depth instead of a flat single plane. */
   --shadow-raise: 0 1px 0 0 oklch(100% 0 0 / 5%) inset, 0 8px 24px -14px oklch(0% 0 0 / 70%);
   --shadow-overlay:
     0 1px 0 0 oklch(100% 0 0 / 7%) inset,
     0 24px 64px -28px oklch(0% 0 0 / 85%),
     0 8px 20px -16px oklch(0% 0 0 / 60%);
-  /* Accent glow — strength scales with --activity (idle 0 → working 1). */
+  /* Accent glow â€” strength scales with --activity (idle 0 â†’ working 1). */
   --shadow-glow:
     0 0 0 1px oklch(73% 0.18 72 / calc(0.18 + 0.22 * var(--activity, 0))),
     0 0 28px -6px oklch(73% 0.18 72 / calc(0.10 + 0.40 * var(--activity, 0)));
 
-  /* Motion — one vocabulary. 150 quick / 300 standard / 500 expressive. */
+  /* Motion â€” one vocabulary. 150 quick / 300 standard / 500 expressive. */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --animate-shimmer: shimmer 1.4s linear infinite;
   --animate-pulse-glow: pulse-glow 2.6s ease-in-out infinite;
@@ -60,18 +60,18 @@
   --animate-toast-out: toast-out 160ms ease-in forwards;
 }
 
-/* Motion tokens (plain vars — used in inline transitions + framer config). */
+/* Motion tokens (plain vars â€” used in inline transitions + framer config). */
 :root {
   color-scheme: dark;
   --dur-fast: 150ms;
   --dur-base: 300ms;
   --dur-slow: 500ms;
   --ease-bio: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Live activity level, 0 (asleep/idle) → 1 (working). Set by Synapse. */
+  /* Live activity level, 0 (asleep/idle) â†’ 1 (working). Set by Synapse. */
   --activity: 0;
 }
 
-/* Page plane — deep ink with a faint ember aurora bleeding from the rail
+/* Page plane â€” deep ink with a faint ember aurora bleeding from the rail
    side, plus a vignette so content floats above atmosphere, not on a slab. */
 body {
   @apply bg-ink-950 text-ink-100 font-sans antialiased;
@@ -96,7 +96,7 @@ h1, h2, h3 {
   scrollbar-color: var(--color-ink-700) transparent;
 }
 
-/* ── Elevation utility classes — semantic planes the surfaces build on. ── */
+/* â”€â”€ Elevation utility classes â€” semantic planes the surfaces build on. â”€â”€ */
 @utility surface-raised {
   background:
     linear-gradient(oklch(100% 0 0 / 2.5%), oklch(0% 0 0 / 0%)),
@@ -118,7 +118,7 @@ h1, h2, h3 {
   box-shadow: var(--shadow-glow);
 }
 
-/* ── Keyframes ───────────────────────────────────────────────────────── */
+/* â”€â”€ Keyframes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes shimmer {
   0% { background-position: -150% 0; }
   100% { background-position: 150% 0; }
@@ -154,11 +154,11 @@ h1, h2, h3 {
   to { opacity: 0; transform: translateX(16px); }
 }
 
-/* ── The Den frame — a non-interactive atmosphere layer over the 3D canvas:
+/* â”€â”€ The Den frame â€” a non-interactive atmosphere layer over the 3D canvas:
       a soft vignette so the world floats in a dark frame, plus faint ember
       scanlines so it reads as a living instrument you peer through. Sits above
       the canvas, below the rail/overlays; never intercepts pointer (so the
-      cursor-lure + orbit still work). Tokens only (claw/ink). ────────────── */
+      cursor-lure + orbit still work). Tokens only (claw/ink). â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .den-atmosphere {
   position: absolute;
   inset: 0;
@@ -190,7 +190,7 @@ h1, h2, h3 {
   text-shadow: 0 0 16px oklch(73% 0.18 72 / 35%);
 }
 
-/* ── Accessibility: honor reduced-motion everywhere (WCAG 2.2). ────────── */
+/* â”€â”€ Accessibility: honor reduced-motion everywhere (WCAG 2.2). â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;

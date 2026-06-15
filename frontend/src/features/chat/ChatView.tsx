@@ -30,7 +30,7 @@ import {
   Textarea,
 } from "../../components/ui";
 
-/* ── Stream state ────────────────────────────────────────────────── */
+/* â”€â”€ Stream state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 interface ToolActivity {
   tool: string;
@@ -48,7 +48,7 @@ interface StreamState {
 
 const idleStream: StreamState = { text: "", tools: [], error: null, running: false };
 
-/* ── Markdown body ───────────────────────────────────────────────── */
+/* â”€â”€ Markdown body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function Body({ text }: { text: string }) {
   return (
@@ -84,7 +84,7 @@ function ToolRow({ activity }: { activity: ToolActivity }) {
   );
 }
 
-/* ── Message bubbles ─────────────────────────────────────────────── */
+/* â”€â”€ Message bubbles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function UserBubble({ text }: { text: string }) {
   return (
@@ -121,7 +121,7 @@ function AssistantBlock({
   );
 }
 
-/* ── Session sidebar ─────────────────────────────────────────────── */
+/* â”€â”€ Session sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function SessionList({
   activeId,
@@ -202,7 +202,7 @@ function SessionList({
   );
 }
 
-/* ── Main view ───────────────────────────────────────────────────── */
+/* â”€â”€ Main view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
   const params = useParams();
@@ -297,7 +297,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           queryKey: queryKeys.sessionMessages(newSessionId),
         });
         // Keep a surfaced error visible (the reply lives in reloaded history, but
-        // a failed/errored turn — common for a pinned model with no failover —
+        // a failed/errored turn â€” common for a pinned model with no failover â€”
         // persists nothing, so the error banner must survive the reset).
         setStream((s) => (s.error ? { ...idleStream, error: s.error } : idleStream));
         if (newSessionId !== sessionId) goToSession(newSessionId);
@@ -329,7 +329,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           ) : visibleMessages.length === 0 && !stream.running && !stream.text ? (
             <EmptyState
               icon={MessageSquare}
-              title="Talk to NeuraClaw"
+              title="Talk to AI Pet Companion"
               description="It can search the web, manage files in its workspace, take notes and remember what matters."
             />
           ) : (
@@ -368,7 +368,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
             <ModelSelector className="w-44 shrink-0" />
             <Textarea
               rows={Math.min(6, Math.max(1, input.split("\n").length))}
-              placeholder="Message… (Enter to send, Shift+Enter for newline)"
+              placeholder="Messageâ€¦ (Enter to send, Shift+Enter for newline)"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {

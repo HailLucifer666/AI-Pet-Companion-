@@ -1,10 +1,10 @@
-/** PetBubble — a small emoji chip that floats above the companion's head saying
- *  what it's doing right now (🔧 working, 😴 napping, 🌱 planting a memory…). It
+/** PetBubble â€” a small emoji chip that floats above the companion's head saying
+ *  what it's doing right now (ðŸ”§ working, ðŸ˜´ napping, ðŸŒ± planting a memoryâ€¦). It
  *  reads the same live FSM that drives the pet's motion (worldStore.lumen) and maps
  *  it through the pure petEmoji(). When the pet is simply resting the bubble hides.
  *
  *  Mounted as a child of the Lumenform's <group>, so drei's <Html> projects it to
- *  screen space above the pet every frame — no manual camera math. Reduced-motion
+ *  screen space above the pet every frame â€” no manual camera math. Reduced-motion
  *  just shows the chip, no animation. */
 
 import { Html } from "@react-three/drei";
@@ -19,7 +19,7 @@ export function PetBubble() {
   const speech = useWorldStore((s) => s.speech);
   const emoji = petEmoji(lumen.mode, lumen.gesture);
 
-  // The companion is speaking a chat reply → show the words over its head; this
+  // The companion is speaking a chat reply â†’ show the words over its head; this
   // takes priority over the activity emoji.
   if (speech) {
     return (
@@ -36,7 +36,7 @@ export function PetBubble() {
     );
   }
 
-  if (!emoji) return null; // resting → no bubble
+  if (!emoji) return null; // resting â†’ no bubble
 
   return (
     <Html position={[0, 1.15, 0]} center distanceFactor={9} zIndexRange={[40, 0]}>

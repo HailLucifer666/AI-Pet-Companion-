@@ -1,7 +1,7 @@
 """Vision-brain resolution: which model sees a screen, and whether it's remote."""
 
-from neuraclaw.config import Config
-from neuraclaw.core.vision import is_local_url, resolve_vision
+from ai_pet_companion.config import Config
+from ai_pet_companion.core.vision import is_local_url, resolve_vision
 
 
 def make_config() -> Config:
@@ -28,7 +28,7 @@ def test_is_local_url():
 
 
 def test_prefers_remote_when_its_key_is_present():
-    # First in the chain wins when usable — and it's remote (screen leaves device).
+    # First in the chain wins when usable â€” and it's remote (screen leaves device).
     out = resolve_vision(make_config(), {"openrouter": True}, local_up=True)
     assert out["available"] is True
     assert out["remote"] is True
@@ -37,7 +37,7 @@ def test_prefers_remote_when_its_key_is_present():
 
 
 def test_falls_back_to_local_when_no_cloud_key():
-    # No cloud key → the local Ollama vision model carries it, fully on-device.
+    # No cloud key â†’ the local Ollama vision model carries it, fully on-device.
     out = resolve_vision(make_config(), {"openrouter": False}, local_up=True)
     assert out["available"] is True
     assert out["remote"] is False

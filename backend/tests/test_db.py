@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from neuraclaw.config import MIGRATIONS_DIR
-from neuraclaw.db import migrate, open_db
-from neuraclaw.db.connection import vec_version
+from ai_pet_companion.config import MIGRATIONS_DIR
+from ai_pet_companion.db import migrate, open_db
+from ai_pet_companion.db.connection import vec_version
 
 
 @pytest.fixture

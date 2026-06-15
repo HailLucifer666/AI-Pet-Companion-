@@ -1,16 +1,16 @@
-/** LumenformFSM — the companion's behavior, as a pure state machine.
+/** LumenformFSM â€” the companion's behavior, as a pure state machine.
  *
  *  It expresses *intent*, not pixels: a destination Place, a baseline disposition
  *  (rest vs. work), and a transient gesture. The renderer turns that into motion
  *  and pose. Real Synapse events drive work (walk to the Workbench while a tool
  *  runs, return home when done, plant on a formed memory); when nothing is
- *  happening the idle scheduler gives it a small private life. Pure → unit-tested.
+ *  happening the idle scheduler gives it a small private life. Pure â†’ unit-tested.
  *
  *  Under reduced-motion the FSM still runs (the pet IS where state says), but the
- *  idle scheduler is suppressed — no motion for motion's sake.
+ *  idle scheduler is suppressed â€” no motion for motion's sake.
  */
 
-import type { Place } from "../../places";
+import type { Place } from "../../../world3d/placeRegistry";
 
 export type Gesture = "none" | "plant" | "celebrate" | "gaze" | "nap" | "play" | "wander";
 
@@ -110,13 +110,13 @@ export function scheduleIdle(
   if (state.mode === "work") return state;
   if (state.gesture !== "none" && now < state.gestureUntil) return state;
 
-  // A gesture just expired → settle back before choosing the next thing.
+  // A gesture just expired â†’ settle back before choosing the next thing.
   if (state.gesture !== "none") {
     const settledPlace = state.gesture === "wander" ? "home" : state.place;
     return { ...state, gesture: "none", gestureUntil: 0, place: settledPlace, since: now };
   }
 
-  // Idle long enough → pick a small activity, weighted by how long it's rested.
+  // Idle long enough â†’ pick a small activity, weighted by how long it's rested.
   const idleMs = now - state.since;
   if (idleMs < 6000) return state;
 

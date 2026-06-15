@@ -1,7 +1,7 @@
-/** Places3D — diegetic navigation in the 3D Grove. Each Place is a low-poly
+/** Places3D â€” diegetic navigation in the 3D Grove. Each Place is a low-poly
  *  landmark you can click (mouse via raycasting) plus a drei <Html> label that is
  *  a real, focusable DOM button (keyboard parity). Activating it opens that
- *  surface as an overlay over the world — the same worldNavStore + SurfaceOverlay
+ *  surface as an overlay over the world â€” the same worldNavStore + SurfaceOverlay
  *  the 2D version used. The rail still reaches every surface directly. */
 
 import { useState } from "react";
@@ -10,12 +10,12 @@ import { useWorldNav } from "../state/worldNavStore";
 import { useWorldStore } from "../state/worldStore";
 import { cx } from "../components/ui";
 import { WORLD } from "./palette";
-import { PLACES_3D, type Place3D as PlaceDef, type PlaceKind } from "./placeDefs";
+import { PLACES_3D, type PlaceEntry as PlaceDef, type Place as PlaceKind } from "./placeRegistry";
 
 function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
   // The Hollow's fire flares while a real tool runs (the companion is working).
   const working = useWorldStore((s) => s.lumen.mode === "work");
-  if (kind === "hollow") {
+  if (kind === "home") {
     const hot = hovered || working;
     return (
       <group>
@@ -37,7 +37,7 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
           <cylinderGeometry args={[0.06, 0.06, 0.8, 5]} />
           <meshStandardMaterial color={WORLD.trunk} flatShading roughness={1} />
         </mesh>
-        {/* flame — flares when hovered or while the companion works */}
+        {/* flame â€” flares when hovered or while the companion works */}
         <mesh position-y={0.34} scale-y={hot ? 1.3 : 1}>
           <coneGeometry args={[0.2, 0.6, 5]} />
           <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hot ? 2.8 : 1.5} flatShading />
@@ -46,7 +46,7 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
           <coneGeometry args={[0.1, 0.3, 5]} />
           <meshStandardMaterial color={WORLD.emberHi} emissive={WORLD.emberHi} emissiveIntensity={hot ? 3.0 : 1.8} flatShading />
         </mesh>
-        {/* the fire's light only when it matters — the emissive flame carries the cold state */}
+        {/* the fire's light only when it matters â€” the emissive flame carries the cold state */}
         {hot && <pointLight color={WORLD.ember} intensity={7} distance={8} decay={2} position={[0, 0.5, 0]} />}
       </group>
     );
@@ -112,7 +112,7 @@ function Place({ place }: { place: PlaceDef }) {
         open(place.route);
       }}
     >
-      <Marker kind={place.kind} hovered={hovered} />
+      <Marker kind={place.id as PlaceKind} hovered={hovered} />
       <Html position={[0, 1.15, 0]} center distanceFactor={9} zIndexRange={[20, 0]}>
         <button
           onClick={() => open(place.route)}
@@ -120,7 +120,7 @@ function Place({ place }: { place: PlaceDef }) {
           onPointerLeave={() => setHovered(false)}
           onFocus={() => setHovered(true)}
           onBlur={() => setHovered(false)}
-          aria-label={`${place.label} — ${place.sub}`}
+          aria-label={`${place.label} â€” ${place.sub}`}
           className={cx(
             "whitespace-nowrap rounded-full border px-2.5 py-1 font-display text-xs font-medium transition-colors duration-150",
             "focus-visible:outline-2 focus-visible:outline-claw-400",

@@ -1,10 +1,10 @@
-/** petAnim — the companion's idle/character animation, as pure math (no three, no
+/** petAnim â€” the companion's idle/character animation, as pure math (no three, no
  *  React, no DOM). Locomotion (locomotion.ts) decides WHERE the pet is; this decides
  *  how its body *lives* there: breath, gaze, blink, ear/tail secondary motion, the
  *  walk's leg cycle, a contact shadow. Each function takes primitives and returns
  *  numbers/tuples, so the renderer (Lumenform3D) is a thin humble object over it and
  *  every behaviour is unit-tested in Node. Frequencies are deliberately mismatched
- *  (breath 1.8, glow 2.2, nod 1.8-on-its-own-phase…) so nothing reads as one pulse. */
+ *  (breath 1.8, glow 2.2, nod 1.8-on-its-own-phaseâ€¦) so nothing reads as one pulse. */
 
 import type { Gesture } from "../world/entities/lumenform/LumenformFSM";
 
@@ -39,7 +39,7 @@ export function headNodY(t: number, working: boolean, gesture: Gesture): number 
 }
 
 /** Heading-relative yaw for the head to look toward (dx,dz), normalized + clamped so
- *  the neck never twists past ±0.55 rad (it would turn the whole body past that). */
+ *  the neck never twists past Â±0.55 rad (it would turn the whole body past that). */
 export function gazeYaw(dx: number, dz: number, headingRad: number): number {
   const worldYaw = Math.atan2(dx, dz);
   const rel = worldYaw - headingRad;
@@ -56,7 +56,7 @@ export function gazePitch(dy: number, dhoriz: number, gesture: Gesture): number 
   return clamp(base, -0.3, 0.2);
 }
 
-/** Tail rotation.x — the body's last part to move; the caller adds a lagged lean. */
+/** Tail rotation.x â€” the body's last part to move; the caller adds a lagged lean. */
 export function tailWag(t: number, moving: boolean, gait: number, gesture: Gesture): number {
   if (gesture === "nap") return 0;
   if (gesture === "celebrate") return Math.sin(t * 12) * 0.38;
@@ -73,19 +73,19 @@ export function legLift(t: number, gait: number, moving: boolean, i: number): nu
   return Math.max(0, Math.sin(t * 7 + phases[i])) * 0.08 * gait;
 }
 
-/** Eyelid target (0 open … 1 closed): closed only inside the short blink window at
+/** Eyelid target (0 open â€¦ 1 closed): closed only inside the short blink window at
  *  the end of each interval. `blinkPhase` is the accumulated time since last blink. */
 export function blinkLidTarget(blinkPhase: number, blinkInterval: number): number {
   const phase = blinkPhase % blinkInterval;
   return phase > blinkInterval - 0.18 ? 1 : 0;
 }
 
-/** Next blink interval (s) — Poisson-ish spacing so blinks never feel metronomic. */
+/** Next blink interval (s) â€” Poisson-ish spacing so blinks never feel metronomic. */
 export function nextBlinkInterval(rand: () => number): number {
   return 3.8 + rand() * 2.6;
 }
 
-/** Ear-flick delta for [left, right] over a 0.15s window — one ear twitches as if it
+/** Ear-flick delta for [left, right] over a 0.15s window â€” one ear twitches as if it
  *  heard something. `side` picks which ear; outside the window both are 0. */
 export function earFlickDelta(t: number, flickStart: number, side: "L" | "R" | "none"): [number, number] {
   const age = t - flickStart;
@@ -94,7 +94,7 @@ export function earFlickDelta(t: number, flickStart: number, side: "L" | "R" | "
   return side === "L" ? [d, 0] : [0, -d];
 }
 
-/** Contact-shadow scale — shrinks as the pet hops (yOff), grounding the bounce. */
+/** Contact-shadow scale â€” shrinks as the pet hops (yOff), grounding the bounce. */
 export function shadowScale(yOff: number, maxYOff = 0.45): number {
   return 0.7 + 0.3 * (1 - Math.min(1, Math.abs(yOff) / maxYOff));
 }

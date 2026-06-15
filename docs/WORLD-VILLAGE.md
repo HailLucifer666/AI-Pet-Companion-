@@ -1,4 +1,4 @@
-# WORLD-VILLAGE.md — Bioluminescent Medieval Village (V-World direction)
+# WORLD-VILLAGE.md â€” Bioluminescent Medieval Village (V-World direction)
 
 > Build-ready specification. Read this cold and implement it. It is self-contained.
 > All file paths are absolute. All coordinates are in world units. `WORLD_SCALE = W = 7`,
@@ -8,11 +8,11 @@
 
 ## 1. Vision & the fused look
 
-A small medieval hamlet IS the world, and the bioluminescent magic is the mood/lighting layer painted over it — not a separate biome. A central cobblestone **plaza with a hearth/bonfire** is the hub; three low-poly buildings (a **tavern**, a **forge/workshop**, a **greenhouse-shrine**) radiate around it, and cobble **roads spoke out** from the plaza to each building, flanked by fences and glow-mushrooms. The companion **rests at the plaza hearth** and **walks the roads building-to-building** to do real work. Medieval CC0 geometry (KayKit, Kenney) is recolored to our dusk tokens — dark indigo stone, near-black roofs, dark timber — while every window, lantern, crystal and mushroom glows in `WORLD.ember` / `WORLD.garden`, the same emissive vocabulary the pet already uses. The screenshot test is "magical dusk hamlet at the edge of night," never "daytime RPG town." This is **additive**: terrain, weather×day/night, bloom, motes, crystals, the diorama camera, pet locomotion, and the Places/surface system all survive unchanged except where this doc explicitly says CHANGED.
+A small medieval hamlet IS the world, and the bioluminescent magic is the mood/lighting layer painted over it â€” not a separate biome. A central cobblestone **plaza with a hearth/bonfire** is the hub; three low-poly buildings (a **tavern**, a **forge/workshop**, a **greenhouse-shrine**) radiate around it, and cobble **roads spoke out** from the plaza to each building, flanked by fences and glow-mushrooms. The companion **rests at the plaza hearth** and **walks the roads building-to-building** to do real work. Medieval CC0 geometry (KayKit, Kenney) is recolored to our dusk tokens â€” dark indigo stone, near-black roofs, dark timber â€” while every window, lantern, crystal and mushroom glows in `WORLD.ember` / `WORLD.garden`, the same emissive vocabulary the pet already uses. The screenshot test is "magical dusk hamlet at the edge of night," never "daytime RPG town." This is **additive**: terrain, weatherÃ—day/night, bloom, motes, crystals, the diorama camera, pet locomotion, and the Places/surface system all survive unchanged except where this doc explicitly says CHANGED.
 
 ---
 
-## 2. Locked decisions (contradictions between facets resolved here — follow THESE)
+## 2. Locked decisions (contradictions between facets resolved here â€” follow THESE)
 
 These resolve real disagreements among the five facet drafts. Where a facet proposed something that breaks an existing test, this doc overrides it. Hard data from sampling `islandHeight()` is cited.
 
@@ -20,40 +20,40 @@ These resolve real disagreements among the five facet drafts. Where a facet prop
 
 2. **The plaza is a separate concept from the surface places.** `PLACES_3D` keeps exactly the three surface buildings. The plaza hub is exported as a separate constant `PLAZA_POS` so adding it never breaks the array-equality test.
 
-3. **Plaza hub location = `(-7, -7)` = `(-1*W, -1*W)`, NOT the origin.** Sampled heights: origin `(0,0)` = **3.295** (rock-band edge — `colorForHeight` switches to rock at y≥3.4, and the hub would sit on a peak); plaza `(-7,-7)` = **2.088** (solid mid-grass). The layout facet's `(-7,-7)` wins over the perf/places facets' `(0,0)`. Pet home anchor beside the hearth = `(-5.8, -6.3)`, height **2.317** — passes the `worldScale.test.ts` ceiling (`0.3 < y < 5`).
+3. **Plaza hub location = `(-7, -7)` = `(-1*W, -1*W)`, NOT the origin.** Sampled heights: origin `(0,0)` = **3.295** (rock-band edge â€” `colorForHeight` switches to rock at yâ‰¥3.4, and the hub would sit on a peak); plaza `(-7,-7)` = **2.088** (solid mid-grass). The layout facet's `(-7,-7)` wins over the perf/places facets' `(0,0)`. Pet home anchor beside the hearth = `(-5.8, -6.3)`, height **2.317** â€” passes the `worldScale.test.ts` ceiling (`0.3 < y < 5`).
 
-4. **The pet's `home` moves to the plaza hearth.** Today `ANCHORS.home` sits beside the Hollow fire at `(-33.8, -16.8)`. It moves to `(-5.8, -6.3)` (plaza). This is the one behavioural change: the companion rests at the plaza and walks out to buildings, then returns — it no longer lives at the tavern.
+4. **The pet's `home` moves to the plaza hearth.** Today `ANCHORS.home` sits beside the Hollow fire at `(-33.8, -16.8)`. It moves to `(-5.8, -6.3)` (plaza). This is the one behavioural change: the companion rests at the plaza and walks out to buildings, then returns â€” it no longer lives at the tavern.
 
-5. **The FSM is NOT re-routed in the first cut.** The places-buildings facet proposed routing `memory-formed` to `place:"garden"`. That **breaks `LumenformFSM.test.ts` line 37–42**, which asserts the pet plants where it stands (`place:"pool"` stays `"pool"`). The FSM stays exactly as-is. Walking to the greenhouse on memory-formed is a deferred V-2.5 item (§11) requiring a coordinated test update — out of scope for the first cut.
+5. **The FSM is NOT re-routed in the first cut.** The places-buildings facet proposed routing `memory-formed` to `place:"garden"`. That **breaks `LumenformFSM.test.ts` line 37â€“42**, which asserts the pet plants where it stands (`place:"pool"` stays `"pool"`). The FSM stays exactly as-is. Walking to the greenhouse on memory-formed is a deferred V-2.5 item (Â§11) requiring a coordinated test update â€” out of scope for the first cut.
 
-6. **Widening the `Place` type is deferred, not done in the first cut.** Several facets widen `Place` to add `"garden"`/`"hollow"`. The first cut does NOT need this: the pet only ever routes to `home`/`workbench`/`pool`/`wander` (FSM unchanged), and the road graph keys its own entry table by string so it tolerates places the union doesn't yet name. Type-widening + `toolCategoryToPlace()` is the V-2.5 "tool→place routing" sprint (§11).
+6. **Widening the `Place` type is deferred, not done in the first cut.** Several facets widen `Place` to add `"garden"`/`"hollow"`. The first cut does NOT need this: the pet only ever routes to `home`/`workbench`/`pool`/`wander` (FSM unchanged), and the road graph keys its own entry table by string so it tolerates places the union doesn't yet name. Type-widening + `toolCategoryToPlace()` is the V-2.5 "toolâ†’place routing" sprint (Â§11).
 
-7. **Buildings are PROCEDURAL low-poly meshes for the first cut, with a GLB swap hook later.** No GLB assets are vendored in the repo yet (`public/models/` has only Quaternius nature). Shipping today means hand-built primitive geometry in the dusk palette — the exact pattern the existing `Places3D` markers already use. KayKit/Kenney GLBs are a later additive swap (§6.6 / §11) touching only the building renderer, never the data model. This keeps `DRACOLoader` / asset-pipeline work off the critical path.
+7. **Buildings are PROCEDURAL low-poly meshes for the first cut, with a GLB swap hook later.** No GLB assets are vendored in the repo yet (`public/models/` has only Quaternius nature). Shipping today means hand-built primitive geometry in the dusk palette â€” the exact pattern the existing `Places3D` markers already use. KayKit/Kenney GLBs are a later additive swap (Â§6.6 / Â§11) touching only the building renderer, never the data model. This keeps `DRACOLoader` / asset-pipeline work off the critical path.
 
 8. **Roads are 3 procedural terrain-following strips**, one draw call each (a `BufferGeometry` of quads sampled on `islandHeight`, vertex-colored cobble), NOT instanced tile GLBs. Fences are instanced later with the GLB swap; first cut uses simple procedural posts or omits them until the GLB pass.
 
 9. **One new renderer file owns it all: `Village3D.tsx`.** Mounted once in `World3D.tsx` between `<Island />` and `<GlowMushrooms3D />`. Road graph + layout data live in pure modules. The diorama camera, weather, bloom, particles, crystals, and pet are untouched.
 
-10. **`Postfx` bloom threshold rises to make the look read.** `luminanceThreshold` `0.72 → 0.90` so only emissive windows/lanterns/mushrooms/crystals bloom, not lit stone. Already a queued ROADMAP V-2.5 quick-win; the single change separating "glowing amber windows in dark stone" from "everything haloed."
+10. **`Postfx` bloom threshold rises to make the look read.** `luminanceThreshold` `0.72 â†’ 0.90` so only emissive windows/lanterns/mushrooms/crystals bloom, not lit stone. Already a queued ROADMAP V-2.5 quick-win; the single change separating "glowing amber windows in dark stone" from "everything haloed."
 
 ---
 
 ## 3. The data model
 
-Two new pure modules (no three, no React → unit-testable in Node), plus tiny derivations in existing files. There is intentionally **no big-bang placeRegistry rewrite in the first cut** — that consolidation is a V-2.5 architecture item (§11). The first cut adds the minimum: a plaza constant, a road graph, and a village layout table that DERIVES from the existing `PLACES_3D` so coordinates are never duplicated.
+Two new pure modules (no three, no React â†’ unit-testable in Node), plus tiny derivations in existing files. There is intentionally **no big-bang placeRegistry rewrite in the first cut** â€” that consolidation is a V-2.5 architecture item (Â§11). The first cut adds the minimum: a plaza constant, a road graph, and a village layout table that DERIVES from the existing `PLACES_3D` so coordinates are never duplicated.
 
-### 3.1 `frontend/src/world3d/placeDefs.ts` — add `PLAZA_POS` only
+### 3.1 `frontend/src/world3d/placeDefs.ts` â€” add `PLAZA_POS` only
 
 `PLACES_3D` is unchanged (test-locked). Add one export:
 
 ```ts
-// ADD to placeDefs.ts — the plaza hub. NOT a surface; not in PLACES_3D.
+// ADD to placeDefs.ts â€” the plaza hub. NOT a surface; not in PLACES_3D.
 export const PLAZA_POS: [number, number, number] = on(-1 * W, -1 * W); // (-7, h=2.088, -7)
 ```
 
 ### 3.2 New module: `frontend/src/world3d/villageLayout.ts` (pure)
 
-Single source of building placements, road specs, and clear radii — all DERIVED from `PLACES_3D` + `PLAZA_POS`, so no coordinate is written twice.
+Single source of building placements, road specs, and clear radii â€” all DERIVED from `PLACES_3D` + `PLAZA_POS`, so no coordinate is written twice.
 
 ```ts
 import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeDefs";
@@ -68,7 +68,7 @@ export interface BuildingDef {
   id: string;            // matches PLACES_3D id ("hollow" | "garden" | "workbench")
   kind: BuildingKind;
   pos: [number, number, number];
-  rotationY: number;     // radians — building faces the plaza
+  rotationY: number;     // radians â€” building faces the plaza
 }
 export interface RoadSpec {
   id: string;
@@ -94,18 +94,18 @@ export const PLAZA_CLEAR_R = 5.5;
 
 ### 3.3 New module: `frontend/src/world3d/roadGraph.ts` (pure)
 
-Waypoint graph for pet pathing + a procedural road-strip geometry builder. Spoke tree: plaza → junction → entrance per building. Undirected; BFS finds the unique shortest sequence. Adding cross-road edges later needs zero path-follower changes.
+Waypoint graph for pet pathing + a procedural road-strip geometry builder. Spoke tree: plaza â†’ junction â†’ entrance per building. Undirected; BFS finds the unique shortest sequence. Adding cross-road edges later needs zero path-follower changes.
 
-**Node coordinates (verified; road samples stay in the 1.15–3.52 grass band — no water, no rock peak):**
+**Node coordinates (verified; road samples stay in the 1.15â€“3.52 grass band â€” no water, no rock peak):**
 
 | NodeId | x | z | derivation |
 |---|---|---|---|
 | `plaza` | -7 | -7 | `PLAZA_POS` xz |
-| `hollow_jct` | -21 | -12.25 | midpoint plaza→hollow |
+| `hollow_jct` | -21 | -12.25 | midpoint plazaâ†’hollow |
 | `hollow_entrance` | -33.8 | -16.8 | hollow anchor |
-| `workbench_jct` | -17.5 | 9.8 | midpoint plaza→workbench |
+| `workbench_jct` | -17.5 | 9.8 | midpoint plazaâ†’workbench |
 | `workbench_entrance` | -27.2 | 25.8 | workbench anchor |
-| `garden_jct` | 12.25 | -15.05 | midpoint plaza→garden |
+| `garden_jct` | 12.25 | -15.05 | midpoint plazaâ†’garden |
 | `garden_entrance` | 30.4 | -22.5 | garden anchor |
 
 ```ts
@@ -156,7 +156,7 @@ export function bfsPath(start: NodeId, goal: NodeId): NodeId[] {
   return [];
 }
 
-/** FSM Place string → graph "front door" node. Keyed by string so it tolerates
+/** FSM Place string â†’ graph "front door" node. Keyed by string so it tolerates
  *  Place values the union does not yet name (garden/hollow land here in V-2.5). */
 export const PLACE_ENTRY: Readonly<Record<string, NodeId>> = {
   home: "plaza", workbench: "workbench_entrance", pool: "plaza",
@@ -200,24 +200,24 @@ export function buildRoadGeometry(road: RoadSpec): RoadGeometryData {
 
 ---
 
-## 4. Place → building mapping
+## 4. Place â†’ building mapping
 
 | Surface (place id) | Label / route | Building kind | Center (x, z) | Verified h | Pet anchor (x, z) | Anchor h |
 |---|---|---|---|---|---|---|
 | `hollow` | The Hollow `/chat` | **tavern/inn** (fireplace) | (-35, -17.5) | 1.146 | (-33.8, -16.8) | 1.272 |
 | `workbench` | The Workbench `/notes` | **forge/workshop** | (-28, 26.6) | 1.326 | (-27.2, 25.8) | 1.753 |
 | `garden` | Memory Garden `/memory` | **greenhouse/shrine** | (31.5, -23.1) | 1.528 | (30.4, -22.5) | 1.441 |
-| — (`PLAZA_POS`) | hub, pet home | **hearth/bonfire + well** | (-7, -7) | 2.088 | home (-5.8, -6.3) | 2.317 |
-| `pool` (existing) | wander only | — | (38.5, 24.5) | 1.346 | (37.4, 23.9) | — |
+| â€” (`PLAZA_POS`) | hub, pet home | **hearth/bonfire + well** | (-7, -7) | 2.088 | home (-5.8, -6.3) | 2.317 |
+| `pool` (existing) | wander only | â€” | (38.5, 24.5) | 1.346 | (37.4, 23.9) | â€” |
 
-All centers/anchors match the existing `placeDefs`/`ANCHORS` positions **except `home`**, which relocates to the plaza (§2.4). The procedural building wraps each existing marker (marker fire/bench geometry becomes diegetic detail inside/beside the building).
+All centers/anchors match the existing `placeDefs`/`ANCHORS` positions **except `home`**, which relocates to the plaza (Â§2.4). The procedural building wraps each existing marker (marker fire/bench geometry becomes diegetic detail inside/beside the building).
 
 **Building geometry intent (procedural, dusk-recolored):**
 - **Tavern**: timber box body, peaked two-panel roof, stone chimney, two ember windows + hanging door lantern, fireplace glow (reuses the Hollow fire marker).
 - **Forge/workshop**: stockier stone base + timber upper, prominent forge chimney whose ember top flares when `lumen.mode === "work"`, a cyan (`WORLD.botEye`) work window, an exterior anvil.
 - **Greenhouse/shrine**: 6-sided translucent `WORLD.garden` glass prism on a stone ring, peaked translucent cap, interior ember-crystal cluster, arched entrance, ring of glow-mushrooms.
 
-`Html` label Y rises from `~1.15` to `~3.4` (buildings ~2.5–3 units tall). Keyboard/`aria-label` contract unchanged (real focusable `<button>`, `onFocus/onBlur` mirror hover, `onClick → open(place.route)`).
+`Html` label Y rises from `~1.15` to `~3.4` (buildings ~2.5â€“3 units tall). Keyboard/`aria-label` contract unchanged (real focusable `<button>`, `onFocus/onBlur` mirror hover, `onClick â†’ open(place.route)`).
 
 ---
 
@@ -231,7 +231,7 @@ Only `home` moves; `Place` union stays as-is (no widening in the first cut).
 
 ```ts
 const ANCHORS: Record<Exclude<Place, "wander">, Vec2> = {
-  home:      { x: -5.8, z: -6.3 },                                      // CHANGED → plaza hearth
+  home:      { x: -5.8, z: -6.3 },                                      // CHANGED â†’ plaza hearth
   workbench: { x: -4 * WORLD_SCALE + 0.8, z: 3.8 * WORLD_SCALE - 0.8 }, // unchanged
   pool:      { x: 5.5 * WORLD_SCALE - 1.1, z: 3.5 * WORLD_SCALE - 0.6 },// unchanged
 };
@@ -244,7 +244,7 @@ const ANCHORS: Record<Exclude<Place, "wander">, Vec2> = {
 ```ts
 import { bfsPath, NODES, PLACE_ENTRY, nearestNode } from "./roadGraph";
 
-const NODE_ARRIVE = 2.8; // switch waypoints this close — rounds corners, no dead stop
+const NODE_ARRIVE = 2.8; // switch waypoints this close â€” rounds corners, no dead stop
 
 export class PathFollower {
   private waypoints: Vec2[] = [];
@@ -302,15 +302,15 @@ if (lured) {
 }
 // ... existing: const want = arrive(pos.current, target, WALK_SPEED); integrate as before
 ```
-Facing/lean (`Math.atan2(vel.vx, vel.vz)`) is unchanged — it tracks the current segment and curves the lean organically. **Reduced-motion path is unchanged** (snaps to `placeTarget()`, never touches the graph).
+Facing/lean (`Math.atan2(vel.vx, vel.vz)`) is unchanged â€” it tracks the current segment and curves the lean organically. **Reduced-motion path is unchanged** (snaps to `placeTarget()`, never touches the graph).
 
 ### 5.4 Fallbacks
 
 | Condition | Behaviour |
 |---|---|
-| `bfsPath` returns `[]` (shouldn't on a connected tree) | `planTo` → false → direct `placeTarget()`. No crash. |
+| `bfsPath` returns `[]` (shouldn't on a connected tree) | `planTo` â†’ false â†’ direct `placeTarget()`. No crash. |
 | Pet off-road after a wander seed | `nearestNode` joins the closest node, then follows the road. |
-| `place === "pool"` → entry `"plaza"` | Walks to plaza, then `placeTarget("pool")` resolves the pool anchor directly. |
+| `place === "pool"` â†’ entry `"plaza"` | Walks to plaza, then `placeTarget("pool")` resolves the pool anchor directly. |
 | `place === "wander"` | Bypasses the road graph (existing wander). |
 | Reduced-motion | Road graph bypassed; existing snap. |
 
@@ -320,10 +320,10 @@ Facing/lean (`Math.atan2(vel.vx, vel.vz)`) is unchanged — it tracks the curren
 
 ## 6. Assets & the bioluminescent recolor/lighting recipe
 
-### 6.1 First cut — procedural, no GLBs
+### 6.1 First cut â€” procedural, no GLBs
 Buildings, plaza, hearth, roads are procedural meshes in `Village3D.tsx` using only palette tokens. No texture loads, no `useGLTF`, no Draco. Ships today.
 
-### 6.2 Palette additions — `frontend/src/world3d/palette.ts` (ADD only)
+### 6.2 Palette additions â€” `frontend/src/world3d/palette.ts` (ADD only)
 ```ts
 export const VILLAGE = {
   stoneDark:   0x2a2730, stoneHi: 0x3a3545, timberDark: 0x2e2016,
@@ -336,44 +336,44 @@ export const VILLAGE = {
 
 | Element | color | emissive | base intensity | flatShading | notes |
 |---|---|---|---|---|---|
-| Tavern/forge windows | `WORLD.ember` | `WORLD.ember` | 1.1 (×glowBoost) | false | hover → ~2.2 |
-| Forge work window | `WORLD.botEye` | `WORLD.botEye` | 0.8 (×glowBoost) | false | brightens on `work` |
-| Door / hanging lanterns | `WORLD.emberHi` | `WORLD.emberHi` | 1.8 (×glowBoost) | false | bloom carriers |
-| Greenhouse glass + crystals | `WORLD.garden` | `WORLD.garden` | 0.45–1.2 (×glowBoost) | false | `DoubleSide`, transparent |
+| Tavern/forge windows | `WORLD.ember` | `WORLD.ember` | 1.1 (Ã—glowBoost) | false | hover â†’ ~2.2 |
+| Forge work window | `WORLD.botEye` | `WORLD.botEye` | 0.8 (Ã—glowBoost) | false | brightens on `work` |
+| Door / hanging lanterns | `WORLD.emberHi` | `WORLD.emberHi` | 1.8 (Ã—glowBoost) | false | bloom carriers |
+| Greenhouse glass + crystals | `WORLD.garden` | `WORLD.garden` | 0.45â€“1.2 (Ã—glowBoost) | false | `DoubleSide`, transparent |
 | Iron/trim seams | `WORLD.ember` | `WORLD.ember` | 0.3 | true | low-key warm rim |
 | Stone-wall seam (opt.) | `VILLAGE.stoneDark` | `WORLD.rim` | 0.05 | true | barely-there cool seam |
-| Roof | `VILLAGE.roofDark` | — | 0 | true | silhouette vs indigo fog |
-| Timber | `VILLAGE.timberDark` | — | 0 | true | — |
-| Plaza disc / roads | `VILLAGE.plazaCobble` / `roadCobble` | — | 0 | true | `receiveShadow`, no cast |
+| Roof | `VILLAGE.roofDark` | â€” | 0 | true | silhouette vs indigo fog |
+| Timber | `VILLAGE.timberDark` | â€” | 0 | true | â€” |
+| Plaza disc / roads | `VILLAGE.plazaCobble` / `roadCobble` | â€” | 0 | true | `receiveShadow`, no cast |
 
-All emissive intensities are animated each frame by the **existing** `glowBoost(sky.dayness)` (`daylight.ts`) — same mechanism as `GlowMushrooms3D`/`Crystals3D`/`SporeGate3D`. Store base in `material.userData.emissiveBase`; one `useFrame` in `Village3D.tsx` multiplies by `glowBoost` (plus optional lantern flicker `0.88 + 0.12*sin(t*1.4+i)` when `!reduced`). Zero per-frame allocation.
+All emissive intensities are animated each frame by the **existing** `glowBoost(sky.dayness)` (`daylight.ts`) â€” same mechanism as `GlowMushrooms3D`/`Crystals3D`/`SporeGate3D`. Store base in `material.userData.emissiveBase`; one `useFrame` in `Village3D.tsx` multiplies by `glowBoost` (plus optional lantern flicker `0.88 + 0.12*sin(t*1.4+i)` when `!reduced`). Zero per-frame allocation.
 
 ### 6.4 Per-building point lights (budget-capped)
 
 | Light | color | base intensity | distance | decay |
 |---|---|---|---|---|
 | Tavern | `WORLD.ember` | 2.8 | 7 | 2 |
-| Forge | `WORLD.ember` | 2.2 (→~5 on `work`) | 6 | 2 |
+| Forge | `WORLD.ember` | 2.2 (â†’~5 on `work`) | 6 | 2 |
 | Greenhouse | `WORLD.garden` | 1.8 | 5 | 2 |
-| Plaza hearth | `WORLD.ember` | 5 (→9 when `lumen.place==="home"`) + flicker | 12 | 2 |
+| Plaza hearth | `WORLD.ember` | 5 (â†’9 when `lumen.place==="home"`) + flicker | 12 | 2 |
 
 ### 6.5 `Atmosphere` is UNCHANGED
-Existing warm key / cool rim / indigo hemisphere / cool ambient rig already produces dusk. At hour ≈ 18.5 (`dayness ≈ 0.45`) stone reads dark indigo, roofs silhouette, windows glow amber. Existing fog dissolves the island edge with buildings (radius ~35) inside the envelope.
+Existing warm key / cool rim / indigo hemisphere / cool ambient rig already produces dusk. At hour â‰ˆ 18.5 (`dayness â‰ˆ 0.45`) stone reads dark indigo, roofs silhouette, windows glow amber. Existing fog dissolves the island edge with buildings (radius ~35) inside the envelope.
 
-### 6.6 Later GLB swap (additive, §11)
-When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road tiles) GLBs are vendored to `public/models/village/`, only the building sub-components in `Village3D.tsx` change: `useGLTF` + `scene.clone(true)` + per-mesh material override (`classifyMesh` by KayKit's consistent mesh names → the §6.3 role table). Fences become instanced via `nature/InstancedModel.tsx`. `villageLayout.ts`, `roadGraph.ts`, the data model, and locomotion are untouched. Defer Draco to the unified V-3 sweep.
+### 6.6 Later GLB swap (additive, Â§11)
+When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road tiles) GLBs are vendored to `public/models/village/`, only the building sub-components in `Village3D.tsx` change: `useGLTF` + `scene.clone(true)` + per-mesh material override (`classifyMesh` by KayKit's consistent mesh names â†’ the Â§6.3 role table). Fences become instanced via `nature/InstancedModel.tsx`. `villageLayout.ts`, `roadGraph.ts`, the data model, and locomotion are untouched. Defer Draco to the unified V-3 sweep.
 
 ---
 
 ## 7. Performance & low-end rules
 
-- **Draw-call budget**: roads 3, plaza disc 1, hearth ~5, three buildings ~9, optional first-cut fences ≤4, procedural lanterns ≤3 → **≈22–25** added on top of ~200–250. Within budget.
-- **Point lights**: +4 always-on (3 buildings + plaza), forge +1 conditional. Mirrors existing discipline (mushroom `LIT=3`). If FPS dips on low tier, drop building point lights — emissive materials read without cast lighting.
+- **Draw-call budget**: roads 3, plaza disc 1, hearth ~5, three buildings ~9, optional first-cut fences â‰¤4, procedural lanterns â‰¤3 â†’ **â‰ˆ22â€“25** added on top of ~200â€“250. Within budget.
+- **Point lights**: +4 always-on (3 buildings + plaza), forge +1 conditional. Mirrors existing discipline (mushroom `LIT=3`). If FPS dips on low tier, drop building point lights â€” emissive materials read without cast lighting.
 - **No new textures, no GLBs, no Draco in the first cut.** Zero texture uploads.
 - **Static geometry, demand-friendly**: only the single glow-sweep `useFrame`. Under `frameloop="demand"` it renders correctly. No reduced-motion special-casing (flicker gates on `!reduced`).
 - **Shadows**: buildings cast+receive; roads/plaza disc no cast; transparent greenhouse glass never casts/receives. Directional frustum unchanged.
-- **Source-size delta**: ~2–4 kB gz; world chunk ≤ 350 kB gz.
-- **GPU-tier hook (V-2.5)**: gate building lights with `{tier !== 'low' && <pointLight .../>}` — one-liner, accommodated.
+- **Source-size delta**: ~2â€“4 kB gz; world chunk â‰¤ 350 kB gz.
+- **GPU-tier hook (V-2.5)**: gate building lights with `{tier !== 'low' && <pointLight .../>}` â€” one-liner, accommodated.
 
 ---
 
@@ -382,7 +382,7 @@ When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road
 ### ADDED
 | File | Purpose |
 |---|---|
-| `frontend/src/world3d/villageLayout.ts` | Pure: `BUILDING_DEFS`, `VILLAGE_ROADS`, clear radii — DERIVED from `PLACES_3D` + `PLAZA_POS`. |
+| `frontend/src/world3d/villageLayout.ts` | Pure: `BUILDING_DEFS`, `VILLAGE_ROADS`, clear radii â€” DERIVED from `PLACES_3D` + `PLAZA_POS`. |
 | `frontend/src/world3d/roadGraph.ts` | Pure: `NODES`, edges, `bfsPath`, `nearestNode`, `PLACE_ENTRY`, `buildRoadGeometry`. |
 | `frontend/src/world3d/Village3D.tsx` | Renderer: plaza disc + hearth, 3 road strips, 3 procedural buildings, lanterns, one glow `useFrame`. |
 | `frontend/src/world3d/villageLayout.test.ts` | Vitest: buildings/anchors on land & within radius; road samples on land; node ids unique; `bfsPath` correctness; `PathFollower` advance. |
@@ -392,37 +392,37 @@ When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road
 |---|---|---|
 | `placeDefs.ts` | ADD `export const PLAZA_POS = on(-1*W,-1*W)`. | `PLACES_3D` + its test. |
 | `palette.ts` | ADD `VILLAGE` token block. | All `WORLD` tokens. |
-| `locomotion.ts` | `ANCHORS.home → {x:-5.8,z:-6.3}`; append `PathFollower` (+ roadGraph import). | `arrive`, `placeTarget`, speeds, `Place` union, other anchors. |
+| `locomotion.ts` | `ANCHORS.home â†’ {x:-5.8,z:-6.3}`; append `PathFollower` (+ roadGraph import). | `arrive`, `placeTarget`, speeds, `Place` union, other anchors. |
 | `Lumenform3D.tsx` | Add 2 refs; swap single-target line for path-aware resolution (~12 lines). | All hover/glow/face/shadow/gesture/integration. |
-| `Island.tsx` | Add plaza clear zone `{x:-7,z:-7,r:5.5}`; bump 3 building `CLEAR_ZONES` `2.4 → 4.0`. | Terrain mesh, sea, pool, scatter, MEADOW_R. |
-| `Postfx.tsx` | `luminanceThreshold 0.72 → 0.90`. | Everything else. |
+| `Island.tsx` | Add plaza clear zone `{x:-7,z:-7,r:5.5}`; bump 3 building `CLEAR_ZONES` `2.4 â†’ 4.0`. | Terrain mesh, sea, pool, scatter, MEADOW_R. |
+| `Postfx.tsx` | `luminanceThreshold 0.72 â†’ 0.90`. | Everything else. |
 | `World3D.tsx` | Import + mount `<Village3D reduced={reduced} />` between `<Island/>` and `<GlowMushrooms3D/>`. | Camera rig, OrbitControls, other children, Canvas gl. |
 
 ### UNCHANGED (verified read-only)
 `terrain.ts`, `Atmosphere.tsx`, `useWeather.ts`, `weather.ts`, `daylight.ts`, `celestial.ts`, `Clouds3D.tsx`, `Rain3D.tsx`, `Sky3D.tsx`, `Particles3D.tsx` + `particles/flow.ts`, `Crystals3D.tsx` + `crystalPlacement.ts`, `GlowMushrooms3D.tsx`, `SporeGate3D.tsx`, `Pulses3D.tsx`, `Places3D.tsx`*, `petPosition.ts`, `petAnim.ts`, `nature/InstancedModel.tsx`, `nature/models.ts`, `state/worldStore.ts`, `state/worldNavStore.ts`, `world/places.ts`, `world/entities/lumenform/LumenformFSM.ts`, all existing tests.
 
-*`Places3D.tsx`: first cut leaves markers as the clickable hitboxes; buildings in `Village3D` are decorative around them. Replacing markers with interactive buildings is a later pass (§11), not required to ship.
+*`Places3D.tsx`: first cut leaves markers as the clickable hitboxes; buildings in `Village3D` are decorative around them. Replacing markers with interactive buildings is a later pass (Â§11), not required to ship.
 
 ### First-cut build order (tests green at every step)
-1. **Pure modules, no render**: add `PLAZA_POS`; create `villageLayout.ts`, `roadGraph.ts`, `villageLayout.test.ts`. Run vitest (`placeDefs`, `worldScale`, new suite) → green.
-2. **Palette + locomotion**: add `VILLAGE` tokens; change `ANCHORS.home`; append `PathFollower`. Run `locomotion`, `worldScale` → green.
+1. **Pure modules, no render**: add `PLAZA_POS`; create `villageLayout.ts`, `roadGraph.ts`, `villageLayout.test.ts`. Run vitest (`placeDefs`, `worldScale`, new suite) â†’ green.
+2. **Palette + locomotion**: add `VILLAGE` tokens; change `ANCHORS.home`; append `PathFollower`. Run `locomotion`, `worldScale` â†’ green.
 3. **Lumenform3D wire-in**: 2 refs + path-aware target. Build check.
 4. **Island clear zones** + **Postfx threshold**. Build check.
 5. **Village3D.tsx**: plaza disc + hearth, roads, buildings, lanterns, glow `useFrame`.
 6. **World3D.tsx**: mount `<Village3D/>`.
-7. **Visual QA** (§10).
+7. **Visual QA** (Â§10).
 
 ---
 
 ## 9. What must NOT break
-- The eased diorama camera (`CameraRig`) — zero edits to camera code.
+- The eased diorama camera (`CameraRig`) â€” zero edits to camera code.
 - Terrain (`islandHeight`, `WORLD_SCALE`, `ISLAND_MAX_R`) and the terrain mesh.
-- Weather × day/night, bloom, motes, glow.
+- Weather Ã— day/night, bloom, motes, glow.
 - Memory crystals (`Crystals3D`) and placement.
 - Pet locomotion math (`arrive`, `placeTarget`, speeds) + `petPosition` singleton.
-- `Places3D` keyboard parity (focusable buttons, `aria-label`, `onClick → open(route)`).
-- `worldStore` SSE→FSM pipeline and `LumenformFSM` (unchanged → tests green).
-- All 25 existing vitest suites — specifically `placeDefs.test.ts` (array equality), `worldScale.test.ts` (`home`/`workbench`/`pool` on land), `locomotion.test.ts`, `LumenformFSM.test.ts` (`memory-formed` plants in place).
+- `Places3D` keyboard parity (focusable buttons, `aria-label`, `onClick â†’ open(route)`).
+- `worldStore` SSEâ†’FSM pipeline and `LumenformFSM` (unchanged â†’ tests green).
+- All 25 existing vitest suites â€” specifically `placeDefs.test.ts` (array equality), `worldScale.test.ts` (`home`/`workbench`/`pool` on land), `locomotion.test.ts`, `LumenformFSM.test.ts` (`memory-formed` plants in place).
 - Low-end target: instancing discipline, `dpr` cap `[1,1.75]`, `antialias:false`, 60 fps.
 
 ---
@@ -430,10 +430,10 @@ When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road
 ## 10. Verification checklist
 
 **Functional**
-- [ ] `npm run build` — no TS errors.
-- [ ] `npm run test` — all 25 suites green; new `villageLayout.test.ts` green.
+- [ ] `npm run build` â€” no TS errors.
+- [ ] `npm run test` â€” all 25 suites green; new `villageLayout.test.ts` green.
 - [ ] `placeDefs.test.ts` still asserts exactly `["garden","hollow","workbench"]` (PLAZA_POS separate).
-- [ ] `worldScale.test.ts` — `home (-5.8,-6.3)` passes `0.3 < y < 5` (sampled 2.317).
+- [ ] `worldScale.test.ts` â€” `home (-5.8,-6.3)` passes `0.3 < y < 5` (sampled 2.317).
 - [ ] Pet rests at plaza, walks the road to the Workbench on `tool-start`, returns to plaza on `done`.
 - [ ] Pet curves through junctions (no dead-stop); lean organic.
 - [ ] Cursor lure still overrides road travel.
@@ -445,41 +445,41 @@ When KayKit (`Tavern/Forge/Greenhouse/Fence_Wood/Well/Lantern`) and Kenney (road
 - [ ] Windows amber, blooming slightly; lanterns warm ember along dark cobble roads.
 - [ ] Greenhouse glass + interior crystals glow `WORLD.garden`.
 - [ ] Mushrooms (cyan/violet) + crystals read as the same bioluminescent layer.
-- [ ] Overall: warm amber (windows/lanterns/pet) vs cool dark (stone/sky/fog) + cyan/violet — "magical dusk hamlet," not daytime RPG.
+- [ ] Overall: warm amber (windows/lanterns/pet) vs cool dark (stone/sky/fog) + cyan/violet â€” "magical dusk hamlet," not daytime RPG.
 
 **Performance**
 - [ ] 60 fps on Intel UHD 620-class.
-- [ ] New draw calls ≈ 22–25; new always-on point lights ≤ 4 (+1 conditional).
+- [ ] New draw calls â‰ˆ 22â€“25; new always-on point lights â‰¤ 4 (+1 conditional).
 - [ ] No texture uploads; no GLB loads in the first cut.
-- [ ] World chunk ≤ 350 kB gz.
+- [ ] World chunk â‰¤ 350 kB gz.
 
 ---
 
 ## 11. Sequencing with V-2 / V-3 / V-2.5
 - **V-2 (pet)**: independent. Locomotion change is additive (`PathFollower`); pet pose/anim untouched.
-- **V-3 (props pass)**: the GLB swap (§6.6) lives here — vendor KayKit/Kenney GLBs + the unified Draco/LOD sweep (covers nature AND village together). Only `Village3D.tsx` building sub-components change; data model frozen. New `villageModels.ts` mirrors `nature/models.ts` (zero collision).
+- **V-3 (props pass)**: the GLB swap (Â§6.6) lives here â€” vendor KayKit/Kenney GLBs + the unified Draco/LOD sweep (covers nature AND village together). Only `Village3D.tsx` building sub-components change; data model frozen. New `villageModels.ts` mirrors `nature/models.ts` (zero collision).
 - **V-2.5 (hardening)** dovetails and is DEFERRED from the first cut:
-  - **placeRegistry consolidation**: `villageLayout.ts` switches to import from the registry instead of `placeDefs.ts` — one-line change. First cut derives from `PLACES_3D` so it ships without waiting.
-  - **Tool→place routing**: widen `Place` (+`garden`/`hollow`), add `toolCategoryToPlace()`, route `memory-formed → place:"garden"` and update `LumenformFSM.test.ts`. `PLACE_ENTRY` already has those keys → no roadGraph change.
-  - **GPU-tier ladder**: gate building lights + bloom by tier (one-liners, §7).
+  - **placeRegistry consolidation**: `villageLayout.ts` switches to import from the registry instead of `placeDefs.ts` â€” one-line change. First cut derives from `PLACES_3D` so it ships without waiting.
+  - **Toolâ†’place routing**: widen `Place` (+`garden`/`hollow`), add `toolCategoryToPlace()`, route `memory-formed â†’ place:"garden"` and update `LumenformFSM.test.ts`. `PLACE_ENTRY` already has those keys â†’ no roadGraph change.
+  - **GPU-tier ladder**: gate building lights + bloom by tier (one-liners, Â§7).
   - **petAnim wiring / audio**: orthogonal.
 
 ---
 
 ### Critical files for implementation
-- `D:\NeuraClaw v1\frontend\src\world3d\Village3D.tsx` (new)
-- `D:\NeuraClaw v1\frontend\src\world3d\villageLayout.ts` (new)
-- `D:\NeuraClaw v1\frontend\src\world3d\roadGraph.ts` (new)
-- `D:\NeuraClaw v1\frontend\src\world3d\placeDefs.ts` (add `PLAZA_POS`)
-- `D:\NeuraClaw v1\frontend\src\world3d\locomotion.ts` (`ANCHORS.home` + `PathFollower`)
-- `D:\NeuraClaw v1\frontend\src\world3d\Lumenform3D.tsx` (path-follower wire-in)
-- `D:\NeuraClaw v1\frontend\src\world3d\Island.tsx` (clear zones)
-- `D:\NeuraClaw v1\frontend\src\world3d\Postfx.tsx` (bloom threshold)
-- `D:\NeuraClaw v1\frontend\src\world3d\palette.ts` (`VILLAGE` tokens)
-- `D:\NeuraClaw v1\frontend\src\world3d\World3D.tsx` (mount)
+- `D:\AI Pet Companion v1\frontend\src\world3d\Village3D.tsx` (new)
+- `D:\AI Pet Companion v1\frontend\src\world3d\villageLayout.ts` (new)
+- `D:\AI Pet Companion v1\frontend\src\world3d\roadGraph.ts` (new)
+- `D:\AI Pet Companion v1\frontend\src\world3d\placeDefs.ts` (add `PLAZA_POS`)
+- `D:\AI Pet Companion v1\frontend\src\world3d\locomotion.ts` (`ANCHORS.home` + `PathFollower`)
+- `D:\AI Pet Companion v1\frontend\src\world3d\Lumenform3D.tsx` (path-follower wire-in)
+- `D:\AI Pet Companion v1\frontend\src\world3d\Island.tsx` (clear zones)
+- `D:\AI Pet Companion v1\frontend\src\world3d\Postfx.tsx` (bloom threshold)
+- `D:\AI Pet Companion v1\frontend\src\world3d\palette.ts` (`VILLAGE` tokens)
+- `D:\AI Pet Companion v1\frontend\src\world3d\World3D.tsx` (mount)
 
 ---
 
-**Note on plan-mode constraint:** I could not write to `D:\NeuraClaw v1\docs\WORLD-VILLAGE.md` directly (plan mode permits writing only to the plan file). The full doc body above is also saved at `C:\Users\Arghya Chowdhury\.claude\plans\i-am-looking-to-virtual-manatee-agent-a234ae30454119b5f.md`. When you approve, the implementing agent should save this content to `D:\NeuraClaw v1\docs\WORLD-VILLAGE.md`.
+**Note on plan-mode constraint:** I could not write to `D:\AI Pet Companion v1\docs\WORLD-VILLAGE.md` directly (plan mode permits writing only to the plan file). The full doc body above is also saved at `C:\Users\Arghya Chowdhury\.claude\plans\i-am-looking-to-virtual-manatee-agent-a234ae30454119b5f.md`. When you approve, the implementing agent should save this content to `D:\AI Pet Companion v1\docs\WORLD-VILLAGE.md`.
 
 **Material contradictions I resolved** (do not re-litigate): plaza at `(-7,-7)` not origin (origin h=3.295 is on the rock band); place ids NOT renamed (breaks `placeDefs.test.ts`); FSM `memory-formed` NOT rerouted in first cut (breaks `LumenformFSM.test.ts`); `Place`-type widening + placeRegistry consolidation deferred to V-2.5; buildings procedural first, GLB swap later.

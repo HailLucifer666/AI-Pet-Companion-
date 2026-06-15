@@ -1,7 +1,7 @@
-/** nature/models — the curated low-poly GLB set (Quaternius "Ultimate Stylized
+/** nature/models â€” the curated low-poly GLB set (Quaternius "Ultimate Stylized
  *  Nature", CC0) used for the island scatter. Files live in public/models/nature/*.glb.
  *  Trees/rocks/bushes round-robin across their list (any length) in Island.tsx, so
- *  growing a list here is enough to add variety — no scatter-logic change. */
+ *  growing a list here is enough to add variety â€” no scatter-logic change. */
 
 export const NATURE_TREES = [
   "BirchTree_1",

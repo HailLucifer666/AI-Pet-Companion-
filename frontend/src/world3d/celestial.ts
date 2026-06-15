@@ -1,20 +1,20 @@
-/** celestial — where the sun/moon disc sits and how the two crossfade, as pure
+/** celestial â€” where the sun/moon disc sits and how the two crossfade, as pure
  *  math (no three, no GPU). The visible body keeps the day/night light's true
  *  compass AZIMUTH (`sunDir` from daylight.ts) but its elevation is capped low so it
- *  rides near the horizon — otherwise it sits overhead and the down-looking explore
- *  camera never frames it. Placed at a fixed sky distance → shows where the dominant
+ *  rides near the horizon â€” otherwise it sits overhead and the down-looking explore
+ *  camera never frames it. Placed at a fixed sky distance â†’ shows where the dominant
  *  light comes from (sun's arc by day, moon's by night). Sun fades in / moon fades
- *  out with `dayness`, crossing at twilight. Pure → unit-tested; Sky3D adds the
+ *  out with `dayness`, crossing at twilight. Pure â†’ unit-tested; Sky3D adds the
  *  camera position so the body reads as infinitely far. */
 
 export const SKY_DIST = 200; // camera-relative distance to the celestial body
-const MAX_ELEV = 0.5; // radians (~29°) — cap height so the body sits in the forward view, not overhead
+const MAX_ELEV = 0.5; // radians (~29Â°) â€” cap height so the body sits in the forward view, not overhead
 
 export interface Celestial {
-  /** Offset from the camera to the body (direction × SKY_DIST). */
+  /** Offset from the camera to the body (direction Ã— SKY_DIST). */
   offset: [number, number, number];
   sunOpacity: number; // 1 by day, 0 at night
-  moonOpacity: number; // the inverse — they crossfade at twilight
+  moonOpacity: number; // the inverse â€” they crossfade at twilight
 }
 
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -39,7 +39,7 @@ export function celestialPlacement(
     Math.sin(elev) * dist,
     (z / horiz) * cosE * dist,
   ];
-  // Crossfade in the deep-twilight band (dayness 0.2 → 0.4): full sun by ~dawn/dusk,
+  // Crossfade in the deep-twilight band (dayness 0.2 â†’ 0.4): full sun by ~dawn/dusk,
   // full moon only in the genuine dark.
   const sunOpacity = smoothstep(0.2, 0.4, dayness);
   return { offset, sunOpacity, moonOpacity: 1 - sunOpacity };

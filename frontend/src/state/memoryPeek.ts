@@ -1,4 +1,4 @@
-/** memoryPeek — which memory crystal (if any) is open for reading. A click on a
+/** memoryPeek â€” which memory crystal (if any) is open for reading. A click on a
  *  crystal in the Den (Crystals3D, inside the canvas) calls `open(memoryId)`; the
  *  DenView's MemoryPeek panel (DOM, outside the canvas) reads it and shows the REAL
  *  memory text. Mirrors worldNavStore's door pattern so in-canvas clicks reach React

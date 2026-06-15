@@ -1,10 +1,10 @@
-/** Postfx — the Grove's post-processing. A single selective bloom pass: only the
+/** Postfx â€” the Grove's post-processing. A single selective bloom pass: only the
  *  bright/emissive things (the companion's ember body + its light, memory crystals,
  *  place embers) blossom into glow, the matte terrain does not. This is the one
- *  effect that reads as "premium" — restrained, not a haze.
+ *  effect that reads as "premium" â€” restrained, not a haze.
  *
  *  Gated by the caller: reduced-motion AND the low GPU tier render the scene
- *  straight (no composer) — bloom is the first thing to drop on weak hardware. The
+ *  straight (no composer) â€” bloom is the first thing to drop on weak hardware. The
  *  MSAA sample count rides the same quality ladder. */
 
 import { EffectComposer, Bloom, Vignette, HueSaturation } from "@react-three/postprocessing";

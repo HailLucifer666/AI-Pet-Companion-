@@ -1,4 +1,4 @@
-/** petPosition — the companion's live world position, written by Lumenform3D
+/** petPosition â€” the companion's live world position, written by Lumenform3D
  *  every frame and read by the follow-camera. A plain mutable singleton, kept
  *  deliberately outside React/zustand: per-frame writes must never trigger a
  *  re-render. Both readers live inside the same Canvas, so this is module-local

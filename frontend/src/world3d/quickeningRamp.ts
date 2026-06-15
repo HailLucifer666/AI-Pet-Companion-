@@ -1,8 +1,8 @@
-/** quickeningRamp — the dark→dawn light schedule for the Quickening (the in-world
+/** quickeningRamp â€” the darkâ†’dawn light schedule for the Quickening (the in-world
  *  first-run hatch). Pure math: maps the ritual's progress to a fractional hour the
  *  day/night palette (daylightAt) accepts, so the world holds deep night while the
  *  questions are asked, warms toward pre-dawn as each is answered, then cubic-eases
- *  into a first dawn at the moment of hatching. No DOM/React/three → unit-tested. */
+ *  into a first dawn at the moment of hatching. No DOM/React/three â†’ unit-tested. */
 
 export type QuickeningPhase = "idle" | "questions" | "hatching" | "dawn";
 
@@ -17,8 +17,8 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 /** The fractional hour for the current ritual phase.
  *  - idle: deep night (1.0)
  *  - questions: 1.0 + qi*0.8 (each answer warms the sky), capped below pre-dawn
- *  - hatching: holds at pre-dawn (5.0) — the world holds its breath
- *  - dawn: cubic-eases 5.0 → 6.5 over DAWN_MS (the companion is born) */
+ *  - hatching: holds at pre-dawn (5.0) â€” the world holds its breath
+ *  - dawn: cubic-eases 5.0 â†’ 6.5 over DAWN_MS (the companion is born) */
 export function rampHour(phase: QuickeningPhase, qi: number, elapsedMs: number): number {
   switch (phase) {
     case "questions":
