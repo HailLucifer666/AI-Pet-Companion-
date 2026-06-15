@@ -24,8 +24,11 @@ from ..providers import parse_ref
 from ..skillsys import loader as skill_loader
 from ..weather import fetch_weather
 
+from .productivity import prod_router
+
 log = logging.getLogger(__name__)
 api_router = APIRouter()
+api_router.include_router(prod_router)
 
 
 @api_router.get("/health")

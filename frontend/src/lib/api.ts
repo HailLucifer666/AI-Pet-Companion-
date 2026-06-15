@@ -74,6 +74,28 @@ export interface Note {
   updated_at: string;
 }
 
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: "open" | "in_progress" | "done" | "blocked";
+  due_date_iso: string | null;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CalendarEvent {
+  id: number;
+  title: string;
+  description: string;
+  start_iso: string;
+  end_iso: string;
+  location: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Settings {
   providers: Record<
     string,
@@ -249,6 +271,16 @@ export const api = {
   updateNote: (id: number, body: { title: string; content_md: string }) =>
     request<{ ok: boolean }>("PUT", `/notes/${id}`, body),
   deleteNote: (id: number) => request<{ ok: boolean }>("DELETE", `/notes/${id}`),
+
+  tasks: (q = "") => get<{ tasks: Task[] }>(`/tasks?q=${encodeURIComponent(q)}`),
+  createTask: (body: Partial<Task>) => request<{ id: number }>("POST", "/tasks", body),
+  updateTask: (id: number, body: Partial<Task>) => request<{ ok: boolean }>("PUT", `/tasks/${id}`, body),
+  deleteTask: (id: number) => request<{ ok: boolean }>("DELETE", `/tasks/${id}`),
+
+  events: (q = "") => get<{ events: CalendarEvent[] }>(`/events?q=${encodeURIComponent(q)}`),
+  createEvent: (body: Partial<CalendarEvent>) => request<{ id: number }>("POST", "/events", body),
+  updateEvent: (id: number, body: Partial<CalendarEvent>) => request<{ ok: boolean }>("PUT", `/events/${id}`, body),
+  deleteEvent: (id: number) => request<{ ok: boolean }>("DELETE", `/events/${id}`),
 };
 
 /** react-query key conventions — one place, every surface follows it. */
@@ -269,4 +301,6 @@ export const queryKeys = {
   memoryGraph: ["memory", "graph"] as const,
   profile: ["profile"] as const,
   notes: (q: string) => ["notes", q] as const,
+  tasks: (q: string) => ["tasks", q] as const,
+  events: (q: string) => ["events", q] as const,
 };
