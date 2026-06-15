@@ -17,6 +17,7 @@ import {
   AdditiveBlending,
   Color,
   Fog,
+  Vector3,
   type BufferAttribute,
   type DirectionalLight,
   type Group,
@@ -258,6 +259,36 @@ function EmergenceMotes({ phase, reduced }: { phase: HatchPhase; reduced: boolea
   );
 }
 
+/* ── Dolly ───────────────────────────────────────────────────────────────
+ * A slow, unbroken push toward the egg: far at the intro, drawing closer with
+ * each question answered, holding its breath at the brain-check, pressing into
+ * the burst at hatch, then easing back to let the first dawn breathe at reveal.
+ * Always re-aimed at the egg so it stays centred. Reduced-motion: snap to each
+ * phase's framing (no glide). */
+const DOLLY: Record<HatchPhase, [number, number, number]> = {
+  intro: [0, 2.4, 9.0],
+  questions: [0, 2.2, 7.5], // z refined per question below
+  brain: [0, 2.0, 6.2],
+  hatching: [0, 1.9, 5.6],
+  revealed: [0, 2.6, 8.5],
+};
+
+function DollyRig({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: boolean }) {
+  const cam = useThree((s) => s.camera);
+  const target = useMemo(() => new Vector3(), []);
+  const look = useMemo(() => new Vector3(0, 0.7, EGG_Z - 0.4), []);
+
+  useFrame((_, delta) => {
+    const [x, y, baseZ] = DOLLY[phase];
+    const z = phase === "questions" ? 8.6 - Math.min(qi, 4) * 0.45 : baseZ; // 8.6 → 6.8
+    target.set(x, y, z);
+    const k = reduced ? 1 : 1 - Math.exp(-2.2 * delta);
+    cam.position.lerp(target, k);
+    cam.lookAt(look);
+  });
+  return null;
+}
+
 export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }) {
   const reduced = useReducedMotion() ?? false;
   return (
@@ -267,6 +298,7 @@ export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }
         camera={{ position: [0, 2.4, 9], fov: 50, near: 0.1, far: 120 }}
         gl={{ antialias: true }}
       >
+        <DollyRig phase={phase} qi={qi} reduced={reduced} />
         <Dawn phase={phase} qi={qi} reduced={reduced} />
         <Egg3D phase={phase} qi={qi} reduced={reduced} />
         <EmergenceMotes phase={phase} reduced={reduced} />
