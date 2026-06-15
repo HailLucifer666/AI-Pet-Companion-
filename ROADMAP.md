@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`2b161e8`) · **Current:** V-2.5 ladder + 2D fallback + V-2h emotion-glow shipped → W-8 clickable crystals next.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`16ec055`) · **Current:** V-2.5 ladder + 2D fallback, V-2h emotion-glow, W-8 clickable crystals shipped → W-6 Quickening or W-7 realms next.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -46,6 +46,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-6 Forging | skill draft → **forge erupts** + pet celebrates at the Foundry | `a12dfd1` |
 | V-2.5 (part) | **GPU-tier quality ladder** (`quality.ts`, pure-tested — drops bloom/MSAA/shadows/extra-lights/dpr first on weak GPUs) + **2D no-WebGL fallback** | `2de142d` |
 | V-2h (part) | **Emotion vector** (`emotion.ts`, pure-tested) — real agent cadence → {arousal,valence,curiosity,confidence} colours the pet's glow (brighter when busy, warmer on a real win) | `2b161e8` |
+| W-8 (part) | **Clickable memory crystals** — click a crystal → a glass panel shows the real memory (type/content/age/confidence) from the cached list | `16ec055` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -58,7 +59,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Emotion Vector backend — persist the derived vector to the `mood` column + surface via `/api/pet` (frontend glow already shipped `2b161e8`) | **S** |
 | W-7 | The Widening — realms II (Wilderness) + III (Observatory), camera bounds expand on stage-up | **L** |
-| W-8 | Full-game layer — clickable crystals open real memories, skill monuments, play | **L** |
+| W-8 (rest) | Full-game layer — skill monuments (earned decoration), walk-to/fetch play, diegetic Hollow chat (clickable crystals shipped `16ec055`) | **L** |
 | V-4 | Sight & Voice — browser teaching → Tauri native shell + desktop pointing (see `docs/SIGHT-AND-VOICE.md`) | **XL** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
