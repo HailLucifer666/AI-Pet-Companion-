@@ -20,7 +20,7 @@ import { petPos } from "./petPosition";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 import { WORLD } from "./palette";
-import { deriveEmotion, emotionGlow, type EmotionVector } from "./emotion";
+import { emotionGlow, type EmotionVector } from "./emotion";
 import { PetBubble } from "./PetBubble";
 import { FaceScreen } from "./pet/FaceScreen";
 import { gazeYaw, glowIntensity, shadowScale } from "./petAnim";
@@ -194,18 +194,9 @@ export function Lumenform3D() {
       headG.rotation.y += (targetYaw - headG.rotation.y) * Math.min(1, yawSpeed * dt);
     }
 
-    // Emotion (real agent cadence) → ease the vector, then let it colour the glow.
-    const now = performance.now();
-    const recentEvents = st.pulses.reduce((n, p) => (now - p.bornMs < 6000 ? n + 1 : n), 0);
-    const lastEventMs = st.pulses.length ? now - Math.max(...st.pulses.map((p) => p.bornMs)) : Infinity;
-    const emoTarget = deriveEmotion({
-      mode: lumen.mode,
-      gesture,
-      recentEvents,
-      msSinceActivity: lastEventMs,
-      msSinceBloom: st.bloomAt ? now - st.bloomAt : Infinity,
-      msSinceForge: st.forgeAt ? now - st.forgeAt : Infinity,
-    });
+    // Emotion (derived from real cadence in the store's 700ms tick) → ease the
+    // vector toward it, then let it colour the glow.
+    const emoTarget = st.emotion;
     const ek = 1 - Math.exp(-1.8 * dt); // emotion drifts gently, not twitchy
     emo.current.arousal += (emoTarget.arousal - emo.current.arousal) * ek;
     emo.current.valence += (emoTarget.valence - emo.current.valence) * ek;

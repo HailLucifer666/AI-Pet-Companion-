@@ -24,6 +24,7 @@ import {
   type WorldEvent,
 } from "../world/entities/lumenform/LumenformFSM";
 import { makeCrystalSeed, MAX_CRYSTALS, type CrystalSeed } from "../world/entities/crystalSeed";
+import { deriveEmotion, moodWord, type EmotionVector } from "../world3d/emotion";
 
 const reduced =
   typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -65,6 +66,8 @@ interface WorldStore {
   threads: MemoryGraphEdge[]; // similarity links between memory crystals (real embeddings)
   recencyById: Record<number, number | null>; // memory_id → last-mattered epoch ms (compost)
   speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
+  emotion: EmotionVector; // derived from real agent cadence (tick) — drives the pet's glow
+  mood: string; // a one-word read of `emotion` for the HUD
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
@@ -94,6 +97,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
   threads: [],
   recencyById: {},
   speech: "",
+  emotion: { arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 },
+  mood: "Content",
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
@@ -180,7 +185,21 @@ export const useWorldStore = create<WorldStore>((set) => ({
       const now = Date.now();
       const h = new Date(now).getHours();
       const night = h < 6 || h >= 21; // the user's quiet hours
-      return { lumen: scheduleIdle(state.lumen, now, idleRnd, reduced, night) };
+      const lumen = scheduleIdle(state.lumen, now, idleRnd, reduced, night);
+      // Emotion from real cadence (the same signals the glow rides): recent pulses,
+      // time since the last event / level-up / skill draft, the just-updated FSM.
+      const t = nowMs();
+      const recentEvents = state.pulses.reduce((n, p) => (t - p.bornMs < 6000 ? n + 1 : n), 0);
+      const lastEventMs = state.pulses.length ? t - Math.max(...state.pulses.map((p) => p.bornMs)) : Infinity;
+      const emotion = deriveEmotion({
+        mode: lumen.mode,
+        gesture: lumen.gesture,
+        recentEvents,
+        msSinceActivity: lastEventMs,
+        msSinceBloom: state.bloomAt ? t - state.bloomAt : Infinity,
+        msSinceForge: state.forgeAt ? t - state.forgeAt : Infinity,
+      });
+      return { lumen, emotion, mood: moodWord(emotion) };
     }),
 }));
 

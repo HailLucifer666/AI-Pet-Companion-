@@ -14,6 +14,7 @@ export function CoilRing() {
   const xpFrac = useWorldStore((s) => s.xpFrac);
   const level = useWorldStore((s) => s.level);
   const stage = useWorldStore((s) => s.stage);
+  const mood = useWorldStore((s) => s.mood);
   const pct = Math.round(xpFrac * 100);
   const stageName = STAGE_NAMES[stage] ?? "";
 
@@ -21,7 +22,7 @@ export function CoilRing() {
     <div
       className="pointer-events-none absolute bottom-8 right-5 select-none text-center"
       role="img"
-      aria-label={`Level ${level}, ${pct}% to the next level. Stage: ${stageName}.`}
+      aria-label={`Level ${level}, ${pct}% to the next level. Stage: ${stageName}. Mood: ${mood}.`}
     >
       <div className="relative grid place-items-center">
         <svg width="58" height="58" viewBox="0 0 58 58" className="-rotate-90" aria-hidden>
@@ -46,7 +47,7 @@ export function CoilRing() {
         </div>
       </div>
       <p className="mt-1 text-[10px] uppercase tracking-wider text-ink-400/80">
-        {stageName} · {pct}%
+        {stageName} · {mood}
       </p>
     </div>
   );

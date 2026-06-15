@@ -62,3 +62,14 @@ export function emotionGlow(e: EmotionVector): { lightMul: number; warmth: numbe
     warmth: clamp01((e.valence - 0.5) / 0.5), // neutral → 0, joyful → 1
   };
 }
+
+/** A one-word read of the emotion vector for the HUD — the same real signal the
+ *  glow rides, named. Order matters (most specific first). */
+export function moodWord(e: EmotionVector): string {
+  if (e.valence > 0.8) return "Elated"; // a real win shows even when otherwise calm
+  if (e.confidence > 0.7 && e.arousal > 0.45) return "Focused";
+  if (e.curiosity > 0.7) return "Curious"; // gazing reads curious even at low arousal
+  if (e.arousal < 0.12) return "Resting"; // nothing else going on
+  if (e.arousal > 0.6) return "Excited";
+  return "Content";
+}

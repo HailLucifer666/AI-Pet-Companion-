@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveEmotion, emotionGlow, type EmotionInput } from "./emotion";
+import { deriveEmotion, emotionGlow, moodWord, type EmotionInput } from "./emotion";
 
 const CALM: EmotionInput = {
   mode: "rest",
@@ -60,5 +60,28 @@ describe("emotionGlow", () => {
   it("neutral valence → cool (0 warmth), joyful → warm (→1)", () => {
     expect(emotionGlow({ arousal: 0, valence: 0.5, curiosity: 0, confidence: 0 }).warmth).toBe(0);
     expect(emotionGlow({ arousal: 0, valence: 1, curiosity: 0, confidence: 0 }).warmth).toBe(1);
+  });
+});
+
+describe("moodWord", () => {
+  it("a calm long-idle pet reads as Resting", () => {
+    expect(moodWord(deriveEmotion(CALM))).toBe("Resting");
+  });
+
+  it("a busy working pet reads as Focused", () => {
+    const e = deriveEmotion({ ...CALM, mode: "work", recentEvents: 5, msSinceActivity: 200 });
+    expect(moodWord(e)).toBe("Focused");
+  });
+
+  it("a fresh level-up reads as Elated", () => {
+    expect(moodWord(deriveEmotion({ ...CALM, msSinceBloom: 0 }))).toBe("Elated");
+  });
+
+  it("gazing reads as Curious", () => {
+    expect(moodWord(deriveEmotion({ ...CALM, gesture: "gaze", msSinceActivity: 3000 }))).toBe("Curious");
+  });
+
+  it("a mild middle state reads as Content", () => {
+    expect(moodWord({ arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 })).toBe("Content");
   });
 });
