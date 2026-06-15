@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api, queryKeys } from "./lib/api";
+import { hasWebGL } from "./world3d/quality";
 import { Spinner } from "./components/ui";
 import { AppShell } from "./app/shell/AppShell";
 import { HatchRitual } from "./features/hatch/HatchRitual";
@@ -79,7 +80,7 @@ export function App() {
     );
   }
   if (!isError && data && data.pet === null) {
-    return <HatchRitual brain={data.brain} />;
+    return <HatchRitual brain={data.brain} cinematicMode={hasWebGL()} />;
   }
   return <Shell />;
 }

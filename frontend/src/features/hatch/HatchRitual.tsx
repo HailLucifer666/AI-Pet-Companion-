@@ -8,7 +8,7 @@
  * judged on. Honors reduced-motion: the egg simply *is*, no breathing.
  */
 
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
@@ -16,6 +16,13 @@ import { ArrowLeft, ArrowRight, Check, KeyRound, Sparkles } from "lucide-react";
 import { api, queryKeys, type Brain, type HatchBody } from "../../lib/api";
 import { Button, Input, Select, Spinner, Textarea, toast } from "../../components/ui";
 import { Creature } from "../../components/creature/Creature";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
+
+// Lazy so three.js/r3f never enter the eager main bundle (HatchRitual is eagerly
+// imported by App). The 3D backdrop streams in; the questions show immediately.
+const QuickeningScene = lazy(() =>
+  import("./QuickeningScene").then((m) => ({ default: m.QuickeningScene })),
+);
 
 const VOICES = [
   { value: "warm", label: "Warm — encouraging, never saccharine" },
@@ -102,9 +109,40 @@ function Void({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ── Stage: the ritual's backdrop ────────────────────────────────────────
+ * Plain Void by default. Under `cinematic` (WebGL present, no error yet) it sets
+ * the same Void content over the in-world Quickening dawn scene, wrapped in an
+ * ErrorBoundary so any 3D failure falls straight back to the Void — onboarding
+ * can never get trapped on a blank screen. */
+function Stage({
+  cinematic,
+  phase,
+  qi,
+  onError,
+  children,
+}: {
+  cinematic: boolean;
+  phase: Phase;
+  qi: number;
+  onError: () => void;
+  children: React.ReactNode;
+}) {
+  if (!cinematic) return <Void>{children}</Void>;
+  return (
+    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-ink-950 px-6 text-center">
+      <ErrorBoundary onError={onError}>
+        <Suspense fallback={null}>
+          <QuickeningScene phase={phase} qi={qi} />
+        </Suspense>
+      </ErrorBoundary>
+      <div className="relative z-10 flex flex-col items-center">{children}</div>
+    </div>
+  );
+}
+
 /* ── Main ────────────────────────────────────────────────────────────── */
 
-export function HatchRitual({ brain }: { brain: Brain }) {
+export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; cinematicMode?: boolean }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const reduced = useReducedMotion();
@@ -114,6 +152,8 @@ export function HatchRitual({ brain }: { brain: Brain }) {
   const [answers, setAnswers] = useState<Answers>(EMPTY);
   const [hasBrain, setHasBrain] = useState(brain.ollama || brain.cloud_keys);
   const [creatureName, setCreatureName] = useState("");
+  const [cineFailed, setCineFailed] = useState(false); // a 3D panic → fall back to the plain Void
+  const cinematic = cinematicMode && !cineFailed;
   const suggested = useSuggestedPrompts(answers, creatureName);
 
   const set = (k: keyof Answers, v: string) => setAnswers((a) => ({ ...a, [k]: v }));
@@ -147,7 +187,7 @@ export function HatchRitual({ brain }: { brain: Brain }) {
   /* intro */
   if (phase === "intro") {
     return (
-      <Void>
+      <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
         <Egg size={200} />
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -166,14 +206,14 @@ export function HatchRitual({ brain }: { brain: Brain }) {
             <Sparkles className="size-4" /> Begin
           </Button>
         </motion.div>
-      </Void>
+      </Stage>
     );
   }
 
   /* hatching + revealed */
   if (phase === "hatching" || phase === "revealed") {
     return (
-      <Void>
+      <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
         {phase === "hatching" ? (
           <>
             <Egg size={200} cracking />
@@ -211,14 +251,14 @@ export function HatchRitual({ brain }: { brain: Brain }) {
             </Button>
           </motion.div>
         )}
-      </Void>
+      </Stage>
     );
   }
 
   /* brain-check */
   if (phase === "brain") {
     return (
-      <Void>
+      <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
         <Egg size={120} />
         <BrainStep
           hasBrain={hasBrain}
@@ -226,7 +266,7 @@ export function HatchRitual({ brain }: { brain: Brain }) {
           onBack={() => setPhase("questions")}
           onContinue={doHatch}
         />
-      </Void>
+      </Stage>
     );
   }
 
@@ -234,7 +274,7 @@ export function HatchRitual({ brain }: { brain: Brain }) {
   const isLast = qi === 4;
   const canAdvance = qi !== 0 || answers.creature_name.trim().length > 0;
   return (
-    <Void>
+    <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
       <Egg size={120} />
       <motion.div
         key={qi}
@@ -264,7 +304,7 @@ export function HatchRitual({ brain }: { brain: Brain }) {
           </Button>
         </div>
       </motion.div>
-    </Void>
+    </Stage>
   );
 }
 
