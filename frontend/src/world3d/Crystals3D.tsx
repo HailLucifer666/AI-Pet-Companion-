@@ -9,6 +9,7 @@ import { useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import type { Group, MeshStandardMaterial } from "three";
 import { freshCrystals, useWorldStore } from "../state/worldStore";
+import { useMemoryPeek } from "../state/memoryPeek";
 import { mulberry32 } from "../world/engine/rng";
 import { SPECIES, type CrystalSeed } from "../world/entities/crystalSeed";
 import { crystalPosition, CRYSTAL_COLOR } from "./crystalPlacement";
@@ -113,8 +114,27 @@ function Crystal({ seed, fresh }: { seed: CrystalSeed; fresh: number }) {
     if (!reduced) g.rotation.y += delta * spin;
   });
 
+  // Click a crystal to read its real memory (the id IS the memory_id). Hover shows a
+  // pointer cursor as the affordance; keyboard users read memories via the rail's
+  // Memory surface (canvas hit-areas can't take focus).
+  const peek = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    useMemoryPeek.getState().open(seed.id);
+  };
+  const cursor = (on: boolean) => (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    document.body.style.cursor = on ? "pointer" : "";
+  };
+
   return (
-    <group ref={ref} position={[pos.x, sunkY, pos.z]} scale={reduced ? BASE * compost.scale : 0}>
+    <group
+      ref={ref}
+      position={[pos.x, sunkY, pos.z]}
+      scale={reduced ? BASE * compost.scale : 0}
+      onClick={peek}
+      onPointerOver={cursor(true)}
+      onPointerOut={cursor(false)}
+    >
       <Shape seed={seed} matRef={matRef} />
     </group>
   );
