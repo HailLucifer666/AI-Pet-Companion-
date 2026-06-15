@@ -60,16 +60,16 @@ Goal: close the gap from *tech demo* → *game*. Almost all **wiring, not rewrit
 - [ ] **No audio at all** (no dep, zero `AudioContext`). Thin Howler/Web-Audio layer: 1 ambient loop + rain crossfade + 3–4 SFX off existing `worldStore` events (`memory.formed`, `pet.levelup`, celebrate, hatch). Mute toggle. Hooks already in `worldStore.connect()`. **~3–5d.**
 
 ### ⚡ Quick wins (hours each — do as ONE batch; biggest feel/perf per effort, low risk)
-- [ ] `antialias:false` in Canvas `gl` (`World3D.tsx`) — MSAA fights the faceted low-poly look + costs frames on integrated GPUs.
-- [ ] Bloom grade (`Postfx.tsx`): raise `luminanceThreshold` ~0.72→**0.9**, `intensity` 0.7→**0.4**; add **Vignette + HueSaturation** passes (already in `@react-three/postprocessing`). Single biggest art uplift.
-- [ ] **Pause-on-blur**: `World3D` `visibilitychange` → `frameloop='demand'` when hidden (stops hidden-tab fan-spin).
-- [ ] **Canvas ErrorBoundary** around lazy `DenView` + `World3D` (WebGL crash → recoverable, not blank black).
-- [ ] Pet turn/lean/gaze: `Math.min(1,k*dt)` → `1-Math.exp(-k*dt)` (`Lumenform3D` ~145/147/156) — currently **5× too fast at 144Hz**, breaks the "never snappy" rule.
-- [ ] **Camera-terrain clearance** in `CameraRig` (sample `islandHeight` at camera x/z, push up) — camera clips through the island at close zoom.
-- [ ] **Anticipation gaze** on tool-start (~600ms gaze toward target before moving; flip face to 'working' only on arrival) — reads as deciding, not executing.
-- [ ] Idle RNG: seed from pet DB id, not constant `0x10fc` (`worldStore`) + `lastGesture` anti-repeat — kills the identical-every-session idle loop.
-- [ ] `castShadow=false`/`receiveShadow=false` on transparent meshes (sea, pool surface, XP fill, rain, clouds); tighten shadow frustum ±22→**±16** (island radius).
-- [ ] Derive `Island.tsx` `CLEAR_ZONES` from the place table (remove one duplicate coord copy).
+- [x] `antialias:false` in Canvas `gl` (`World3D.tsx`) — MSAA fights the faceted low-poly look + costs frames on integrated GPUs.
+- [x] Bloom grade (`Postfx.tsx`): raise `luminanceThreshold` ~0.72→**0.9**, `intensity` 0.7→**0.4**; add **Vignette + HueSaturation** passes (already in `@react-three/postprocessing`). Single biggest art uplift.
+- [x] **Pause-on-blur**: `World3D` `visibilitychange` → `frameloop='demand'` when hidden (stops hidden-tab fan-spin).
+- [x] **Canvas ErrorBoundary** around lazy `DenView` + `World3D` (WebGL crash → recoverable, not blank black).
+- [x] Pet turn/lean/gaze: `Math.min(1,k*dt)` → `1-Math.exp(-k*dt)` (`Lumenform3D` ~145/147/156) — currently **5× too fast at 144Hz**, breaks the "never snappy" rule.
+- [x] **Camera-terrain clearance** in `CameraRig` (sample `islandHeight` at camera x/z, push up) — camera clips through the island at close zoom.
+- [x] **Anticipation gaze** on tool-start (~600ms gaze toward target before moving; flip face to 'working' only on arrival) — reads as deciding, not executing.
+- [x] Idle RNG: seed from pet DB id, not constant `0x10fc` (`worldStore`) + `lastGesture` anti-repeat — kills the identical-every-session idle loop.
+- [x] `castShadow=false`/`receiveShadow=false` on transparent meshes (sea, pool surface, XP fill, rain, clouds); tighten shadow frustum ±22→**±16** (island radius).
+- [x] Derive `Island.tsx` `CLEAR_ZONES` from the place table (remove one duplicate coord copy).
 
 ### 🟠 High gaps (1–5d each)
 - [ ] **Tool→place routing.** `worldStore.toWorldEvent()` drops the tool name; every `tool-start` → the single Workbench. Pass `ev.tool` through; add a pure `toolCategoryToPlace()`; add **`garden`/`hollow` to the `Place` type + `ANCHORS`** so the pet can visit its Memory Garden (today structurally impossible — `Place` vs `PlaceKind` name mismatch). ~1–2d.
