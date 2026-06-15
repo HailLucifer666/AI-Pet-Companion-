@@ -14,13 +14,17 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
 import {
+  AdditiveBlending,
   Color,
   Fog,
+  type BufferAttribute,
   type DirectionalLight,
   type Group,
   type HemisphereLight,
   type MeshStandardMaterial,
+  type Points,
   type PointLight,
+  type PointsMaterial,
 } from "three";
 import { daylightAt } from "../../world3d/daylight";
 import { rampHour, type QuickeningPhase } from "../../world3d/quickeningRamp";
@@ -175,6 +179,85 @@ function Egg3D({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced:
   );
 }
 
+/* ── Emergence motes ─────────────────────────────────────────────────────
+ * A one-shot burst of warm sparks that fountains up out of the egg the instant
+ * it hatches and rises into the new dawn as the companion appears, then fades.
+ * Additive, un-tonemapped points so they read as light. Reduced-motion: none. */
+const MOTE_COUNT = 64;
+const MOTE_LIFE = 2.4; // seconds
+
+function EmergenceMotes({ phase, reduced }: { phase: HatchPhase; reduced: boolean }) {
+  const pts = useRef<Points>(null);
+  const mat = useRef<PointsMaterial>(null);
+  const burstStart = useRef<number | null>(null);
+
+  // Per-mote launch origin + direction, seeded once (upward bias, fanned out).
+  const { positions, dirs } = useMemo(() => {
+    const positions = new Float32Array(MOTE_COUNT * 3);
+    const dirs = new Float32Array(MOTE_COUNT * 3);
+    for (let i = 0; i < MOTE_COUNT; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.1 + Math.random() * 0.4;
+      positions[i * 3] = Math.cos(a) * r;
+      positions[i * 3 + 1] = 0;
+      positions[i * 3 + 2] = Math.sin(a) * r;
+      dirs[i * 3] = Math.cos(a) * (0.5 + Math.random() * 0.6);
+      dirs[i * 3 + 1] = 1.4 + Math.random() * 1.8;
+      dirs[i * 3 + 2] = Math.sin(a) * (0.5 + Math.random() * 0.6);
+    }
+    return { positions, dirs };
+  }, []);
+
+  useFrame((state) => {
+    const bursting = phase === "hatching" || phase === "revealed";
+    if (reduced || !bursting) {
+      burstStart.current = null;
+      if (pts.current) pts.current.visible = false;
+      return;
+    }
+    if (burstStart.current === null) burstStart.current = state.clock.elapsedTime;
+    const t = state.clock.elapsedTime - burstStart.current;
+    if (t > MOTE_LIFE) {
+      if (pts.current) pts.current.visible = false;
+      return;
+    }
+    if (pts.current) pts.current.visible = true;
+    const e = 1 - Math.pow(1 - t / MOTE_LIFE, 2); // ease-out rise
+    const attr = pts.current?.geometry.attributes.position as BufferAttribute | undefined;
+    if (attr) {
+      for (let i = 0; i < MOTE_COUNT; i++) {
+        attr.setXYZ(
+          i,
+          positions[i * 3] + dirs[i * 3] * e,
+          positions[i * 3 + 1] + dirs[i * 3 + 1] * e,
+          positions[i * 3 + 2] + dirs[i * 3 + 2] * e,
+        );
+      }
+      attr.needsUpdate = true;
+    }
+    if (mat.current) mat.current.opacity = 0.9 * (1 - t / MOTE_LIFE);
+  });
+
+  return (
+    <points ref={pts} position={[0, EGG_Y, EGG_Z]} visible={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={MOTE_COUNT} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial
+        ref={mat}
+        color={WORLD.emberHi}
+        size={0.14}
+        sizeAttenuation
+        transparent
+        opacity={0}
+        depthWrite={false}
+        blending={AdditiveBlending}
+        toneMapped={false}
+      />
+    </points>
+  );
+}
+
 export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }) {
   const reduced = useReducedMotion() ?? false;
   return (
@@ -186,6 +269,7 @@ export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }
       >
         <Dawn phase={phase} qi={qi} reduced={reduced} />
         <Egg3D phase={phase} qi={qi} reduced={reduced} />
+        <EmergenceMotes phase={phase} reduced={reduced} />
         <Stars radius={70} depth={30} count={700} factor={3} saturation={0.2} fade speed={reduced ? 0 : 0.25} />
       </Canvas>
     </div>
