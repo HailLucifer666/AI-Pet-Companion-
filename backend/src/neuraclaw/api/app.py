@@ -1,5 +1,6 @@
 """FastAPI app factory: lifespan owns the DB and router, serves frontend if built."""
 
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,8 +11,8 @@ from ..config import DB_PATH, FRONTEND_DIST, MIGRATIONS_DIR, WORKSPACE_DIR, load
 from ..db import migrate, open_db
 from ..providers import Router
 from ..tools import build_registry
+from ..core import scheduler
 from .routes import api_router
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -23,7 +24,15 @@ async def lifespan(app: FastAPI):
     app.state.db = db
     app.state.router = Router(config, db)
     app.state.registry = build_registry(config)
+
+    # Start the proactive scheduler loop
+    scheduler_task = asyncio.create_task(
+        scheduler.run_loop(db, app.state.router, app.state.registry, config)
+    )
+
     yield
+
+    scheduler_task.cancel()
     await db.close()
 
 

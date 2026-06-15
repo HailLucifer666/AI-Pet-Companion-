@@ -22,6 +22,8 @@ export interface LumenformState {
   since: number; // ms epoch when the current activity began
   wanderSeed: number; // varies the wander target
   lastGesture: Gesture; // anti-repeat
+  energy: number; // 0.0 to 1.0 (drains from work, recharges from rest/memories)
+  mood: number; // -1.0 to 1.0 (valence)
 }
 
 export type WorldEvent =
@@ -40,6 +42,8 @@ export const INITIAL: LumenformState = {
   since: 0,
   wanderSeed: 1,
   lastGesture: "none",
+  energy: 1.0,
+  mood: 0.0,
 };
 
 const GESTURE_MS: Record<Exclude<Gesture, "none">, number> = {
@@ -68,19 +72,19 @@ export function reduceLumenform(
 ): LumenformState {
   switch (event.kind) {
     case "tool-start":
-      return { ...state, place: "workbench", mode: "work", gesture: "none", gestureUntil: 0, since: now };
+      // Work drains energy
+      return { ...state, place: "workbench", mode: "work", gesture: "none", gestureUntil: 0, since: now, energy: Math.max(0, state.energy - 0.1) };
     case "tool-end":
       // Still at the bench; more tools may follow. Just clear any transient.
       return state.mode === "work" ? state : { ...state, place: "workbench", mode: "work", since: now };
     case "done":
       return { ...state, place: "home", mode: "rest", gesture: "none", gestureUntil: 0, since: now };
     case "memory-formed":
-      // Walk the road to the Memory Garden (greenhouse) and plant there — the
-      // crystal itself is spawned deterministically by the store.
-      return withGesture({ ...state, place: "garden", since: now }, "plant", now);
+      // Walk the road to the Memory Garden (greenhouse) and plant there
+      return withGesture({ ...state, place: "garden", since: now, mood: Math.min(1.0, state.mood + 0.2), energy: Math.min(1.0, state.energy + 0.1) }, "plant", now);
     case "skill-drafted":
       // Walk to the Foundry (forge/Workbench) and celebrate the newly forged skill.
-      return withGesture({ ...state, place: "workbench", since: now }, "celebrate", now);
+      return withGesture({ ...state, place: "workbench", since: now, mood: Math.min(1.0, state.mood + 0.3), energy: 1.0 }, "celebrate", now);
     case "thinking":
       // Perk up only when at rest; never interrupt work.
       return state.mode === "rest" && state.gesture === "none"
@@ -100,6 +104,7 @@ export function scheduleIdle(
   rnd: () => number,
   reduced: boolean,
   night = false,
+  weatherCategory: string = "clear",
 ): LumenformState {
   if (reduced) return state;
   if (state.mode === "work") return state;
@@ -115,28 +120,48 @@ export function scheduleIdle(
   const idleMs = now - state.since;
   if (idleMs < 6000) return state;
 
+  // Slowly restore energy if resting
+  let energy = state.energy;
+  if (state.mode === "rest" && state.gesture === "none") {
+      energy = Math.min(1.0, energy + 0.005);
+  }
+
   const roll = rnd();
   let nextGesture: Gesture = "none";
+  
+  const isStormy = weatherCategory === "storm" || weatherCategory === "rain";
+  const isFoggy = weatherCategory === "fog";
+
   if (night && idleMs > 15_000 && roll < 0.7) {
     nextGesture = "nap";
+  } else if (isStormy && idleMs > 10_000 && roll < 0.8) {
+    nextGesture = "nap"; // take shelter
+  } else if (energy < 0.3 && roll < 0.6) {
+    nextGesture = "nap"; // tired
   } else if (idleMs > 60_000 && roll < 0.5) {
     nextGesture = "nap";
-  } else if (roll < 0.34) {
+  } else if (roll < 0.34 && !isStormy && !isFoggy) {
     nextGesture = "wander";
+  } else if (isFoggy && roll < 0.15) {
+    nextGesture = "wander"; // slower wander in fog
   } else if (roll < 0.62) {
     nextGesture = "gaze";
-  } else if (roll < 0.8) {
-    nextGesture = "play";
+  } else if (roll < 0.8 && energy > 0.6 && state.mood > -0.2) {
+    nextGesture = "play"; // happy and energetic
   }
 
   if (nextGesture !== "none" && nextGesture === state.lastGesture) {
-    return state; // anti-repeat: skip and try again later
+    return { ...state, energy }; // anti-repeat: skip and try again later, but update energy
   }
 
   if (nextGesture === "wander") {
-    return withGesture({ ...state, place: "wander", wanderSeed: Math.floor(rnd() * 1e9) || 1, since: now }, "wander", now);
+    return withGesture({ ...state, place: "wander", wanderSeed: Math.floor(rnd() * 1e9) || 1, since: now, energy }, "wander", now);
   } else if (nextGesture !== "none") {
-    return withGesture({ ...state, since: now }, nextGesture, now);
+    return withGesture({ ...state, since: now, energy }, nextGesture, now);
+  }
+  
+  if (energy !== state.energy) {
+     return { ...state, energy };
   }
   return state; // sometimes just rest
 }

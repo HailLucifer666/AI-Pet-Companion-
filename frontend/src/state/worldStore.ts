@@ -68,6 +68,7 @@ interface WorldStore {
   speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
   emotion: EmotionVector; // derived from real agent cadence (tick) — drives the pet's glow
   mood: string; // a one-word read of `emotion` for the HUD
+  weather: string; // current weather category (e.g. 'clear', 'storm', 'rain')
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
   removeCrystal: (id: number) => void;
@@ -81,6 +82,7 @@ interface WorldStore {
   refreshThreads: () => Promise<void>;
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
+  setWeather: (weather: string) => void;
   tickIdle: () => void;
 }
 
@@ -99,6 +101,7 @@ export const useWorldStore = create<WorldStore>((set) => ({
   speech: "",
   emotion: { arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 },
   mood: "Content",
+  weather: "clear",
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
 
@@ -181,12 +184,14 @@ export const useWorldStore = create<WorldStore>((set) => ({
   setStage: (stage) =>
     set(() => ({ stage: Math.min(4, Math.max(1, stage)) as 1 | 2 | 3 | 4 })),
 
+  setWeather: (weather) => set(() => ({ weather })),
+
   tickIdle: () =>
     set((state) => {
       const now = Date.now();
       const h = new Date(now).getHours();
       const night = h < 6 || h >= 21; // the user's quiet hours
-      const lumen = scheduleIdle(state.lumen, now, idleRnd, reduced, night);
+      const lumen = scheduleIdle(state.lumen, now, idleRnd, reduced, night, state.weather);
       // Emotion from real cadence (the same signals the glow rides): recent pulses,
       // time since the last event / level-up / skill draft, the just-updated FSM.
       const t = nowMs();

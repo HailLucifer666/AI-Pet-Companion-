@@ -201,6 +201,13 @@ export function World3D() {
     return () => clearInterval(id);
   }, []);
 
+  const setWeather = useWorldStore((s) => s.setWeather);
+  useEffect(() => {
+    if (weather.category) {
+      setWeather(weather.category);
+    }
+  }, [weather.category, setWeather]);
+
   // Pause-on-blur: drop frameloop to demand when the tab is hidden to save power.
   const [blurred, setBlurred] = useState(false);
   useEffect(() => {

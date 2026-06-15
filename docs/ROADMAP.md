@@ -74,7 +74,7 @@ Goal: close the gap from *tech demo* → *game*. Almost all **wiring, not rewrit
 ### 🟠 High gaps (1–5d each)
 - [ ] **Tool→place routing.** `worldStore.toWorldEvent()` drops the tool name; every `tool-start` → the single Workbench. Pass `ev.tool` through; add a pure `toolCategoryToPlace()`; add **`garden`/`hollow` to the `Place` type + `ANCHORS`** so the pet can visit its Memory Garden (today structurally impossible — `Place` vs `PlaceKind` name mismatch). ~1–2d.
 - [ ] **Wire `petAnim.ts`** (breath→body `scale.y`, head-nod, squash/stretch on hop/land, blink-into-expression swap, per-gesture arm poses). Library is written + tested but mostly **unwired** in `Lumenform3D` (imports only gazeYaw/glow/shadow). Highest alive-payoff for least new code. ~1–2d.
-- [ ] **Drives/mood.** Add `mood`+`energy` to `LumenformState`; work drains, memory/skill events charge; weight `scheduleIdle` by them; weather/time bindings (storm→shelter/nap, fog→slower wander). ~3–5d.
+- [x] **Drives/mood.** Add `mood`+`energy` to `LumenformState`; work drains, memory/skill events charge; weight `scheduleIdle` by them; weather/time bindings (storm→shelter/nap, fog→slower wander). ~3–5d.
 - [ ] **Milestone screen-space juice.** Level-up swell + celebrate sparkles are sub-pixel at default zoom — add FOV punch + brief auto-zoom + a CSS ember flash on `pet.levelup`. (Effects are fine; fix is camera-side.) ~1–2d.
 - [ ] **Robot↔world art rhymes** so the robot doesn't read as "dropped into a nature game": data plates near the Workbench, cyan seam on the bench marker (`botEye`), ember rim on the Hollow fire (`botGlow`). ~1–2d.
 
