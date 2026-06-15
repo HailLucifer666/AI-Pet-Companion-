@@ -13,6 +13,7 @@ from .. import __version__
 from ..config import REPO_ROOT, SOUL_PATH, write_env_keys
 from ..core import agent
 from ..core.synapse import sse_stream, synapse as _synapse
+from ..core.vision import resolve_vision
 from ..db.connection import vec_version
 from ..memory import extractor, store
 from ..pet import hatch as hatch_svc, xp
@@ -122,6 +123,22 @@ async def get_pet(request: Request):
     pet = await xp.get_pet(request.app.state.db)
     brain = await _detect_brain(request.app.state.config)
     return {"pet": pet, "brain": brain}
+
+
+@api_router.get("/vision")
+async def get_vision(request: Request):
+    """Whether the companion can see a screen, and whether doing so sends it
+    off-device — so the UI can warn before capturing. Resolves the `vision`
+    role against live key presence + a local-model probe."""
+    import os
+
+    config = request.app.state.config
+    key_present = {
+        name: bool(pc.api_key_env and os.environ.get(pc.api_key_env))
+        for name, pc in config.providers.items()
+    }
+    local_up = (await _detect_brain(config))["ollama"]
+    return resolve_vision(config, key_present, local_up)
 
 
 @api_router.get("/den")
