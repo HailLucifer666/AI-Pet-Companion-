@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`7fb90cd`) · **Current:** V-2.5 ladder + 2D fallback, V-2h emotion-glow, W-8 clickable crystals, W-7 Widening core shipped → W-6 Quickening (needs workflow) next.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`072457c`) · **Current:** V-2.5, V-2h emotion-glow, W-7 Widening core, W-8 clickable crystals + skill monuments shipped → W-6 Quickening (needs workflow) next.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -47,6 +47,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | V-2.5 (part) | **GPU-tier quality ladder** (`quality.ts`, pure-tested — drops bloom/MSAA/shadows/extra-lights/dpr first on weak GPUs) + **2D no-WebGL fallback** | `2de142d` |
 | V-2h (part) | **Emotion vector** (`emotion.ts`, pure-tested) — real agent cadence → {arousal,valence,curiosity,confidence} colours the pet's glow (brighter when busy, warmer on a real win) | `2b161e8` |
 | W-8 (part) | **Clickable memory crystals** — click a crystal → a glass panel shows the real memory (type/content/age/confidence) from the cached list | `16ec055` |
+| W-8 (part) | **Skill monuments** — approved (active) skills raise glowing obelisks ringing the forge (`GET /api/skills` + `skill.approved` event + pure-tested placement); earned, real-data only | `072457c` |
 | W-7 (core) | **The Widening** (`widening.ts`, pure-tested) — real `pet.stage` widens the camera survey range + horizon fog per stage + a warm stage-up flash | `7fb90cd` |
 
 ### In progress 🔨
@@ -60,7 +61,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Emotion Vector backend — persist the derived vector to the `mood` column + surface via `/api/pet` (frontend glow already shipped `2b161e8`) | **S** |
 | W-7 (rest) | Separate realms II (Wilderness) + III (Observatory) — **needs a design rethink post-village-pivot** (workflow-sized); the stage-up world-reveal core shipped `7fb90cd` | **L** |
-| W-8 (rest) | Full-game layer — skill monuments (earned decoration), walk-to/fetch play, diegetic Hollow chat (clickable crystals shipped `16ec055`) | **L** |
+| W-8 (rest) | Full-game layer — walk-to/fetch play, diegetic Hollow chat (clickable crystals `16ec055` + skill monuments `072457c` shipped) | **M** |
 | V-4 | Sight & Voice — browser teaching → Tauri native shell + desktop pointing (see `docs/SIGHT-AND-VOICE.md`) | **XL** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
