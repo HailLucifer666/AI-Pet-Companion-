@@ -13,9 +13,18 @@ import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
-import { Color, Fog, type DirectionalLight, type HemisphereLight } from "three";
+import {
+  Color,
+  Fog,
+  type DirectionalLight,
+  type Group,
+  type HemisphereLight,
+  type MeshStandardMaterial,
+  type PointLight,
+} from "three";
 import { daylightAt } from "../../world3d/daylight";
 import { rampHour, type QuickeningPhase } from "../../world3d/quickeningRamp";
+import { WORLD } from "../../world3d/palette";
 
 type HatchPhase = "intro" | "questions" | "brain" | "hatching" | "revealed";
 
@@ -96,6 +105,76 @@ function Dawn({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: 
   );
 }
 
+/* ── The egg in the grove ────────────────────────────────────────────────
+ * A glowing ovoid waiting on the dark ground at the centre of the scene, lit by
+ * its own warm point light. It brightens as each question lands, swells into a
+ * hot burst at the moment of hatching, then vanishes on reveal (the awakened
+ * companion takes over in the DOM above). Reduced-motion: no bob, snap glow. */
+const EGG_Y = 0.85;
+const EGG_Z = 2.0;
+
+function eggEmissive(phase: HatchPhase, qi: number): number {
+  switch (phase) {
+    case "revealed":
+      return 0;
+    case "hatching":
+      return 2.8; // hot burst
+    case "brain":
+      return 1.5; // held breath, pre-dawn
+    case "questions":
+      return 1.0 + Math.min(qi, 4) * 0.14; // warms as you answer
+    default:
+      return 0.85; // intro
+  }
+}
+
+function eggScale(phase: HatchPhase): number {
+  if (phase === "revealed") return 0.01;
+  if (phase === "hatching") return 1.16;
+  return 1.0;
+}
+
+function Egg3D({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: boolean }) {
+  const grp = useRef<Group>(null);
+  const mat = useRef<MeshStandardMaterial>(null);
+  const light = useRef<PointLight>(null);
+  const ei = useRef(0.85);
+  const sc = useRef(1.0);
+
+  useFrame((state, delta) => {
+    const targetEi = eggEmissive(phase, qi);
+    const targetSc = eggScale(phase);
+    const k = reduced ? 1 : 1 - Math.exp(-5 * delta);
+    ei.current += (targetEi - ei.current) * k;
+    sc.current += (targetSc - sc.current) * k;
+    if (mat.current) mat.current.emissiveIntensity = ei.current;
+    if (light.current) light.current.intensity = ei.current * 1.4;
+    if (grp.current) {
+      const bob = reduced ? 0 : Math.sin(state.clock.elapsedTime * 1.3) * 0.06;
+      grp.current.scale.setScalar(sc.current);
+      grp.current.position.y = EGG_Y + bob;
+      grp.current.visible = sc.current > 0.02;
+    }
+  });
+
+  return (
+    <group ref={grp} position={[0, EGG_Y, EGG_Z]}>
+      <mesh scale={[1, 1.32, 1]}>
+        <sphereGeometry args={[0.62, 32, 32]} />
+        <meshStandardMaterial
+          ref={mat}
+          color={0x2a1c0e}
+          emissive={WORLD.botGlow}
+          emissiveIntensity={0.85}
+          roughness={0.5}
+          metalness={0.1}
+        />
+      </mesh>
+      <pointLight ref={light} color={WORLD.emberHi} intensity={1.2} distance={9} decay={2} />
+    </group>
+  );
+}
+
 export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }) {
   const reduced = useReducedMotion() ?? false;
   return (
@@ -106,6 +185,7 @@ export function QuickeningScene({ phase, qi }: { phase: HatchPhase; qi: number }
         gl={{ antialias: true }}
       >
         <Dawn phase={phase} qi={qi} reduced={reduced} />
+        <Egg3D phase={phase} qi={qi} reduced={reduced} />
         <Stars radius={70} depth={30} count={700} factor={3} saturation={0.2} fade speed={reduced ? 0 : 0.25} />
       </Canvas>
     </div>

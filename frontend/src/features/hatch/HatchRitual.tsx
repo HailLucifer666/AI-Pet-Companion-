@@ -8,7 +8,7 @@
  * judged on. Honors reduced-motion: the egg simply *is*, no breathing.
  */
 
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
@@ -17,6 +17,7 @@ import { api, queryKeys, type Brain, type HatchBody } from "../../lib/api";
 import { Button, Input, Select, Spinner, Textarea, toast } from "../../components/ui";
 import { Creature } from "../../components/creature/Creature";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { bloomFlash } from "../../world3d/bloomCinematic";
 
 // Lazy so three.js/r3f never enter the eager main bundle (HatchRitual is eagerly
 // imported by App). The 3D backdrop streams in; the questions show immediately.
@@ -109,11 +110,48 @@ function Void({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ── Dawn burst: the first light ─────────────────────────────────────────
+ * A single warm radial veil that pops the instant the egg hatches (dawn breaks),
+ * then falls off cubic-out (bloomFlash) — the screen-wide echo of the egg's burst
+ * of light, in cinematic and plain modes alike. Reduced-motion: no flash. */
+const DAWN_MS = 1600;
+
+function DawnBurst({ active, reduced }: { active: boolean; reduced: boolean }) {
+  const [op, setOp] = useState(0);
+  useEffect(() => {
+    if (!active || reduced) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = () => {
+      const f = bloomFlash(performance.now() - start, DAWN_MS);
+      setOp(f * 0.6);
+      if (f > 0.001) raf = requestAnimationFrame(tick);
+      else setOp(0);
+    };
+    tick();
+    return () => cancelAnimationFrame(raf);
+  }, [active, reduced]);
+
+  if (op <= 0) return null;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-40"
+      style={{
+        opacity: op,
+        background:
+          "radial-gradient(circle at 50% 50%, var(--color-claw-200), var(--color-claw-400) 40%, transparent 75%)",
+      }}
+    />
+  );
+}
+
 /* ── Stage: the ritual's backdrop ────────────────────────────────────────
  * Plain Void by default. Under `cinematic` (WebGL present, no error yet) it sets
  * the same Void content over the in-world Quickening dawn scene, wrapped in an
  * ErrorBoundary so any 3D failure falls straight back to the Void — onboarding
- * can never get trapped on a blank screen. */
+ * can never get trapped on a blank screen. Either way the dawn burst veils the
+ * screen at the hatch moment. */
 function Stage({
   cinematic,
   phase,
@@ -127,7 +165,16 @@ function Stage({
   onError: () => void;
   children: React.ReactNode;
 }) {
-  if (!cinematic) return <Void>{children}</Void>;
+  const reduced = useReducedMotion() ?? false;
+  const dawn = phase === "hatching" || phase === "revealed";
+  if (!cinematic) {
+    return (
+      <Void>
+        {children}
+        <DawnBurst active={dawn} reduced={reduced} />
+      </Void>
+    );
+  }
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-ink-950 px-6 text-center">
       <ErrorBoundary onError={onError}>
@@ -136,6 +183,7 @@ function Stage({
         </Suspense>
       </ErrorBoundary>
       <div className="relative z-10 flex flex-col items-center">{children}</div>
+      <DawnBurst active={dawn} reduced={reduced} />
     </div>
   );
 }
@@ -188,7 +236,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   if (phase === "intro") {
     return (
       <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
-        <Egg size={200} />
+        {!cinematic && <Egg size={200} />}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -216,7 +264,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
       <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
         {phase === "hatching" ? (
           <>
-            <Egg size={200} cracking />
+            {!cinematic && <Egg size={200} cracking />}
             <div className="mt-8 flex items-center gap-2 text-sm text-ink-500">
               <Spinner /> Waking…
             </div>
@@ -259,7 +307,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   if (phase === "brain") {
     return (
       <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
-        <Egg size={120} />
+        {!cinematic && <Egg size={120} />}
         <BrainStep
           hasBrain={hasBrain}
           onConnected={() => setHasBrain(true)}
@@ -275,7 +323,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   const canAdvance = qi !== 0 || answers.creature_name.trim().length > 0;
   return (
     <Stage cinematic={cinematic} phase={phase} qi={qi} onError={() => setCineFailed(true)}>
-      <Egg size={120} />
+      {!cinematic && <Egg size={120} />}
       <motion.div
         key={qi}
         initial={{ opacity: 0, y: 10 }}
