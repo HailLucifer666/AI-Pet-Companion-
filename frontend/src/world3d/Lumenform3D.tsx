@@ -15,6 +15,7 @@ import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { arrive, placeTarget, WALK_SPEED, PathFollower, type Vec2 } from "./locomotion";
 import { activeLure, lure } from "./lure";
+import { stepFetch, fetchToy } from "./fetchPlay";
 import { petPos } from "./petPosition";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
@@ -106,8 +107,17 @@ export function Lumenform3D() {
 
     const lured = activeLure(lure, performance.now(), lumen.mode, reduced);
 
+    // Fetch play: a thrown spark pulls the pet out then back. Work always wins
+    // (real computation first), and reduced-motion never chases. Commit the phase
+    // the pure step advances to.
+    const fetchStep = !working && !reduced ? stepFetch(fetchToy, pos.current.x, pos.current.z) : null;
+    if (fetchStep && fetchStep.phase !== fetchToy.phase) fetchToy.phase = fetchStep.phase;
+    const fetchT = fetchStep?.target ?? null;
+
     let target: Vec2;
-    if (lured) {
+    if (fetchT) {
+      target = fetchT; // fetch overrides the cursor lure + the road
+    } else if (lured) {
       target = lured; // cursor lure overrides the road
     } else if (reduced) {
       target = placeTarget(lumen.place, lumen.wanderSeed); // reduced: snap to anchor, no road

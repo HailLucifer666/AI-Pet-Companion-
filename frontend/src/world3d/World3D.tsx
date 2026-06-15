@@ -25,6 +25,7 @@ import { Sky3D } from "./Sky3D";
 import { Clouds3D } from "./Clouds3D";
 import { Rain3D } from "./Rain3D";
 import { CursorLure } from "./CursorLure";
+import { FetchToy3D } from "./FetchToy3D";
 import { useWeather } from "./useWeather";
 import { fxFor } from "./weather";
 import { localHour } from "./daylight";
@@ -222,6 +223,7 @@ export function World3D() {
       <Village3D reduced={reduced} skills={skills} />
       <GlowMushrooms3D reduced={reduced} lit={q.litMushrooms} />
       <Lumenform3D />
+      <FetchToy3D reduced={reduced} />
       <Crystals3D />
       <Places3D />
       <SporeGate3D />

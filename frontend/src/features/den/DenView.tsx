@@ -18,6 +18,8 @@ import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus
 import { lure, lureControl } from "../../world3d/lure";
 import { hasWebGL } from "../../world3d/quality";
 import { useWorldStore } from "../../state/worldStore";
+import { throwSpot, throwToy } from "../../world3d/fetchPlay";
+import { petPos } from "../../world3d/petPosition";
 
 const PILL =
   "pointer-events-auto absolute left-5 select-none rounded-full border border-claw-500/40 bg-ink-950/70 px-3 py-1.5 font-display text-xs font-medium text-ink-200 backdrop-blur-sm transition-colors duration-150 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400";
@@ -127,9 +129,29 @@ function FreeRoamButton() {
   );
 }
 
+/** Throws a glowing spark for the companion to fetch — pure play (zero XP, fully
+ *  ignorable). Each throw fans to a fresh grassy spot near the pet; it dashes out,
+ *  grabs it, trots it home. Hidden under reduced-motion (no chase). */
+function ThrowButton() {
+  const [count, setCount] = useState(0);
+  return (
+    <button
+      onClick={() => {
+        const spot = throwSpot(petPos.x, petPos.z, count);
+        throwToy(spot.x, spot.z, petPos.x, petPos.z);
+        setCount((c) => c + 1);
+      }}
+      className={`${PILL} bottom-[10.75rem]`}
+    >
+      🎾 Throw a spark
+    </button>
+  );
+}
+
 export default function DenView() {
   const [host, setHost] = useState<HTMLDivElement | null>(null);
   const [mindOpen, setMindOpen] = useState(false);
+  const reduced = useReducedMotion() ?? false;
   const webgl = useMemo(hasWebGL, []); // no GPU/WebGL → a static 2D fallback, not a blank canvas
 
   // Press M to open/close the Mind's Eye (ignored while typing in a field).
@@ -160,6 +182,7 @@ export default function DenView() {
       <PetChat />
       <CoilRing />
       {webgl && <SeePetButton />}
+      {webgl && !reduced && <ThrowButton />}
       {webgl && <FreeRoamButton />}
       <button
         onClick={() => setMindOpen(true)}
