@@ -48,6 +48,9 @@ class AgentConfig(BaseModel):
     max_steps: int = Field(default=20, ge=1, le=100)
     history_messages: int = Field(default=40, ge=4, le=500)
     extract_memories: bool = True
+    # Fallback for models that can't emit structured tool_calls: parse
+    # [[tool {json}]] tags from the reply text. Only used when no structured calls.
+    tool_tag_fallback: bool = True
 
 
 class PetConfig(BaseModel):

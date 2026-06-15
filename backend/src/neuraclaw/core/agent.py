@@ -12,7 +12,7 @@ from ..config import WORKSPACE_DIR, Config
 from ..providers import ProviderError, Router, ToolsUnsupportedError, parse_ref
 from ..tools import Registry, ToolContext
 from ..tools.registry import args_summary
-from . import context
+from . import context, tooltags
 from .synapse import Synapse
 
 log = logging.getLogger(__name__)
@@ -125,50 +125,53 @@ async def run_turn(
             yield AgentEvent(type="error", text="Provider returned no response", ok=False)
             return
 
-        if not response.tool_calls:
-            await _persist(
-                db, session_id, {"role": "assistant", "content": response.text}
+        # The calls to run this step: structured tool_calls first; otherwise fall
+        # back to [[tool {json}]] tags in the text (for models that can't emit
+        # structured calls). Tags are read ONLY when there are no structured calls,
+        # so capable models never double-fire.
+        if response.tool_calls:
+            calls = [(tc.id, tc.name, tc.arguments_json) for tc in response.tool_calls]
+            assistant_content = response.text or None
+        else:
+            tagged = (
+                tooltags.parse_tool_tags(response.text)
+                if config.agent.tool_tag_fallback
+                else []
             )
-            if synapse:
-                synapse.publish("agent.done", session_id=session_id)
-            yield AgentEvent(type="done", text=response.text)
-            return
+            tagged = [(name, args) for name, args in tagged if name in registry.tools]
+            if not tagged:
+                await _persist(
+                    db, session_id, {"role": "assistant", "content": response.text}
+                )
+                if synapse:
+                    synapse.publish("agent.done", session_id=session_id)
+                yield AgentEvent(type="done", text=response.text)
+                return
+            calls = [(f"tag_{i}", name, args) for i, (name, args) in enumerate(tagged)]
+            assistant_content = tooltags.strip_tags(response.text) or None
 
         assistant_msg = {
             "role": "assistant",
-            "content": response.text or None,
+            "content": assistant_content,
             "tool_calls": [
-                {
-                    "id": tc.id,
-                    "type": "function",
-                    "function": {"name": tc.name, "arguments": tc.arguments_json},
-                }
-                for tc in response.tool_calls
+                {"id": cid, "type": "function", "function": {"name": name, "arguments": args}}
+                for cid, name, args in calls
             ],
         }
         messages.append(assistant_msg)
         await _persist(db, session_id, assistant_msg)
 
-        for tc in response.tool_calls:
+        for cid, name, args in calls:
             if synapse:
-                synapse.publish("agent.tool.start", tool=tc.name)
-            yield AgentEvent(
-                type="tool_start", tool=tc.name, detail=args_summary(tc.arguments_json)
-            )
-            result = await registry.dispatch(ctx, tc.name, tc.arguments_json)
+                synapse.publish("agent.tool.start", tool=name)
+            yield AgentEvent(type="tool_start", tool=name, detail=args_summary(args))
+            result = await registry.dispatch(ctx, name, args)
             if synapse:
-                synapse.publish("agent.tool.end", tool=tc.name, ok=result.ok)
+                synapse.publish("agent.tool.end", tool=name, ok=result.ok)
             yield AgentEvent(
-                type="tool_end",
-                tool=tc.name,
-                detail=result.content[:300],
-                ok=result.ok,
+                type="tool_end", tool=name, detail=result.content[:300], ok=result.ok
             )
-            tool_msg = {
-                "role": "tool",
-                "content": result.content,
-                "tool_call_id": tc.id,
-            }
+            tool_msg = {"role": "tool", "content": result.content, "tool_call_id": cid}
             messages.append(tool_msg)
             await _persist(db, session_id, tool_msg)
 

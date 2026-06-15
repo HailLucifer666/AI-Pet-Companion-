@@ -104,6 +104,40 @@ async def test_tool_call_roundtrip(db, tmp_path):
     assert any(m.get("role") == "tool" for m in router.calls[1])
 
 
+async def test_tag_fallback_dispatches_when_no_structured_calls(db, tmp_path):
+    """A model that writes [[list_dir {}]] in text (no structured call) still runs the tool."""
+    config = make_config()
+    router = ScriptedRouter([
+        ChatResponse(text="Sure, listing them. [[list_dir {}]]"),
+        ChatResponse(text="here you go"),
+    ])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="list files",
+        )
+    )
+    assert any(e.type == "tool_start" and e.tool == "list_dir" for e in events)
+    assert any(e.type == "tool_end" for e in events)
+    assert events[-1].type == "done" and "here you go" in events[-1].text
+    # The tool result was fed back to the model on the next step.
+    assert any(m.get("role") == "tool" for m in router.calls[1])
+
+
+async def test_unknown_tag_stays_plain_text(db, tmp_path):
+    """A tag naming no real tool is left as text — no dispatch."""
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="see [[notatool {}]] here")])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hi",
+        )
+    )
+    assert events[-1].type == "done"
+    assert all(e.type != "tool_start" for e in events)
+
+
 async def test_step_budget_exhaustion(db, tmp_path):
     config = Config.model_validate(
         {"agent": {"max_steps": 2, "extract_memories": False}}

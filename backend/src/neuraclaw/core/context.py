@@ -56,6 +56,8 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
         " and play or control Spotify (`play_music`, `control_playback`)."
         " When the user asks for one of these, call the tool instead of saying you can't;"
         " if it returns a setup or error message, relay that to the user."
+        " If you cannot make a function call, you may instead write a tag on its own line,"
+        ' e.g. [[play_music {"query": "calm down"}]] — the app will run it.'
         " Never fabricate tool output. After tools finish, answer the user directly."
     )
     return "\n\n".join(parts)
