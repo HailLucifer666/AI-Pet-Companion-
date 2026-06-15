@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`604144f`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully polished** (3D egg · dawn burst-flash · emergence motes · camera dolly · per-region kindling — only optional soft-sound left). The headline beats all land — remaining work is the V-4 milestone + deferred refactors.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`d90c582`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete** (3D egg · dawn burst-flash · emergence motes · camera dolly · per-region kindling · birth chime). Every headline beat lands — remaining work is the V-4 milestone + deferred refactors.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -57,6 +57,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-6 polish | **Emergence motes** — a one-shot fountain of warm additive sparks erupts from the egg at hatch and rises into the dawn as the companion appears, then fades (~2.4s); reduced-motion emits none | `768979d` |
 | W-6 polish | **Camera dolly** — the Quickening camera pushes toward the egg through the questions, presses into the hatch burst, eases back for the dawn (always egg-centred); reduced-motion snaps per phase | `7e2bbed` |
 | W-6 polish | **Per-region kindling** — five ember cairns ring the grove; each answer bursts + lights its region (last at the brain-check) so the whole grove is alive by the dawn (the master-plan "5 answers light 5 regions" beat); pure emissive, reduced-motion = lit, no burst | `604144f` |
+| W-6 polish | **Birth chime** — a soft rising C-major swell (live Web Audio synth, no asset/dep) plays once at hatch under the "Hatch" gesture; reduced-motion silent; try/catch so it never breaks the hatch (pure-tested voices/envelope). **W-6 Quickening fully complete** | `d90c582` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -64,7 +65,6 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 ### Pending ⏳
 | Slice | What | Effort |
 |-------|------|--------|
-| W-6 polish (rest) | Quickening laterCuts — **soft sound** only remaining (audio asset + mute/autoplay friction); visuals all shipped (`5ce4315` first cut; 3D egg + dawn burst-flash `efb772b`; emergence motes `768979d`; camera dolly `7e2bbed`; per-region kindling `604144f`) | **S** |
 | V-2.5 (rest) | placeRegistry consolidation (one source for place coords/anchors/road-nodes) — deferred: high test-churn, invisible; the robustness wins (GPU ladder + 2D fallback) already shipped | **S** |
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
