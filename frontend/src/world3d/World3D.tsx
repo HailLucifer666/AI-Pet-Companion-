@@ -5,7 +5,7 @@
  *  once you let go it drifts in a slow cinematic orbit. Reduced-motion holds a
  *  still framed shot. The whole three.js stack is lazy-loaded with the Den. */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
@@ -31,6 +31,7 @@ import { localHour } from "./daylight";
 import { petPos } from "./petPosition";
 import { cameraFocus } from "./cameraFocus";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
+import { detectGpuTier, qualityFlags } from "./quality";
 
 interface ControlsLike {
   target: Vector3;
@@ -174,6 +175,10 @@ export function World3D() {
   const weather = useWeather();
   const fx = fxFor(weather);
 
+  // Detect the GPU tier once → a flag set that drops the GPU-heavy flourishes
+  // (bloom, MSAA, shadows, extra lights, dpr) first on weak hardware so fps holds.
+  const q = useMemo(() => qualityFlags(detectGpuTier()), []);
+
   // The sky tracks the real local clock; re-read each minute.
   const [hour, setHour] = useState(() => localHour(new Date()));
   useEffect(() => {
@@ -183,25 +188,25 @@ export function World3D() {
 
   return (
     <Canvas
-      shadows
-      dpr={[1, 1.75]}
+      shadows={q.shadows}
+      dpr={q.dpr}
       frameloop={reduced ? "demand" : "always"}
       camera={{ position: [0, 20, 24], fov: 42, near: 0.1, far: 400 }}
       gl={{ antialias: false, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >
       {/* Sky, light + fog — driven by real time of day × real weather. */}
-      <Atmosphere hour={hour} fx={fx} reduced={reduced} />
+      <Atmosphere hour={hour} fx={fx} reduced={reduced} shadows={q.shadows} shadowMapSize={q.shadowMapSize} />
 
       {/* The sun + moon disc, riding the same day/night light arc. */}
       <Sky3D hour={hour} reduced={reduced} />
 
       {/* Deep-sky stars — faint by day (the bright sky + fog swallow them), a real
           field at night. `fade` blends them into the horizon fog. */}
-      <Stars radius={250} depth={60} count={1600} factor={4} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
+      <Stars radius={250} depth={60} count={q.stars} factor={4} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
 
       <Island />
       <Village3D reduced={reduced} />
-      <GlowMushrooms3D reduced={reduced} />
+      <GlowMushrooms3D reduced={reduced} lit={q.litMushrooms} />
       <Lumenform3D />
       <Crystals3D />
       <Places3D />
@@ -227,7 +232,7 @@ export function World3D() {
         maxPolarAngle={1.2}
       />
 
-      <Postfx />
+      <Postfx bloom={!reduced && q.bloom} msaa={q.msaa} />
     </Canvas>
   );
 }

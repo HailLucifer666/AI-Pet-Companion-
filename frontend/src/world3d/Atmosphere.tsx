@@ -27,7 +27,19 @@ const skyTarget = new Color();
 const tmpSun = new Color();
 const tmpAmb = new Color();
 
-export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx; reduced: boolean }) {
+export function Atmosphere({
+  hour,
+  fx,
+  reduced,
+  shadows = true,
+  shadowMapSize = 2048,
+}: {
+  hour: number;
+  fx: WeatherFx;
+  reduced: boolean;
+  shadows?: boolean;
+  shadowMapSize?: number;
+}) {
   const scene = useThree((s) => s.scene);
   const dir = useRef<DirectionalLight>(null);
   const hemi = useRef<HemisphereLight>(null);
@@ -92,9 +104,9 @@ export function Atmosphere({ hour, fx, reduced }: { hour: number; fx: WeatherFx;
         color={WORLD.sun}
         intensity={1.45}
         position={[18 * WORLD_SCALE, 18 * WORLD_SCALE, 10 * WORLD_SCALE]}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        castShadow={shadows}
+        shadow-mapSize-width={shadowMapSize}
+        shadow-mapSize-height={shadowMapSize}
         shadow-camera-left={-SHADOW_R}
         shadow-camera-right={SHADOW_R}
         shadow-camera-top={SHADOW_R}

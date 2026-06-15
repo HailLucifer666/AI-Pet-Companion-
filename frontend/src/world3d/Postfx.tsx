@@ -1,22 +1,19 @@
 /** Postfx — the Grove's post-processing. A single selective bloom pass: only the
  *  bright/emissive things (the companion's ember body + its light, memory crystals,
  *  place embers) blossom into glow, the matte terrain does not. This is the one
- *  effect that reads as "premium" — restrained, not a haze. Mounted only when motion
- *  is allowed; reduced-motion / weak-GPU paths render the scene straight (no composer).
+ *  effect that reads as "premium" — restrained, not a haze.
  *
- *  TODO(perf): gate also on a WebGL2/GPU-tier check once detection exists — bloom is
- *  the first thing to drop on low-end hardware (the public-target fallback).
- */
+ *  Gated by the caller: reduced-motion AND the low GPU tier render the scene
+ *  straight (no composer) — bloom is the first thing to drop on weak hardware. The
+ *  MSAA sample count rides the same quality ladder. */
 
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { useReducedMotion } from "motion/react";
 
-export function Postfx() {
-  const reduced = useReducedMotion() ?? false;
-  if (reduced) return null;
+export function Postfx({ bloom, msaa }: { bloom: boolean; msaa: number }) {
+  if (!bloom) return null;
 
   return (
-    <EffectComposer multisampling={8}>
+    <EffectComposer multisampling={msaa}>
       <Bloom
         intensity={0.7}
         luminanceThreshold={0.9}
