@@ -133,6 +133,16 @@ async def active_index(db: aiosqlite.Connection) -> list[dict]:
     return [dict(r) for r in await cur.fetchall()]
 
 
+async def list_active(db: aiosqlite.Connection) -> list[dict]:
+    """Full rows for every approved (active) skill — drives the world's earned
+    monuments (and any skill UI). Drafts/disabled are excluded by design."""
+    cur = await db.execute(
+        "SELECT id, name, description, risk, status, created_at FROM skills"
+        " WHERE status = 'active' ORDER BY created_at"
+    )
+    return [dict(r) for r in await cur.fetchall()]
+
+
 async def load_body(db: aiosqlite.Connection, name: str) -> str | None:
     cur = await db.execute(
         "SELECT path FROM skills WHERE name = ? AND status = 'active'", (name,)

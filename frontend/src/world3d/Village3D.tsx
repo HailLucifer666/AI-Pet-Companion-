@@ -21,6 +21,8 @@ import { WORLD, VILLAGE } from "./palette";
 import { PLAZA_POS } from "./placeDefs";
 import { BUILDING_DEFS, VILLAGE_ROADS, type BuildingDef } from "./villageLayout";
 import { buildRoadGeometry } from "./roadGraph";
+import { skillMonumentPosition } from "./skillMonumentPlacement";
+import type { Skill } from "../lib/api";
 
 const hex = (n: number) => new THREE.Color(n);
 const FORGE_MS = 1600; // how long the forge erupts after a real skill draft
@@ -96,7 +98,12 @@ function useVillageMaterials() {
       1.25,
       { flicker: 1.1 },
     );
-    return { stone, stoneHi, timber, roof, cobble, road, window, workWindow, lantern, glass, crystal, forgeTop, flame, flameTip };
+    // Earned skill monuments: a steady ember glow (no flicker) — calm, not busy.
+    const skillGlow = glow(
+      new THREE.MeshStandardMaterial({ color: hex(WORLD.ember), emissive: hex(WORLD.ember), flatShading: true }),
+      0.9,
+    );
+    return { stone, stoneHi, timber, roof, cobble, road, window, workWindow, lantern, glass, crystal, forgeTop, flame, flameTip, skillGlow };
   }, []);
 
   useEffect(
@@ -406,7 +413,33 @@ function Roads({ mats }: { mats: Mats }) {
   );
 }
 
-export function Village3D({ reduced }: { reduced: boolean }) {
+/** Earned monuments: one small glowing obelisk per APPROVED skill, ringing the
+ *  forge. Real-data — fed by the live active-skills list (useSkills, passed in).
+ *  Mounted inside the Village root group, so the shared glow traversal lights its
+ *  ember caps at zero extra per-frame cost. No own point light (the ≤4 cap holds). */
+function SkillMonuments({ mats, skills, forgeX, forgeZ }: { mats: Mats; skills: Skill[]; forgeX: number; forgeZ: number }) {
+  return (
+    <group>
+      {skills.map((s, i) => {
+        const p = skillMonumentPosition(i, s.id, forgeX, forgeZ);
+        return (
+          <group key={s.id} position={[p.x, p.y, p.z]}>
+            <mesh position-y={0.25} castShadow receiveShadow>
+              <boxGeometry args={[0.34, 0.5, 0.34]} />
+              <primitive object={mats.stone} attach="material" />
+            </mesh>
+            <mesh position-y={0.66}>
+              <icosahedronGeometry args={[0.17, 0]} />
+              <primitive object={mats.skillGlow} attach="material" />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+export function Village3D({ reduced, skills }: { reduced: boolean; skills: Skill[] }) {
   const mats = useVillageMaterials();
   const root = useRef<THREE.Group>(null);
   const hearthLight = useRef<THREE.PointLight>(null);
@@ -457,8 +490,10 @@ export function Village3D({ reduced }: { reduced: boolean }) {
       {BUILDING_DEFS.map((b) => (
         <Building key={b.id} def={b} mats={mats} />
       ))}
+      {forge && <SkillMonuments mats={mats} skills={skills} forgeX={forge.pos[0]} forgeZ={forge.pos[2]} />}
 
-      {/* ≤4 point lights — the bioluminescent ground bounce (capped for perf). */}
+      {/* ≤4 point lights — a HARD perf cap (the bioluminescent ground bounce). Skill
+          monuments add none: they ride the forge's spill + the emissive bloom. */}
       <pointLight ref={hearthLight} position={[px, py + 0.9, pz]} color={hex(WORLD.ember)} intensity={5} distance={12} decay={2} />
       {forge && (
         <pointLight ref={forgeLight} position={[forge.pos[0], forgeH, forge.pos[2]]} color={hex(WORLD.ember)} intensity={2.2} distance={6} decay={2} />

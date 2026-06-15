@@ -16,6 +16,7 @@ from ..core.synapse import sse_stream, synapse as _synapse
 from ..db.connection import vec_version
 from ..memory import extractor, store
 from ..pet import hatch as hatch_svc, xp
+from ..skillsys import loader as skill_loader
 from ..weather import fetch_weather
 
 log = logging.getLogger(__name__)
@@ -144,6 +145,12 @@ async def den(request: Request):
         "memory_count": memory_count,
         "skill_count": skill_count,
     }
+
+
+@api_router.get("/skills")
+async def list_skills(request: Request):
+    """The companion's approved (active) skills — drives the village's earned monuments."""
+    return {"skills": await skill_loader.list_active(request.app.state.db)}
 
 
 class HatchRequest(BaseModel):

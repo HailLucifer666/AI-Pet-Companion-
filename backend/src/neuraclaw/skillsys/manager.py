@@ -6,6 +6,7 @@ from pathlib import Path
 
 import aiosqlite
 
+from ..core.synapse import synapse
 from .loader import DRAFTS_DIR, SKILLS_DIR, parse_skill_md
 
 log = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ async def approve_draft(db: aiosqlite.Connection, skill_id: int) -> bool:
     )
     await _snapshot(db, skill_id, "approved draft")
     await db.commit()
+    synapse.publish("skill.approved", name=row["name"])  # the world raises a monument
     return True
 
 

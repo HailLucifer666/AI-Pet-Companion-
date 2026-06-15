@@ -31,6 +31,16 @@ export interface Memory {
   created_at: string;
 }
 
+/** An approved (active) self-drafted skill — one earned monument in the village. */
+export interface Skill {
+  id: number;
+  name: string;
+  description: string;
+  risk: string;
+  status: string;
+  created_at: string;
+}
+
 /** The Living Memory Web: kept memories + similarity links (real embeddings). */
 export interface MemoryGraphNode {
   id: number;
@@ -153,6 +163,8 @@ export const api = {
 
   weather: () => get<Weather>("/weather"),
 
+  skills: () => get<{ skills: Skill[] }>("/skills"),
+
   sessions: () => get<{ sessions: SessionSummary[] }>("/sessions"),
   sessionMessages: (id: string) =>
     get<{ messages: Message[] }>(`/sessions/${encodeURIComponent(id)}/messages`),
@@ -189,6 +201,7 @@ export const queryKeys = {
   settings: ["settings"] as const,
   pet: ["pet"] as const,
   weather: ["weather"] as const,
+  skills: ["skills"] as const,
   sessions: ["sessions"] as const,
   sessionMessages: (id: string) => ["sessions", id, "messages"] as const,
   memory: (q: string, type: string) => ["memory", q, type] as const,

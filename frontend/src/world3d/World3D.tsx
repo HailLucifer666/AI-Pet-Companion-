@@ -34,6 +34,7 @@ import { islandHeight, ISLAND_MAX_R } from "./terrain";
 import { detectGpuTier, qualityFlags } from "./quality";
 import { stageReveal } from "./widening";
 import { useWorldStore } from "../state/worldStore";
+import { useSkills } from "./useSkills";
 
 interface ControlsLike {
   target: Vector3;
@@ -179,6 +180,9 @@ export function World3D() {
   const reduced = useReducedMotion() ?? false;
   const weather = useWeather();
   const fx = fxFor(weather);
+  // Approved skills → earned village monuments. Read OUTSIDE the Canvas (like
+  // weather) since react-query context doesn't cross the r3f renderer boundary.
+  const skills = useSkills();
 
   // Detect the GPU tier once → a flag set that drops the GPU-heavy flourishes
   // (bloom, MSAA, shadows, extra lights, dpr) first on weak hardware so fps holds.
@@ -215,7 +219,7 @@ export function World3D() {
       <Stars radius={250} depth={60} count={q.stars} factor={4} saturation={0.2} fade speed={reduced ? 0 : 0.4} />
 
       <Island />
-      <Village3D reduced={reduced} />
+      <Village3D reduced={reduced} skills={skills} />
       <GlowMushrooms3D reduced={reduced} lit={q.litMushrooms} />
       <Lumenform3D />
       <Crystals3D />
