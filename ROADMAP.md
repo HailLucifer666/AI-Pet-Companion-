@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`2de142d`) · **Current:** V-2.5 hardening (GPU-tier ladder + 2D fallback shipped) → V-2h Emotion Vector next.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`2b161e8`) · **Current:** V-2.5 ladder + 2D fallback + V-2h emotion-glow shipped → W-8 clickable crystals next.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -45,6 +45,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-6 Blooming | cubic-out level-up gate flash + inbound pulse (pure tested core `bloomCinematic.ts`) | `1819d9b` |
 | W-6 Forging | skill draft → **forge erupts** + pet celebrates at the Foundry | `a12dfd1` |
 | V-2.5 (part) | **GPU-tier quality ladder** (`quality.ts`, pure-tested — drops bloom/MSAA/shadows/extra-lights/dpr first on weak GPUs) + **2D no-WebGL fallback** | `2de142d` |
+| V-2h (part) | **Emotion vector** (`emotion.ts`, pure-tested) — real agent cadence → {arousal,valence,curiosity,confidence} colours the pet's glow (brighter when busy, warmer on a real win) | `2b161e8` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -55,7 +56,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 | W-6 Quickening | **in-world egg-hatch cinematic** — replaces the DOM hatch ritual (first-run-flow rework; ~10 coupling hazards — run its own scope workflow) | **L** |
 | V-2.5 (rest) | placeRegistry consolidation (one source for place coords/anchors/road-nodes) — deferred: high test-churn, invisible; the robustness wins (GPU ladder + 2D fallback) already shipped | **S** |
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
-| V-2h | Emotion Vector — arousal/valence/curiosity from real agent cadence → pet glow (fills the `mood` stub) | **M** |
+| V-2h (rest) | Emotion Vector backend — persist the derived vector to the `mood` column + surface via `/api/pet` (frontend glow already shipped `2b161e8`) | **S** |
 | W-7 | The Widening — realms II (Wilderness) + III (Observatory), camera bounds expand on stage-up | **L** |
 | W-8 | Full-game layer — clickable crystals open real memories, skill monuments, play | **L** |
 | V-4 | Sight & Voice — browser teaching → Tauri native shell + desktop pointing (see `docs/SIGHT-AND-VOICE.md`) | **XL** |
