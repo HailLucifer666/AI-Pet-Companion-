@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`37c5f65`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a backend** done (multimodal plumbing + vision-brain signal). Every headline beat lands — remaining V-4 work is the Sight & Voice **frontend** (capture UI / privacy warning / voice) + deferred refactors.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`f8b3f05`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a Sight complete** (multimodal backend + vision signal + capture UI — needs a backend restart + live eyeball). Every headline beat lands — remaining V-4 work is voice polish + the Tauri native shell + deferred refactors.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -60,6 +60,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-6 polish | **Birth chime** — a soft rising C-major swell (live Web Audio synth, no asset/dep) plays once at hatch under the "Hatch" gesture; reduced-motion silent; try/catch so it never breaks the hatch (pure-tested voices/envelope). **W-6 Quickening fully complete** | `d90c582` |
 | V-4a (backend) | **Multimodal chat plumbing** — optional `ChatRequest.image_b64` + pure `build_user_content()` (text→multimodal array); `run_turn` attaches the image to the current turn only (never persisted); route auto-picks a `vision` role; provider unchanged. Pure core + injection unit-tested. Foundation for Sight & Voice — no capture UI yet | `fc80847` |
 | V-4a (backend) | **`GET /api/vision`** — vision-brain availability + **remote signal** (does a captured screen leave the device?) via pure `resolve_vision()` over the `vision` role chain; the truthful basis for the capture-UI privacy warning. Pure core unit-tested | `37c5f65` |
+| V-4a (frontend) | **Sight capture UI** — 👁 in PetChat captures one screen frame (`useScreenCapture`, feature-detected) → attaches to the next chat turn (multimodal); gated on a real vision brain; **amber privacy warning when the model is remote** (`/api/vision`), reassurance when local; image never persisted. **Live-eyeball only** (getDisplayMedia) — smoke confirms gating+render | `f8b3f05` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -71,7 +72,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
 | W-7 (rest) | Separate realms II (Wilderness) + III (Observatory) — **needs a design rethink post-village-pivot** (workflow-sized); the stage-up world-reveal core shipped `7fb90cd` | **L** |
-| V-4 (rest) | Sight & Voice — **backend done** (multimodal `fc80847` + vision signal `37c5f65`); remaining: screen-capture UI + remote-vision privacy warning (V-4a frontend — **live-eyeball only, privacy-sensitive**), voice in/out (V-4b — partly via PetChat), Tauri shell + desktop pointing (V-4c/d). See `docs/SIGHT-AND-VOICE.md` | **XL** |
+| V-4 (rest) | Sight & Voice — **V-4a Sight done** (backend `fc80847`+`37c5f65`, capture UI `f8b3f05`); remaining: voice in/out (V-4b — largely via PetChat useVoice already), Tauri shell + desktop pointing (V-4c/d). See `docs/SIGHT-AND-VOICE.md` | **L** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
 ---
