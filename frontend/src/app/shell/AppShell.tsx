@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   BookOpen,
   Brain,
@@ -10,6 +10,8 @@ import {
   ListTodo,
   Mail,
   MessageSquare,
+  PanelLeft,
+  PanelLeftClose,
   Settings,
   Sprout,
   StickyNote,
@@ -18,7 +20,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { api, queryKeys } from "../../lib/api";
-import { StatusDot, Tooltip } from "../../components/ui";
+import { IconButton, StatusDot, Tooltip } from "../../components/ui";
 import { Creature } from "../../components/creature/Creature";
 import { useCreatureStore, connect, disconnectSynapse } from "../../state/creatureStore";
 import { connect as connectWorld, disconnectWorld } from "../../state/worldStore";
@@ -40,6 +42,16 @@ const surfaces: Surface[] = [
   { to: "/memory", label: "Memory", icon: Brain },
   { to: "/skills", label: "Skills", icon: Wrench },
 ];
+
+const NAV_COLLAPSED_KEY = "neuraclaw-nav-collapsed";
+
+function readNavCollapsed(): boolean {
+  try {
+    return localStorage.getItem(NAV_COLLAPSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 function RailLink({ to, label, icon: Icon }: Surface) {
   return (
@@ -90,6 +102,16 @@ export function AppShell() {
   const creatureStage = useCreatureStore((s) => s.stage);
   const creatureState = useCreatureStore((s) => s.state);
   const creatureReaction = useCreatureStore((s) => s.reaction);
+  const reduceMotion = useReducedMotion();
+  const [navCollapsed, setNavCollapsed] = useState(readNavCollapsed);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NAV_COLLAPSED_KEY, navCollapsed ? "1" : "0");
+    } catch {
+      /* localStorage unavailable (private mode) — collapse just won't persist */
+    }
+  }, [navCollapsed]);
 
   useEffect(() => {
     connect();
@@ -102,44 +124,86 @@ export function AppShell() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <div className="flex min-h-0 flex-1">
-        <nav className="flex w-16 flex-col items-center gap-1 border-r border-ink-800 bg-ink-900/80 py-3 backdrop-blur-sm">
-          <div
-            className="mb-3 flex size-10 items-center justify-center rounded-card bg-claw-600 font-display text-lg font-bold text-ink-950 glow-accent"
-            title="NeuraClaw"
-          >
-            N
-          </div>
-          {/* The Grove is home — the world the companion lives in (also the live
-              creature avatar at the rail's foot). */}
-          <RailLink to="/den" label="The Grove" icon={Sprout} />
-          <div className="my-1 h-px w-6 bg-ink-800" aria-hidden />
-          {surfaces.map((s) => (
-            <RailLink key={s.to} {...s} />
-          ))}
-          <div className="flex-1" />
-
-          <Tooltip label="Den" side="right">
-            <NavLink
-              to="/den"
-              className={({ isActive }) =>
-                [
-                  "group relative flex size-11 items-center justify-center rounded-ctl",
-                  "transition-colors duration-150 ease-out-expo active:scale-90",
-                  isActive ? "bg-claw-600/15" : "hover:bg-ink-800",
-                ].join(" ")
-              }
+      <div className="relative flex min-h-0 flex-1">
+        <AnimatePresence initial={false}>
+          {!navCollapsed && (
+            <motion.nav
+              key="nav-rail"
+              initial={{ width: 0 }}
+              animate={{ width: 64 }}
+              exit={{ width: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
+              className="shrink-0 overflow-hidden border-r border-ink-800 bg-ink-900/80 backdrop-blur-sm"
             >
-              <Creature stage={creatureStage} state={creatureState} reaction={creatureReaction} size={40} />
-            </NavLink>
-          </Tooltip>
+              <div className="flex h-full w-16 flex-col items-center gap-1 py-3">
+                <div
+                  className="mb-3 flex size-10 items-center justify-center rounded-card bg-claw-600 font-display text-lg font-bold text-ink-950 glow-accent"
+                  title="NeuraClaw"
+                >
+                  N
+                </div>
+                {/* The Grove is home — the world the companion lives in (also the live
+                    creature avatar at the rail's foot). */}
+                <RailLink to="/den" label="The Grove" icon={Sprout} />
+                <div className="my-1 h-px w-6 bg-ink-800" aria-hidden />
+                {surfaces.map((s) => (
+                  <RailLink key={s.to} {...s} />
+                ))}
+                <div className="flex-1" />
 
-          {import.meta.env.DEV && (
-            <RailLink to="/styleguide" label="Styleguide" icon={BookOpen} />
+                <Tooltip label="Den" side="right">
+                  <NavLink
+                    to="/den"
+                    className={({ isActive }) =>
+                      [
+                        "group relative flex size-11 items-center justify-center rounded-ctl",
+                        "transition-colors duration-150 ease-out-expo active:scale-90",
+                        isActive ? "bg-claw-600/15" : "hover:bg-ink-800",
+                      ].join(" ")
+                    }
+                  >
+                    <Creature stage={creatureStage} state={creatureState} reaction={creatureReaction} size={40} />
+                  </NavLink>
+                </Tooltip>
+
+                {import.meta.env.DEV && (
+                  <RailLink to="/styleguide" label="Styleguide" icon={BookOpen} />
+                )}
+                <RailLink to="/settings" label="Settings" icon={Settings} />
+                <div className="my-1 h-px w-6 bg-ink-800" aria-hidden />
+                <Tooltip label="Collapse sidebar" side="right">
+                  <IconButton
+                    icon={PanelLeftClose}
+                    label="Collapse sidebar"
+                    onClick={() => setNavCollapsed(true)}
+                  />
+                </Tooltip>
+              </div>
+            </motion.nav>
           )}
-          <RailLink to="/settings" label="Settings" icon={Settings} />
-        </nav>
-        <main className="min-w-0 flex-1 overflow-hidden">
+        </AnimatePresence>
+        <main className="relative min-w-0 flex-1 overflow-hidden">
+          <AnimatePresence>
+            {navCollapsed && (
+              <motion.div
+                key="nav-reveal"
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: reduceMotion ? 0 : 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute left-2 top-2 z-20"
+              >
+                <Tooltip label="Expand sidebar" side="right">
+                  <IconButton
+                    icon={PanelLeft}
+                    label="Expand sidebar"
+                    className="surface-raised shadow-lg"
+                    onClick={() => setNavCollapsed(false)}
+                  />
+                </Tooltip>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={location.pathname}
