@@ -7,6 +7,7 @@ import pytest
 
 from neuraclaw.config import MIGRATIONS_DIR, Config
 from neuraclaw.core import agent
+from neuraclaw.core.context import build_user_content
 from neuraclaw.db import migrate, open_db
 from neuraclaw.providers.base import ChatResponse, Delta, ToolCall
 from neuraclaw.tools import build_registry
@@ -130,3 +131,50 @@ async def test_system_prompt_contains_soul(db, tmp_path):
     soul = (Path(__file__).resolve().parents[2] / "SOUL.md").read_text(encoding="utf-8")
     norm = lambda s: s.replace("\r\n", "\n").replace("\r", "\n").strip()
     assert norm(soul) in norm(system["content"])
+
+
+def test_build_user_content_plain_text():
+    # No image → a plain string (the common, unchanged path).
+    assert build_user_content("hello", None) == "hello"
+    assert build_user_content("hello", "") == "hello"
+
+
+def test_build_user_content_wraps_bare_base64():
+    content = build_user_content("what is this?", "AAAABBBB")
+    assert isinstance(content, list)
+    text_part, image_part = content
+    assert text_part == {"type": "text", "text": "what is this?"}
+    assert image_part["type"] == "image_url"
+    assert image_part["image_url"]["url"] == "data:image/png;base64,AAAABBBB"
+
+
+def test_build_user_content_passes_through_data_url():
+    url = "data:image/jpeg;base64,ZZZZ"
+    content = build_user_content("look", url)
+    assert content[1]["image_url"]["url"] == url  # used as-is, not double-wrapped
+
+
+async def test_image_attaches_to_latest_user_message(db, tmp_path):
+    config = make_config()
+    router = ScriptedRouter([ChatResponse(text="that's a cat")])
+    events = await collect(
+        agent.run_turn(
+            db=db, router=router, registry=build_registry(config), config=config,
+            session_id="s1", user_text="hello", image_b64="PNGDATA",
+        )
+    )
+    assert events[-1].type == "done"
+    # The model saw a multimodal user message carrying the image.
+    user_msgs = [m for m in router.calls[0] if m.get("role") == "user"]
+    content = user_msgs[-1]["content"]
+    assert isinstance(content, list)
+    assert any(
+        p.get("type") == "image_url" and "PNGDATA" in p["image_url"]["url"]
+        for p in content
+    )
+    # The image is never persisted to history — only the text is stored.
+    cur = await db.execute(
+        "SELECT content FROM messages WHERE session_id='s1' AND role='user'"
+    )
+    rows = await cur.fetchall()
+    assert all("PNGDATA" not in r["content"] for r in rows)

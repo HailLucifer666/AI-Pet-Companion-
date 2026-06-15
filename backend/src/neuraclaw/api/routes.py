@@ -186,6 +186,9 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=100_000)
     session_id: str | None = None
     role: str = "primary"
+    # Optional screen/image the companion should look at. Base64 (raw or a data:
+    # URL). Sent to the vision model for this turn only — never written to history.
+    image_b64: str | None = Field(default=None, max_length=15_000_000)
 
 
 def _sse(event: dict) -> str:
@@ -201,6 +204,10 @@ async def chat(req: ChatRequest, request: Request):
 
     if req.role not in config.roles:
         raise HTTPException(400, f"Unknown role {req.role!r}")
+
+    # An attached image needs a vision-capable model: prefer a configured `vision`
+    # role, else keep the requested one (e.g. a vision-capable `primary`).
+    role = "vision" if req.image_b64 and "vision" in config.roles else req.role
 
     session_id = req.session_id or str(uuid.uuid4())
     cur = await db.execute("SELECT id FROM sessions WHERE id = ?", (session_id,))
@@ -228,7 +235,8 @@ async def chat(req: ChatRequest, request: Request):
             config=config,
             session_id=session_id,
             user_text=req.message,
-            role=req.role,
+            role=role,
+            image_b64=req.image_b64,
             synapse=_synapse,
         ):
             if event.type == "delta":

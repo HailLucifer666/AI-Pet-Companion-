@@ -57,6 +57,24 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
     return "\n\n".join(parts)
 
 
+def build_user_content(text: str, image_b64: str | None) -> str | list[dict[str, Any]]:
+    """The latest user turn's content for the model.
+
+    Plain string when there's no image (the common path). When an image is
+    attached, an OpenAI-style multimodal content array (text + an ``image_url``
+    data-URL) so a vision model can see the screen. The image bytes are passed
+    straight through — never logged, never persisted. A bare base64 string is
+    wrapped as a PNG data-URL; an already-formed ``data:`` URL is used as-is.
+    """
+    if not image_b64:
+        return text
+    url = image_b64 if image_b64.startswith("data:") else f"data:image/png;base64,{image_b64}"
+    return [
+        {"type": "text", "text": text},
+        {"type": "image_url", "image_url": {"url": url}},
+    ]
+
+
 async def load_history(
     db: aiosqlite.Connection, session_id: str, agent_config: AgentConfig
 ) -> list[dict[str, Any]]:

@@ -53,16 +53,28 @@ async def run_turn(
     session_id: str,
     user_text: str,
     role: str = "primary",
+    image_b64: str | None = None,
     synapse: Synapse | None = None,
 ) -> AsyncIterator[AgentEvent]:
     """Run one agent turn. The user message must already be persisted.
 
     When `synapse` is provided, the turn's lifecycle is mirrored onto the bus
     so the whole UI (the creature, any surface) reacts to real activity.
+
+    When `image_b64` is given, the latest user message becomes a multimodal
+    (text + image) content array so a vision model can see the attached screen.
+    The image is sent to the model but never persisted to history.
     """
     system = await context.build_system_prompt(db, user_text)
     history = await context.load_history(db, session_id, config.agent)
     messages: list[dict[str, Any]] = [{"role": "system", "content": system}, *history]
+
+    if image_b64:
+        # Attach the image to the current turn (the last user message in history).
+        for msg in reversed(messages):
+            if msg.get("role") == "user":
+                msg["content"] = context.build_user_content(user_text, image_b64)
+                break
 
     ctx = ToolContext(
         db=db,

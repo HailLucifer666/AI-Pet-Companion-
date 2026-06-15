@@ -22,6 +22,12 @@ roles:
     - nim/meta/llama-3.1-8b-instruct
   local:
     - ollama/qwen2.5
+  # Vision-capable chain — used automatically when a chat carries an image
+  # (the companion "looking at" your screen). Sonnet sees images over the
+  # existing OpenRouter key; the Ollama fallback keeps sight fully local.
+  vision:
+    - openrouter/anthropic/claude-sonnet-4.6
+    - ollama/llama3.2-vision
 
 # Models known to NOT support tool calling. Router refuses tool-bearing
 # requests to these instead of failing silently.
