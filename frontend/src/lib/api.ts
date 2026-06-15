@@ -107,6 +107,21 @@ export interface PetResponse {
   brain: Brain;
 }
 
+export interface XpEvent {
+  type: string;
+  amount: number;
+  ref: string | null;
+  created_at: string;
+}
+
+/** The Den digest: the companion + recent light + what's grown — feeds the daily greeting. */
+export interface DenDigest {
+  pet: Pet | null;
+  recent_xp: XpEvent[];
+  memory_count: number;
+  skill_count: number;
+}
+
 export type WeatherCategory = "clear" | "cloudy" | "overcast" | "fog" | "rain" | "snow" | "storm";
 
 /** Real current weather for the Grove's sky (best-effort; `available:false` → the
@@ -159,6 +174,7 @@ export const api = {
     request<{ ok: boolean; set: string[]; brain: Brain }>("POST", "/settings/keys", { keys }),
 
   pet: () => get<PetResponse>("/pet"),
+  den: () => get<DenDigest>("/den"),
   hatch: (body: HatchBody) => request<{ pet: Pet }>("POST", "/hatch", body),
 
   weather: () => get<Weather>("/weather"),
@@ -200,6 +216,7 @@ export const queryKeys = {
   models: ["models"] as const,
   settings: ["settings"] as const,
   pet: ["pet"] as const,
+  den: ["den"] as const,
   weather: ["weather"] as const,
   skills: ["skills"] as const,
   sessions: ["sessions"] as const,

@@ -12,6 +12,7 @@ import { DenHud } from "./DenHud";
 import { CoilRing } from "./CoilRing";
 import { MindsEye } from "./MindsEye";
 import { MemoryPeek } from "./MemoryPeek";
+import { DenGreeting } from "./DenGreeting";
 import { PetChat } from "./PetChat";
 import { cameraFocus, GROVE_DIST, SEE_PET_DIST } from "../../world3d/cameraFocus";
 import { lure, lureControl } from "../../world3d/lure";
@@ -168,6 +169,7 @@ export default function DenView() {
       </button>
       <MindsEye open={mindOpen} onClose={() => setMindOpen(false)} />
       {webgl && <MemoryPeek />}
+      {webgl && <DenGreeting />}
       <WideningFlash />
       <SurfaceOverlay container={host} />
     </div>
