@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`d90c582`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete** (3D egg · dawn burst-flash · emergence motes · camera dolly · per-region kindling · birth chime). Every headline beat lands — remaining work is the V-4 milestone + deferred refactors.
+> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`fc80847`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a backend multimodal plumbing** in. Every headline beat lands — remaining work is the V-4 Sight & Voice milestone (frontend) + deferred refactors.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -58,6 +58,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | W-6 polish | **Camera dolly** — the Quickening camera pushes toward the egg through the questions, presses into the hatch burst, eases back for the dawn (always egg-centred); reduced-motion snaps per phase | `7e2bbed` |
 | W-6 polish | **Per-region kindling** — five ember cairns ring the grove; each answer bursts + lights its region (last at the brain-check) so the whole grove is alive by the dawn (the master-plan "5 answers light 5 regions" beat); pure emissive, reduced-motion = lit, no burst | `604144f` |
 | W-6 polish | **Birth chime** — a soft rising C-major swell (live Web Audio synth, no asset/dep) plays once at hatch under the "Hatch" gesture; reduced-motion silent; try/catch so it never breaks the hatch (pure-tested voices/envelope). **W-6 Quickening fully complete** | `d90c582` |
+| V-4a (backend) | **Multimodal chat plumbing** — optional `ChatRequest.image_b64` + pure `build_user_content()` (text→multimodal array); `run_turn` attaches the image to the current turn only (never persisted); route auto-picks a `vision` role; provider unchanged. Pure core + injection unit-tested. Foundation for Sight & Voice — no capture UI yet | `fc80847` |
 
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
@@ -69,7 +70,7 @@ _(none — at a clean checkpoint; pick the next from Pending)_
 | V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
 | W-7 (rest) | Separate realms II (Wilderness) + III (Observatory) — **needs a design rethink post-village-pivot** (workflow-sized); the stage-up world-reveal core shipped `7fb90cd` | **L** |
-| V-4 | Sight & Voice — browser teaching → Tauri native shell + desktop pointing (see `docs/SIGHT-AND-VOICE.md`) | **XL** |
+| V-4 (rest) | Sight & Voice — **backend multimodal done `fc80847`**; remaining: screen-capture UI + remote-vision privacy warning (V-4a frontend), voice in/out (V-4b — partly via PetChat), Tauri shell + desktop pointing (V-4c/d). See `docs/SIGHT-AND-VOICE.md` | **XL** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
 ---
