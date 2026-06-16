@@ -24,6 +24,7 @@ import { IconButton, StatusDot, Tooltip } from "../../components/ui";
 import { Creature } from "../../components/creature/Creature";
 import { useCreatureStore, connect, disconnectSynapse } from "../../state/creatureStore";
 import { connect as connectWorld, disconnectWorld } from "../../state/worldStore";
+import { TauriTitleBar } from "./TauriTitleBar";
 
 interface Surface {
   to: string;
@@ -123,7 +124,8 @@ export function AppShell() {
   }, []);
 
   return (
-    <div className="flex h-dvh flex-col">
+    <div className="flex h-dvh flex-col relative">
+      <TauriTitleBar />
       <div className="relative flex min-h-0 flex-1">
         <AnimatePresence initial={false}>
           {!navCollapsed && (
