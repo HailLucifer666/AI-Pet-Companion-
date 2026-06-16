@@ -20,6 +20,17 @@
         "transparent": true,
         "decorations": false,
         "alwaysOnTop": true
+      },
+      {
+        "label": "pointer",
+        "title": "NeuraClaw Pointer Overlay",
+        "url": "/pointer",
+        "transparent": true,
+        "fullscreen": true,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "visible": false,
+        "skipTaskbar": true
       }
     ],
     "security": {

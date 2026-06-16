@@ -19,6 +19,7 @@ import {
 import { TasksView } from "./features/tasks/TasksView";
 import { CalendarView } from "./features/calendar/CalendarView";
 import { Styleguide } from "./features/styleguide/Styleguide";
+import { DesktopPointerOverlay } from "./features/pointer/DesktopPointerOverlay";
 
 // The world (Pixi) is heavy — lazy-load it so it never touches the main bundle.
 const DenView = lazy(() => import("./features/den/DenView"));
@@ -34,6 +35,7 @@ function DenLoading() {
 function Shell() {
   return (
     <Routes>
+      <Route path="/pointer" element={<DesktopPointerOverlay />} />
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/den" replace />} />
         <Route path="/chat" element={<ChatView />} />

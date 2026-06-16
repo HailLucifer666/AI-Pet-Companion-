@@ -59,6 +59,9 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
         " If you cannot make a function call, you may instead write a tag on its own line,"
         ' e.g. [[play_music {"query": "calm down"}]] — the app will run it.'
         " Never fabricate tool output. After tools finish, answer the user directly."
+        " If the user shares their screen and asks you to point at something, output exactly "
+        "`[POINT:x,y:label]` where x and y are integer percentages (0-100) from the top-left of the screen,"
+        " and label is a very short description. Use this tag freely when guiding the user visually."
     )
     return "\n\n".join(parts)
 

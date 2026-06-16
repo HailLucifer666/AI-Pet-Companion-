@@ -272,7 +272,28 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           newSessionId = event.session_id as string;
         } else if (event.type === "delta") {
           acc += (event.text as string);
-          setStream((s) => ({ ...s, text: s.text + (event.text as string) }));
+          
+          const pointRegex = /\[POINT:(\d+),(\d+):([^\]]+)\]/;
+          const match = pointRegex.exec(acc);
+          if (match) {
+            const x = parseInt(match[1]);
+            const y = parseInt(match[2]);
+            const label = match[3];
+            
+            if ((window as any).__TAURI_INTERNALS__) {
+              import("@tauri-apps/api/window").then(({ WebviewWindow }) => {
+                const pointerWin = WebviewWindow.getByLabel("pointer");
+                pointerWin?.show();
+              });
+              import("@tauri-apps/api/event").then(({ emit }) => {
+                emit("draw-pointer", { x, y, label });
+              });
+            }
+            
+            acc = acc.replace(match[0], "");
+          }
+          
+          setStream((s) => ({ ...s, text: acc }));
         } else if (event.type === "tool_start") {
           setStream((s) => ({
             ...s,
