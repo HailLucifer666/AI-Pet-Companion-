@@ -1,8 +1,8 @@
-/** lure â€” where the user is calling the companion. A frame-write singleton (like
+/** lure — where the user is calling the companion. A frame-write singleton (like
  *  petPosition) holding the ground point under the cursor plus an expiry; the
  *  CursorLure component writes it on pointer-move, Lumenform3D reads it to decide
  *  where to walk. The pet only answers the call while it's at rest (real work at
- *  the bench always wins) and never under reduced-motion â€” pure `activeLure` below
+ *  the bench always wins) and never under reduced-motion — pure `activeLure` below
  *  encodes exactly that, so it's unit-tested in Node without three/DOM. */
 
 import type { Vec2 } from "./locomotion";
@@ -23,7 +23,7 @@ export const lureControl = { enabled: true };
 
 /** The cursor target to walk toward, or null to defer to the FSM. The pet answers
  *  the lure only when it's resting (work overrides play), motion is allowed, and
- *  the call hasn't decayed. Pure â†’ testable. */
+ *  the call hasn't decayed. Pure → testable. */
 export function activeLure(
   l: Lure,
   nowMs: number,

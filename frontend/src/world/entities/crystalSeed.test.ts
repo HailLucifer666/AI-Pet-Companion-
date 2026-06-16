@@ -5,7 +5,7 @@ import type { MemoryType } from "../../lib/api";
 const ALL_TYPES: MemoryType[] = ["identity", "preference", "project", "event", "fact"];
 
 describe("makeCrystalSeed", () => {
-  test("is deterministic â€” the same memory always grows the same crystal", () => {
+  test("is deterministic — the same memory always grows the same crystal", () => {
     const a = makeCrystalSeed(42, "fact");
     const b = makeCrystalSeed(42, "fact");
     expect(a).toEqual(b);

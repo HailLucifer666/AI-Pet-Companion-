@@ -1,4 +1,4 @@
-/** computeDrawSpec â€” the Lumenform's body, as pure data ("humble object").
+/** computeDrawSpec — the Lumenform's body, as pure data ("humble object").
  *
  *  Returns ordered, back-to-front primitives with *semantic color roles* (never
  *  baked hex) so the renderer applies the live palette and tokens-only holds on
@@ -6,7 +6,7 @@
  *  spec, so it can be snapshot-tested without a GPU. The renderer (Lumenform.ts)
  *  is the only place that touches Pixi.
  *
- *  Local space: origin at the creature's feet, âˆ’y is up.
+ *  Local space: origin at the creature's feet, −y is up.
  */
 
 export type ColorRole = "glow" | "body" | "belly" | "eye" | "limb" | "spark";
@@ -28,8 +28,8 @@ export interface DrawSpec {
   footprint: number;
 }
 
-/** Build the creature for a life stage (1 Hatchling â€¦ 4 Elder). It grows and
- *  gains features â€” ears at 2, a tail at 3, a crown of sparks at 4. */
+/** Build the creature for a life stage (1 Hatchling … 4 Elder). It grows and
+ *  gains features — ears at 2, a tail at 3, a crown of sparks at 4. */
 export function computeDrawSpec(stage: 1 | 2 | 3 | 4): DrawSpec {
   const bodyR = 16 + stage * 5;
   const cy = -bodyR; // body sits a body-radius above the feet
@@ -38,7 +38,7 @@ export function computeDrawSpec(stage: 1 | 2 | 3 | 4): DrawSpec {
   // Aura
   shapes.push({ type: "circle", x: 0, y: cy, rx: bodyR * 1.8, ry: bodyR * 1.8, role: "glow", alpha: 0.18 });
 
-  // Ears (Juvenile+) â€” drawn behind the body so they read as nubs
+  // Ears (Juvenile+) — drawn behind the body so they read as nubs
   if (stage >= 2) {
     const ear = bodyR * 0.55;
     shapes.push({ type: "ellipse", x: -bodyR * 0.6, y: cy - bodyR * 0.85, rx: ear * 0.5, ry: ear, role: "body", alpha: 1, rotation: -0.32 });
@@ -61,7 +61,7 @@ export function computeDrawSpec(stage: 1 | 2 | 3 | 4): DrawSpec {
     }
   }
 
-  // Eyes â€” always present
+  // Eyes — always present
   const eyeR = 2 + stage * 0.7;
   const eyeY = cy - bodyR * 0.08;
   const eyeDx = bodyR * 0.34;

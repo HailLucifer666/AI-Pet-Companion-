@@ -1,7 +1,7 @@
-/** CoilRing â€” the companion's growth, read at a glance: a small ember XP ring in
+/** CoilRing — the companion's growth, read at a glance: a small ember XP ring in
  *  the Den's lower-right whose arc fills with real progress toward the next level
  *  (worldStore.xpFrac) over the level number, with the life-stage beneath. Same
- *  real signal that fills the Spore Gate â€” never faked. Display only; the global
+ *  real signal that fills the Spore Gate — never faked. Display only; the global
  *  reduced-motion rule freezes the arc's transition. */
 
 import { useWorldStore } from "../../state/worldStore";
@@ -47,7 +47,7 @@ export function CoilRing() {
         </div>
       </div>
       <p className="mt-1 text-[10px] uppercase tracking-wider text-ink-400/80">
-        {stageName} Â· {mood}
+        {stageName} · {mood}
       </p>
     </div>
   );

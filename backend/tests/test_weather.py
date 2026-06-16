@@ -1,8 +1,8 @@
-"""WMO weather-code â†’ visual category mapping (pure, no network)."""
+"""WMO weather-code → visual category mapping (pure, no network)."""
 
 import pytest
 
-from ai_pet_companion.weather import wmo_category
+from neuraclaw.weather import wmo_category
 
 
 @pytest.mark.parametrize(
@@ -25,7 +25,7 @@ from ai_pet_companion.weather import wmo_category
         (95, "storm"),
         (96, "storm"),
         (99, "storm"),
-        (12345, "cloudy"),  # unknown â†’ safe default
+        (12345, "cloudy"),  # unknown → safe default
     ],
 )
 def test_wmo_category(code: int, expected: str) -> None:

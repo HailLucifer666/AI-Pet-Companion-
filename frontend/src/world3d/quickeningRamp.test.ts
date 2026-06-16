@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { rampHour, DAWN_MS } from "./quickeningRamp";
 
-describe("rampHour â€” the Quickening darkâ†’dawn schedule", () => {
+describe("rampHour — the Quickening dark→dawn schedule", () => {
   it("idle is deep night", () => {
     expect(rampHour("idle", 0, 0)).toBe(1.0);
   });

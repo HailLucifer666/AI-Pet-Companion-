@@ -1,4 +1,4 @@
-/** FetchToy3D â€” the thrown spark for the fetch minigame. A small cyan glow that
+/** FetchToy3D — the thrown spark for the fetch minigame. A small cyan glow that
  *  sits at the landing spot while the pet dashes out (outbound), then rides above
  *  the pet's head as it carries it home (return), and hides when idle. Frame-driven
  *  off the fetchPlay singleton (not reactive) + petPos. Reduced-motion: never shown

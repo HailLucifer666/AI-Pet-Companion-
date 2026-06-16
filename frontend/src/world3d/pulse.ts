@@ -1,8 +1,8 @@
-/** pulse â€” the path a Mycelium pulse travels, as pure math (no three). A real
+/** pulse — the path a Mycelium pulse travels, as pure math (no three). A real
  *  Synapse event (a tool run, a memory forming, a skill drafted) sends a mote from
- *  its origin on the island, *through the companion*, into the Spore Gate â€” so you
+ *  its origin on the island, *through the companion*, into the Spore Gate — so you
  *  can watch real computation flow to where the pet's growth accrues. Two eased
- *  legs (originâ†’pet, petâ†’gate), each with a gentle arc lift. Pure â†’ unit-tested. */
+ *  legs (origin→pet, pet→gate), each with a gentle arc lift. Pure → unit-tested. */
 
 export interface Vec3 {
   x: number;
@@ -14,10 +14,10 @@ export type PulseOrigin = "workbench" | "garden" | "hollow";
 
 import { WORLD_SCALE } from "./terrain";
 
-export const PULSE_DURATION = 2200; // ms, origin â†’ gate
+export const PULSE_DURATION = 2200; // ms, origin → gate
 
-/** The gate's glowing centre â€” pulses terminate here (shared with SporeGate3D). The
- *  arch sits proportionally back on the bigger island (z Ã— WORLD_SCALE); its height
+/** The gate's glowing centre — pulses terminate here (shared with SporeGate3D). The
+ *  arch sits proportionally back on the bigger island (z × WORLD_SCALE); its height
  *  (y) is an object-space offset above the terrain, so it stays the same size. */
 export const GATE_POINT: Vec3 = { x: 0, y: 3.2, z: -7 * WORLD_SCALE };
 
@@ -34,7 +34,7 @@ export function pulseDone(t: number): boolean {
   return t >= 1;
 }
 
-/** Position along the path at progress `t`: first leg originâ†’pet, second petâ†’gate,
+/** Position along the path at progress `t`: first leg origin→pet, second pet→gate,
  *  each smoothstep-eased with a small arc lift at the leg's midpoint. Endpoints
  *  (t=0 origin, t=0.5 pet, t=1 gate) carry no lift. */
 export function pulsePoint(t: number, origin: Vec3, pet: Vec3, gate: Vec3 = GATE_POINT): Vec3 {

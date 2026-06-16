@@ -15,8 +15,8 @@ describe("placeTarget", () => {
 
   it("wanders deterministically from the seed, varies across seeds, stays on land", () => {
     const a = placeTarget("wander", 42);
-    expect(placeTarget("wander", 42)).toEqual(a); // same seed â†’ same spot
-    expect(placeTarget("wander", 43)).not.toEqual(a); // different seed â†’ different spot
+    expect(placeTarget("wander", 42)).toEqual(a); // same seed → same spot
+    expect(placeTarget("wander", 43)).not.toEqual(a); // different seed → different spot
     expect(Math.hypot(a.x, a.z)).toBeLessThan(ISLAND_MAX_R); // local roaming region, never past the rim
   });
 });

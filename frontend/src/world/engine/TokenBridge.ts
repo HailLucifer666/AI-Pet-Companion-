@@ -1,9 +1,9 @@
-/** TokenBridge â€” the world never hardcodes color. It reads the same CSS design
+/** TokenBridge — the world never hardcodes color. It reads the same CSS design
  *  tokens the DOM uses (oklch custom properties) and resolves them to the hex
  *  numbers Pixi wants, so the canvas and the UI always share one palette.
  *
  *  Resolution uses a throwaway 2D canvas: assigning any CSS color to `fillStyle`
- *  makes the browser normalize it (including oklch â†’ sRGB hex) on read-back. The
+ *  makes the browser normalize it (including oklch → sRGB hex) on read-back. The
  *  string-parsing core is pure and unit-tested; the canvas step is browser-only.
  */
 

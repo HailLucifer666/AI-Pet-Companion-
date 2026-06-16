@@ -1,15 +1,16 @@
-/** Lumenform3D â€” the companion: a cute floating screen-faced robot. A dark plated
+/** Lumenform3D — the companion: a cute floating screen-faced robot. A dark plated
  *  ovoid body, a rounded head with a glowing cyan SCREEN-FACE (data-driven eyes),
- *  glowing antenna tips and small stubby arms â€” it hovers (no legs). It reads the
+ *  glowing antenna tips and small stubby arms — it hovers (no legs). It reads the
  *  live FSM (worldStore.lumen) and drifts toward where it wants to be (home, the
  *  Workbench while a tool runs, a wander spot, or your cursor when you call it).
- *  Locomotion is pure (locomotion.ts); the face is pure (pet/face.ts). Stages 1â€“4
- *  upgrade it (more antennae + plating + glow). Reduced-motion â†’ it hovers in place,
+ *  Locomotion is pure (locomotion.ts); the face is pure (pet/face.ts). Stages 1–4
+ *  upgrade it (more antennae + plating + glow). Reduced-motion → it hovers in place,
  *  posed by state, with the correct face. */
 
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
+import { damp, dampAngle } from "maath/easing";
 import { Color, type Group, type Mesh, type MeshStandardMaterial, type PointLight } from "three";
 import { useWorldStore } from "../state/worldStore";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
@@ -23,11 +24,10 @@ import { WORLD } from "./palette";
 import { emotionGlow, type EmotionVector } from "./emotion";
 import { PetBubble } from "./PetBubble";
 import { FaceScreen } from "./pet/FaceScreen";
-import { gazeYaw, glowIntensity, shadowScale, breathScale, headNodY, blinkLidTarget, nextBlinkInterval } from "./petAnim";
+import { gazeYaw, glowIntensity, shadowScale } from "./petAnim";
 
-const LIFT = 0.72; // hover height â€” the robot floats above the ground
+const LIFT = 0.72; // hover height — the robot floats above the ground
 const ACCEL = 3.2; // how briskly velocity chases the desired velocity (ease in/out)
-const TURN = 4; // how briskly it rotates to face travel
 const HEAD_Y = 0.46; // head height above the body centre
 
 const groundY = (x: number, z: number) => islandHeight(x, z, ISLAND_MAX_R);
@@ -48,15 +48,15 @@ export function Lumenform3D() {
     [invalidate],
   );
 
-  const baseScale = 0.95 + stage * 0.12; // grows with life stage â€” the companion is the subject
+  const baseScale = 0.95 + stage * 0.12; // grows with life stage — the companion is the subject
   const twoAntennae = stage >= 2;
   const plated = stage >= 3;
   const start = useMemo(() => placeTarget("home"), []);
 
-  // Transform refs the locomotion + glow drive (frozen contract â€” petPos reads group).
+  // Transform refs the locomotion + glow drive (frozen contract — petPos reads group).
   const group = useRef<Group>(null);
   const light = useRef<PointLight>(null);
-  const headGroup = useRef<Group>(null); // gaze yaw â€” the face looks where it's called
+  const headGroup = useRef<Group>(null); // gaze yaw — the face looks where it's called
   const antL = useRef<Group>(null);
   const antR = useRef<Group>(null);
   const tipL = useRef<Mesh>(null);
@@ -70,13 +70,7 @@ export function Lumenform3D() {
     useRef<Mesh>(null),
     useRef<Mesh>(null),
     useRef<Mesh>(null),
-    useRef<Mesh>(null),
   ];
-
-  const bodyRef = useRef<Mesh>(null);
-  const blinkPhase = useRef(0);
-  const nextBlink = useRef(3.8);
-  const currentBlink = useRef(0);
 
   // Live planar position + smoothed velocity + facing, carried frame-to-frame.
   const pos = useRef({ x: start.x, z: start.z });
@@ -84,14 +78,14 @@ export function Lumenform3D() {
   const heading = useRef(0);
 
   // Emotion (derived from real agent cadence) eases frame-to-frame and colours the
-  // glow: brighter when activated, warmer on a real win. Two anchored ember tones â€”
+  // glow: brighter when activated, warmer on a real win. Two anchored ember tones —
   // never drifts off-palette.
   const emo = useRef<EmotionVector>({ arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 });
   const emberBase = useMemo(() => new Color(WORLD.botGlow), []);
   const emberHot = useMemo(() => new Color(WORLD.emberHi), []);
 
   // Road pathing: when the FSM picks a new place, plan a cobble-road route; the
-  // pet walks plaza â†’ junction â†’ entrance instead of beelining (reduced-motion +
+  // pet walks plaza → junction → entrance instead of beelining (reduced-motion +
   // the cursor lure bypass it). Replanned only on place change (O(13) BFS).
   const pathFollower = useRef(new PathFollower());
   const lastPlace = useRef<string>("home");
@@ -182,54 +176,29 @@ export function Lumenform3D() {
     else yOff = Math.sin(t * (working ? 3.4 : 1.6)) * (working ? 0.09 : 0.06) + (moving ? Math.abs(Math.sin(t * 6)) * 0.04 * gait : 0);
 
     const y = groundY(pos.current.x, pos.current.z) + LIFT + yOff;
-    g.position.set(pos.current.x, y, pos.current.z);
+    
+    // Spring physics: visual mesh organically chases the logical position
+    damp(g.position, 'x', pos.current.x, 0.1, delta);
+    damp(g.position, 'y', y, 0.08, delta);
+    damp(g.position, 'z', pos.current.z, 0.1, delta);
+    
     petPos.x = pos.current.x;
     petPos.y = y;
     petPos.z = pos.current.z;
 
-    // Body breath and squash/stretch
-    const breath = breathScale(t, gesture, working);
-    let squash = 0;
-    if (moving) {
-      squash = Math.abs(Math.sin(t * 6)) * 0.08 * gait;
-    } else if (gesture === "celebrate") {
-      // yOff = Math.abs(Math.sin(t * 9)) * 0.4
-      // Near ground (yOff ~ 0) -> squash > 0
-      // Near peak (yOff ~ 0.4) -> squash < 0 (stretch)
-      squash = (0.2 - yOff) * 0.5;
-    }
-    const sy = Math.max(0.2, breath - squash);
-    const sx = 1 / Math.sqrt(sy);
-    const sz = sx;
-    if (bodyRef.current) {
-      bodyRef.current.scale.set(sx, 0.82 * sy, 0.92 * sz);
-    }
-
-    // Blinking
-    blinkPhase.current += dt;
-    if (blinkPhase.current >= nextBlink.current) {
-      blinkPhase.current -= nextBlink.current;
-      nextBlink.current = nextBlinkInterval(Math.random);
-    }
-    const blinkTarget = blinkLidTarget(blinkPhase.current, nextBlink.current);
-    const blinkK = 1 - Math.exp(-25 * dt); // fast eyelid snap
-    currentBlink.current += (blinkTarget - currentBlink.current) * blinkK;
-
-    // Face the way it's moving (the screen leads, +Z); turn gradually; bank into it.
+    // Face the way it's moving (the screen leads, +Z); turn organically; bank into it.
     if (moving) heading.current = Math.atan2(vel.current.vx, vel.current.vz);
+    dampAngle(g.rotation, 'y', heading.current, 0.18, delta);
+    
     let d = heading.current - g.rotation.y;
     d = Math.atan2(Math.sin(d), Math.cos(d));
-    g.rotation.y += d * (1 - Math.exp(-TURN * dt));
     const lean = Math.max(-0.16, Math.min(0.16, -d * 0.4));
-    g.rotation.z += (lean - g.rotation.z) * (1 - Math.exp(-8 * dt));
+    damp(g.rotation, 'z', lean, 0.15, delta);
 
     // Gaze: the head/face turns toward your cursor when called, else dreamily at the camera.
     // If anticipating a walk, look at the destination before moving.
     const headG = headGroup.current;
     if (headG) {
-      const nod = headNodY(t, working, gesture);
-      headG.position.y = HEAD_Y + nod;
-
       let lookX = camera.position.x;
       let lookZ = camera.position.z;
       if (lured) {
@@ -240,26 +209,23 @@ export function Lumenform3D() {
         lookZ = target.z;
       }
       const targetYaw = gazeYaw(lookX - pos.current.x, lookZ - pos.current.z, heading.current);
-      const yawSpeed = lured || anticipating ? 4.5 : 1.8;
-      headG.rotation.y += (targetYaw - headG.rotation.y) * (1 - Math.exp(-yawSpeed * dt));
+      dampAngle(headG.rotation, 'y', targetYaw, lured || anticipating ? 0.12 : 0.4, delta);
     }
 
-    // Emotion (derived from real cadence in the store's 700ms tick) â†’ ease the
+    // Emotion (derived from real cadence in the store's 700ms tick) → ease the
     // vector toward it, then let it colour the glow.
     const emoTarget = st.emotion;
-    const ek = 1 - Math.exp(-1.8 * dt); // emotion drifts gently, not twitchy
-    emo.current.arousal += (emoTarget.arousal - emo.current.arousal) * ek;
-    emo.current.valence += (emoTarget.valence - emo.current.valence) * ek;
-    emo.current.curiosity += (emoTarget.curiosity - emo.current.curiosity) * ek;
-    emo.current.confidence += (emoTarget.confidence - emo.current.confidence) * ek;
+    damp(emo.current, 'arousal', emoTarget.arousal, 0.4, delta);
+    damp(emo.current, 'valence', emoTarget.valence, 0.4, delta);
+    damp(emo.current, 'curiosity', emoTarget.curiosity, 0.4, delta);
+    damp(emo.current, 'confidence', emoTarget.confidence, 0.4, delta);
     const { lightMul, warmth } = emotionGlow(emo.current);
 
     // Glow: the point light on its state ceiling, scaled by arousal + warmed by mood;
     // antenna tips pulse (cyan/ember bloom).
-    const glowK = 1 - Math.exp(-5 * dt);
     const lightTarget = glowIntensity(t, gesture, working, moving) * lightMul;
     if (light.current) {
-      light.current.intensity += (lightTarget - light.current.intensity) * glowK;
+      damp(light.current, 'intensity', lightTarget, 0.12, delta);
       light.current.color.copy(emberBase).lerp(emberHot, warmth);
     }
     let tipE: number;
@@ -283,9 +249,11 @@ export function Lumenform3D() {
     const sg = sparkleGroup.current;
     if (sg) {
       const targetS = gesture === "celebrate" ? 1 : 0;
-      const k = targetS > sg.scale.x ? 6 : 9;
-      const s = sg.scale.x + (targetS - sg.scale.x) * Math.min(1, k * dt);
-      sg.scale.setScalar(s);
+      damp(sg.scale, 'x', targetS, 0.15, delta);
+      damp(sg.scale, 'y', targetS, 0.15, delta);
+      damp(sg.scale, 'z', targetS, 0.15, delta);
+      
+      const s = sg.scale.x;
       if (s > 0.01) {
         for (let i = 0; i < 6; i++) {
           const sp = sparkleRefs[i].current;
@@ -300,22 +268,22 @@ export function Lumenform3D() {
 
   return (
     <group ref={group} position={[start.x, groundY(start.x, start.z) + LIFT, start.z]} scale={baseScale}>
-      {/* contact shadow â€” grounds the float */}
+      {/* contact shadow — grounds the float */}
       <mesh ref={shadow} rotation-x={-Math.PI / 2} position={[0, -(LIFT - 0.02), 0]} renderOrder={-1}>
         <circleGeometry args={[0.3, 16]} />
         <meshStandardMaterial color={0x000000} transparent opacity={0.28} depthWrite={false} />
       </mesh>
 
-      {/* the warm point light inside the body â€” tight so Bloom hits the bot, not a halo */}
+      {/* the warm point light inside the body — tight so Bloom hits the bot, not a halo */}
       <pointLight ref={light} color={WORLD.botGlow} intensity={1.5} distance={4.5} decay={2.5} position={[0, 0.2, 0]} />
 
-      {/* â”€â”€ body: a floating dark plated ovoid â”€â”€ */}
-      <mesh ref={bodyRef} castShadow receiveShadow scale={[1, 0.82, 0.92]}>
+      {/* ── body: a floating dark plated ovoid ── */}
+      <mesh castShadow receiveShadow scale={[1, 0.82, 0.92]}>
         <sphereGeometry args={[0.34, 24, 18]} />
         <meshStandardMaterial color={WORLD.botBody} roughness={0.45} metalness={0.4} flatShading={false} />
       </mesh>
 
-      {/* a thin glowing seam around the belly â€” a little life on the dark shell */}
+      {/* a thin glowing seam around the belly — a little life on the dark shell */}
       <mesh rotation-x={Math.PI / 2} position={[0, -0.02, 0]}>
         <torusGeometry args={[0.3, 0.012, 8, 32]} />
         <meshStandardMaterial color={WORLD.botEye} emissive={WORLD.botEye} emissiveIntensity={1.1} toneMapped={false} />
@@ -329,7 +297,7 @@ export function Lumenform3D() {
         </mesh>
       )}
 
-      {/* â”€â”€ stubby arms â”€â”€ */}
+      {/* ── stubby arms ── */}
       {[-1, 1].map((sx) => (
         <mesh key={sx} position={[sx * 0.33, -0.02, 0.02]} rotation-z={sx * -0.5} castShadow>
           <capsuleGeometry args={[0.05, 0.12, 4, 8]} />
@@ -337,16 +305,16 @@ export function Lumenform3D() {
         </mesh>
       ))}
 
-      {/* â”€â”€ head: rounded dark shell + the glowing screen-face (looks where called) â”€â”€ */}
+      {/* ── head: rounded dark shell + the glowing screen-face (looks where called) ── */}
       <group ref={headGroup} position={[0, HEAD_Y, 0.04]}>
         <mesh castShadow>
           <sphereGeometry args={[0.25, 24, 18]} />
           <meshStandardMaterial color={WORLD.botBody} roughness={0.4} metalness={0.45} />
         </mesh>
         {/* the screen-face on the front (+Z) */}
-        <FaceScreen width={0.34} blinkRef={currentBlink} />
+        <FaceScreen width={0.34} />
 
-        {/* â”€â”€ antennae: 1 from hatch, 2 from the Juvenile stage; glowing tips â”€â”€ */}
+        {/* ── antennae: 1 from hatch, 2 from the Juvenile stage; glowing tips ── */}
         <group ref={antL} position={[-0.1, 0.22, 0]}>
           <mesh position={[0, 0.11, 0]}>
             <cylinderGeometry args={[0.012, 0.012, 0.22, 6]} />
@@ -371,7 +339,7 @@ export function Lumenform3D() {
         )}
       </group>
 
-      {/* â”€â”€ celebrate sparkles: always mounted, faded in by scale on celebrate â”€â”€ */}
+      {/* ── celebrate sparkles: always mounted, faded in by scale on celebrate ── */}
       <group ref={sparkleGroup} scale={0}>
         {Array.from({ length: 6 }).map((_, i) => (
           <mesh key={i} ref={sparkleRefs[i]}>
@@ -381,7 +349,7 @@ export function Lumenform3D() {
         ))}
       </group>
 
-      {/* emoji/speech bubble above the head â€” shows what it's doing / says replies */}
+      {/* emoji/speech bubble above the head — shows what it's doing / says replies */}
       <PetBubble />
     </group>
   );

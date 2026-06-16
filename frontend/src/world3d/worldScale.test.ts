@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D } from "./placeRegistry";
+import { PLACES_3D } from "./placeDefs";
 import { placeTarget } from "./locomotion";
 
-/** After growing the world Ã—WORLD_SCALE, the place markers + the pet anchors sit at
- *  scaled positions sampled against the noise terrain â€” so they MUST be re-verified
+/** After growing the world ×WORLD_SCALE, the place markers + the pet anchors sit at
+ *  scaled positions sampled against the noise terrain — so they MUST be re-verified
  *  to land on grass (above the waterline, off any peak). If one drifts underwater or
  *  onto rock here, nudge its coords in placeDefs.ts / locomotion.ts until it passes. */
 describe("world scale", () => {

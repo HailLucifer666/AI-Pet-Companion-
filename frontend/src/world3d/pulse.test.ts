@@ -6,7 +6,7 @@ const PET = { x: 4, y: 1, z: 0 };
 const GATE = { x: 0, y: 3.2, z: -7 };
 
 describe("pulseT", () => {
-  it("runs 0 â†’ 0.5 â†’ 1 across the duration and clamps past the end", () => {
+  it("runs 0 → 0.5 → 1 across the duration and clamps past the end", () => {
     expect(pulseT(0, 0)).toBe(0);
     expect(pulseT(0, PULSE_DURATION / 2)).toBeCloseTo(0.5);
     expect(pulseT(0, PULSE_DURATION)).toBe(1);

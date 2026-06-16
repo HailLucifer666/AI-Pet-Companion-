@@ -1,4 +1,4 @@
-/** CursorLure â€” turns the mouse into a call the companion answers. On pointer-move
+/** CursorLure — turns the mouse into a call the companion answers. On pointer-move
  *  over the canvas it raycasts the cursor onto a horizontal plane at the pet's
  *  current ground height and writes that point into the `lure` singleton with a
  *  short expiry, so the pet trots toward wherever you point and, when you stop,

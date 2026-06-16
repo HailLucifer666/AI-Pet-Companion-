@@ -35,7 +35,7 @@ describe("celestialPlacement", () => {
   });
 
   it("elevation is capped low so the body rides near the horizon", () => {
-    // Noon sunDir [10,27,8] is steeply overhead (~64Â°) â€” must be pulled down.
+    // Noon sunDir [10,27,8] is steeply overhead (~64°) — must be pulled down.
     const { offset } = celestialPlacement([10, 27, 8], 1);
     const elev = Math.atan2(offset[1], Math.hypot(offset[0], offset[2]));
     expect(elev).toBeLessThanOrEqual(0.51); // ~MAX_ELEV

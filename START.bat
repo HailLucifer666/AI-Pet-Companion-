@@ -15,6 +15,7 @@ popd
 if not "%BUILD_ERR%"=="0" (
     echo.
     echo Frontend build FAILED - see errors above. Backend not started.
+    pause
     exit /b 1
 )
 
@@ -22,4 +23,5 @@ echo.
 echo Starting NeuraClaw at http://127.0.0.1:8090
 start "" http://127.0.0.1:8090
 python -m neuraclaw
+pause
 endlocal

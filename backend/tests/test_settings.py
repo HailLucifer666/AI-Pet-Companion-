@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ai_pet_companion.config import write_env_keys
+from neuraclaw.config import write_env_keys
 
 
 def test_creates_env_and_merges_preserving_other_lines(tmp_path: Path):

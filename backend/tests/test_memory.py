@@ -1,13 +1,13 @@
-"""Memory engine tests. Embeddings are faked â€” no model download in CI."""
+"""Memory engine tests. Embeddings are faked — no model download in CI."""
 
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from ai_pet_companion.config import MIGRATIONS_DIR
-from ai_pet_companion.db import migrate, open_db
-from ai_pet_companion.memory import extractor, store
+from neuraclaw.config import MIGRATIONS_DIR
+from neuraclaw.db import migrate, open_db
+from neuraclaw.memory import extractor, store
 
 # Deterministic fake embeddings: hash words into a small dense vector so that
 # identical texts collide and different texts (almost surely) don't.
@@ -30,7 +30,7 @@ async def fake_embed(texts: list[str]) -> list[list[float]]:
 async def db(tmp_path: Path):
     conn = await open_db(tmp_path / "test.db")
     await migrate(conn, MIGRATIONS_DIR)
-    with patch("ai_pet_companion.memory.embedder.embed", side_effect=fake_embed):
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
         yield conn
     await conn.close()
 
@@ -57,11 +57,11 @@ async def test_different_type_not_deduplicated(db):
 
 
 async def test_hybrid_search_finds_by_keyword(db):
-    await store.add_memory(db, type="project", content="User builds ai_pet_companion agent platform")
+    await store.add_memory(db, type="project", content="User builds NeuraClaw agent platform")
     await store.add_memory(db, type="fact", content="User lives in Kolkata")
     results = await store.search_memories(db, "agent platform")
     assert results
-    assert "ai_pet_companion" in results[0].content
+    assert "NeuraClaw" in results[0].content
 
 
 async def test_forget(db):
@@ -92,6 +92,6 @@ def test_extractor_tolerates_garbage():
 
 
 def test_plausibility_gate_rejects_fragments():
-    assert not extractor._plausible("ai_pet_companion LIVE")
+    assert not extractor._plausible("NEURACLAW LIVE")
     assert not extractor._plausible("User")
     assert extractor._plausible("User prefers terse replies in chat")

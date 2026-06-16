@@ -12,6 +12,11 @@ import "./styles/theme.css";
 import { App } from "./App";
 import { Toaster } from "./components/ui";
 
+// If running inside Tauri, enable the transparent native shell mode
+if ("__TAURI_INTERNALS__" in window || "__TAURI__" in window) {
+  document.documentElement.classList.add("tauri-mode");
+}
+
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },
 });

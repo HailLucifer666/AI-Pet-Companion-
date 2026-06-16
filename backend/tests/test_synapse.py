@@ -3,7 +3,7 @@
 import asyncio
 import json
 
-from ai_pet_companion.core.synapse import Synapse, sse_stream
+from neuraclaw.core.synapse import Synapse, sse_stream
 
 
 async def test_publish_fans_out_to_all_subscribers():

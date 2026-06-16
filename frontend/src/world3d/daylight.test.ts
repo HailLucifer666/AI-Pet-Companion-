@@ -17,7 +17,7 @@ describe("daylightAt", () => {
     expect(d.sunIntensity).toBeLessThan(0.5);
   });
 
-  it("wraps continuously across midnight (00:00 â‰ˆ 24:00)", () => {
+  it("wraps continuously across midnight (00:00 ≈ 24:00)", () => {
     const a = daylightAt(0);
     const b = daylightAt(24);
     expect(a.sky).toBe(b.sky);
@@ -41,7 +41,7 @@ describe("daylightAt", () => {
   });
 });
 
-describe("glowBoost â€” full-glow night", () => {
+describe("glowBoost — full-glow night", () => {
   it("is ~1x at noon and brightest at deep night", () => {
     expect(glowBoost(1)).toBeCloseTo(1);
     expect(glowBoost(0)).toBeCloseTo(2.25);

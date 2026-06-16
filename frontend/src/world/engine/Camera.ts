@@ -1,4 +1,4 @@
-/** Camera â€” a gentle, breathing point of view. Ambient sway gives the Grove
+/** Camera — a gentle, breathing point of view. Ambient sway gives the Grove
  *  life even when untouched; pointer parallax lets it lean toward the cursor.
  *  Pure math (no Pixi); the ParallaxManager turns its position into layer offsets.
  */
@@ -16,7 +16,7 @@ export class Camera {
     this.targetY = ny * 26;
   }
 
-  /** dt = ticker.deltaTime (frames at 60fps â‰ˆ 1). sway off under reduced-motion. */
+  /** dt = ticker.deltaTime (frames at 60fps ≈ 1). sway off under reduced-motion. */
   update(dt: number, sway: boolean): void {
     this.t += dt * 0.006;
     const swayX = sway ? Math.sin(this.t) * 16 : 0;

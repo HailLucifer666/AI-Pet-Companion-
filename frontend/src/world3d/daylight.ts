@@ -1,9 +1,9 @@
-/** daylight â€” the sky/light at a given hour, as pure math (no three, no GPU).
+/** daylight — the sky/light at a given hour, as pure math (no three, no GPU).
  *
- *  A small set of keyframes (night â†’ dawn â†’ noon â†’ dusk â†’ night) interpolated by
+ *  A small set of keyframes (night → dawn → noon → dusk → night) interpolated by
  *  the local clock, so the Grove's sky tracks your real time of day. Returns
  *  colors (THREE hex) + light intensities + a sun direction + a 0..1 "dayness"
- *  the weather layer dims against. Dusk â‰ˆ the world's existing warm look. Pure â†’
+ *  the weather layer dims against. Dusk ≈ the world's existing warm look. Pure →
  *  unit-tested; the renderer (Atmosphere) lerps toward whatever this returns. */
 
 export interface DaySky {
@@ -13,7 +13,7 @@ export interface DaySky {
   sunIntensity: number;
   hemiIntensity: number;
   sunDir: [number, number, number];
-  dayness: number; // 0 deep night â€¦ 1 full noon
+  dayness: number; // 0 deep night … 1 full noon
   isNight: boolean;
 }
 
@@ -34,9 +34,9 @@ const KEYS: Key[] = [
   { h: 24, sky: 0x060a14, sun: 0x3a5a86, ambient: 0x12303a, sunIntensity: 0.22, hemiIntensity: 0.32, sunDir: [-8, 11, -7], dayness: 0, isNight: true },
 ];
 
-/** How much to multiply an emissive object's glow for the time of day: ~1Ã— at noon,
+/** How much to multiply an emissive object's glow for the time of day: ~1× at noon,
  *  rising toward night so crystals/pet/mushrooms blaze in the dark (the "full-glow
- *  night"). Pure â†’ unit-tested. */
+ *  night"). Pure → unit-tested. */
 export function glowBoost(dayness: number, boost = 1.25): number {
   const d = Math.max(0, Math.min(1, dayness));
   return 1 + (1 - d) * boost;

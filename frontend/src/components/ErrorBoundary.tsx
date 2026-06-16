@@ -1,7 +1,7 @@
-/** ErrorBoundary â€” a minimal class boundary. Catches a render/runtime error in its
+/** ErrorBoundary — a minimal class boundary. Catches a render/runtime error in its
  *  subtree, calls onError once, and renders `fallback` (default: nothing). Used to
  *  keep optional flourishes (e.g. the Quickening's 3D cinematic) from ever trapping
- *  the user on a blank screen â€” the parent flips to a safe path on the onError call. */
+ *  the user on a blank screen — the parent flips to a safe path on the onError call. */
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 

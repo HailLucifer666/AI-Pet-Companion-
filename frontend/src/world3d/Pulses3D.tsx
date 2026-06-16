@@ -1,8 +1,8 @@
-/** Pulses3D â€” Mycelium pulses: a glowing mote for each real agent event (a tool
+/** Pulses3D — Mycelium pulses: a glowing mote for each real agent event (a tool
  *  starting, a memory forming, a skill drafting) that travels from its origin on
  *  the island, through the companion, into the Spore Gate. Fed by a small capped
- *  ring buffer in worldStore (real events only â€” never faked). Path is the pure
- *  `pulse.ts`. Reduced-motion â†’ a brief static glow at the origin, no travel. */
+ *  ring buffer in worldStore (real events only — never faked). Path is the pure
+ *  `pulse.ts`. Reduced-motion → a brief static glow at the origin, no travel. */
 
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -14,7 +14,7 @@ import { petPos } from "./petPosition";
 import { pulseDone, pulsePoint, pulseT, type PulseOrigin, type Vec3 } from "./pulse";
 import { WORLD } from "./palette";
 
-// Where each event kind originates on the island (â‰ˆ its Place marker).
+// Where each event kind originates on the island (≈ its Place marker).
 const ORIGIN_XZ: Record<PulseOrigin, [number, number]> = {
   workbench: [-4, 3.8],
   garden: [4.5, -3.3],

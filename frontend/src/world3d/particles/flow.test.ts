@@ -40,7 +40,7 @@ describe("motePosition", () => {
     for (const m of motes) {
       for (const t of [0, 1.3, 7.7, 50, 123.4]) {
         const p = sample(m, t);
-        // two offset sines per axis â†’ bounded by amp*(1+0.4)
+        // two offset sines per axis → bounded by amp*(1+0.4)
         expect(Math.abs(p.x - m.bx)).toBeLessThanOrEqual(m.amp * 1.4 + 1e-9);
         expect(Math.abs(p.z - m.bz)).toBeLessThanOrEqual(m.amp * 1.4 + 1e-9);
         expect(Math.abs(p.y - m.by)).toBeLessThanOrEqual(m.bob + 1e-9);

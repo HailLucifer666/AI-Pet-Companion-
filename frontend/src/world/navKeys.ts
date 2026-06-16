@@ -1,5 +1,5 @@
 /** Spatial keyboard navigation for Place hotspots (WASD). Pure geometry over the
- *  Places' normalized coords â€” picks the nearest Place in the pressed direction,
+ *  Places' normalized coords — picks the nearest Place in the pressed direction,
  *  so a keyboard user can "walk" between them. Tested without a DOM. */
 
 export interface Pt {

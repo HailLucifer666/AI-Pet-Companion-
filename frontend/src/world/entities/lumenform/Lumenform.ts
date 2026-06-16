@@ -1,4 +1,4 @@
-/** Lumenform renderer â€” the one place that turns the pure DrawSpec + FSM intent
+/** Lumenform renderer — the one place that turns the pure DrawSpec + FSM intent
  *  into Pixi. It reads the live palette (tokens-only), moves toward the FSM's
  *  destination, and plays pose/gesture. Under reduced-motion it snaps to where the
  *  state says and never animates: the pet IS where its state says it is.
@@ -6,7 +6,7 @@
 
 import { Container, Graphics } from "pixi.js";
 import type { Palette } from "../../engine/TokenBridge";
-import { PLACES } from "../../../world3d/placeRegistry";
+import { resolvePlace } from "../../places";
 import { computeDrawSpec, type ColorRole } from "./drawSpec";
 import type { LumenformState } from "./LumenformFSM";
 
@@ -80,8 +80,7 @@ export class Lumenform {
 
   /** dt = ticker.deltaTime (≈1 at 60fps); t = seconds. w/h = canvas size. */
   update(dt: number, t: number, w: number, h: number): void {
-    const raw = PLACES[this.state.place as Exclude<typeof this.state.place, "wander">]?.anchor || { x: w * 0.5, z: h * 0.5 };
-    const target = { x: raw.x, y: raw.z };
+    const target = resolvePlace(this.state.place, w, h, this.state.wanderSeed);
 
     let moving = false;
     if (this.reduced) {

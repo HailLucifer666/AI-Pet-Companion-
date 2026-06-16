@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { stageReveal } from "./widening";
 
-describe("stageReveal â€” the world opens as the pet matures", () => {
+describe("stageReveal — the world opens as the pet matures", () => {
   it("a young companion lives in a closer, mistier world than an elder", () => {
     const s1 = stageReveal(1);
     const s4 = stageReveal(4);
@@ -9,7 +9,7 @@ describe("stageReveal â€” the world opens as the pet matures", () => {
     expect(s4.fogFar).toBeGreaterThan(s1.fogFar);
   });
 
-  it("never contracts â€” survey + fog are monotonic non-decreasing across stages", () => {
+  it("never contracts — survey + fog are monotonic non-decreasing across stages", () => {
     for (let s = 2; s <= 4; s++) {
       expect(stageReveal(s).surveyDist).toBeGreaterThanOrEqual(stageReveal(s - 1).surveyDist);
       expect(stageReveal(s).fogFar).toBeGreaterThanOrEqual(stageReveal(s - 1).fogFar);

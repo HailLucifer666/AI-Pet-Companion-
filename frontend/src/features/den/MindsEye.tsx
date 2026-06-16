@@ -1,8 +1,8 @@
-/** MindsEye â€” press M to look into the companion's mind: a connectogram of the
+/** MindsEye — press M to look into the companion's mind: a connectogram of the
  *  real memories. Nodes are placed on a ring grouped by type, sized + brightened
  *  by stored confidence; edges are the real embedding-similarity links from
- *  /api/memory/graph (opacity âˆ similarity). Hovering a memory highlights its
- *  links and shows its text. Pure overlay (DOM/SVG) â€” no 3D, no pet. Esc / âœ• /
+ *  /api/memory/graph (opacity ∝ similarity). Hovering a memory highlights its
+ *  links and shows its text. Pure overlay (DOM/SVG) — no 3D, no pet. Esc / ✕ /
  *  backdrop closes. Honors reduced-motion (the global rule freezes transitions). */
 
 import { useMemo, useState } from "react";
@@ -87,7 +87,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="The Mind's Eye â€” your companion's memory graph"
+      aria-label="The Mind's Eye — your companion's memory graph"
       className="absolute inset-0 z-50 flex items-center justify-center bg-ink-950/85 backdrop-blur-sm"
       onClick={onClose}
     >
@@ -96,7 +96,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
           <div>
             <h2 className="glow-soft font-display text-lg font-semibold text-ink-100">The Mind's Eye</h2>
             <p className="text-xs text-ink-400">
-              {placed.length} memories Â· links by real similarity Â· hover to read
+              {placed.length} memories · links by real similarity · hover to read
             </p>
             {presentTypes.length > 0 && (
               <ul className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1" aria-label="Memory kinds">
@@ -118,13 +118,13 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
             aria-label="Close the Mind's Eye"
             className="rounded-full border border-claw-500/40 bg-ink-900/70 px-3 py-1 font-display text-xs text-ink-200 hover:border-claw-400 hover:bg-claw-600/30 focus-visible:outline-2 focus-visible:outline-claw-400"
           >
-            âœ• Esc
+            ✕ Esc
           </button>
         </div>
 
         {empty ? (
           <p className="rounded-xl border border-ink-700/50 bg-ink-900/60 p-8 text-center text-sm text-ink-400">
-            No memories yet â€” talk with your companion and the web will grow.
+            No memories yet — talk with your companion and the web will grow.
           </p>
         ) : (
           <svg viewBox="0 0 800 800" className="aspect-square w-full" role="img" aria-label="Memory similarity graph">
@@ -166,7 +166,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
                 >
                   <circle cx={p.x} cy={p.y} r={r * 2} fill={color} opacity={lit ? 0.28 : 0.08} filter="url(#me-node-glow)" />
                   <circle cx={p.x} cy={p.y} r={r} fill={color} opacity={lit ? 0.6 + p.confidence * 0.4 : 0.25} />
-                  <title>{`${TYPE_LABEL[p.type]}: ${contentById.get(p.id) ?? "â€¦"}`}</title>
+                  <title>{`${TYPE_LABEL[p.type]}: ${contentById.get(p.id) ?? "…"}`}</title>
                 </g>
               );
             })}
@@ -175,7 +175,7 @@ export function MindsEye({ open, onClose }: { open: boolean; onClose: () => void
 
         {hovered !== null && (
           <p className="mt-2 truncate rounded-lg border border-ink-700/50 bg-ink-900/80 px-3 py-2 text-center text-sm text-ink-200">
-            <span className="text-claw-300">{(() => { const t = posById.get(hovered)?.type; return t ? TYPE_LABEL[t] : ""; })()}</span> Â· {contentById.get(hovered) ?? "â€¦"}
+            <span className="text-claw-300">{(() => { const t = posById.get(hovered)?.type; return t ? TYPE_LABEL[t] : ""; })()}</span> · {contentById.get(hovered) ?? "…"}
           </p>
         )}
       </div>

@@ -5,12 +5,12 @@ from unittest.mock import patch
 
 import pytest
 
-from ai_pet_companion.config import MIGRATIONS_DIR, Config
-from ai_pet_companion.core import agent
-from ai_pet_companion.core.context import build_user_content
-from ai_pet_companion.db import migrate, open_db
-from ai_pet_companion.providers.base import ChatResponse, Delta, ToolCall
-from ai_pet_companion.tools import build_registry
+from neuraclaw.config import MIGRATIONS_DIR, Config
+from neuraclaw.core import agent
+from neuraclaw.core.context import build_user_content
+from neuraclaw.db import migrate, open_db
+from neuraclaw.providers.base import ChatResponse, Delta, ToolCall
+from neuraclaw.tools import build_registry
 
 
 class ScriptedRouter:
@@ -51,7 +51,7 @@ async def db(tmp_path: Path):
         "INSERT INTO messages (session_id, role, content) VALUES ('s1', 'user', 'hello')"
     )
     await conn.commit()
-    with patch("ai_pet_companion.memory.embedder.embed", side_effect=fake_embed):
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
         yield conn
     await conn.close()
 
@@ -125,7 +125,7 @@ async def test_tag_fallback_dispatches_when_no_structured_calls(db, tmp_path):
 
 
 async def test_unknown_tag_stays_plain_text(db, tmp_path):
-    """A tag naming no real tool is left as text â€” no dispatch."""
+    """A tag naming no real tool is left as text — no dispatch."""
     config = make_config()
     router = ScriptedRouter([ChatResponse(text="see [[notatool {}]] here")])
     events = await collect(
@@ -201,7 +201,7 @@ async def test_system_prompt_contains_soul(db, tmp_path):
     assert system["role"] == "system"
     # The system prompt embeds SOUL.md verbatim. Assert against the live file
     # (newline-normalized) rather than a brand literal, so persona rewrites of
-    # SOUL.md don't break this test â€” it verifies the soul is injected, not its wording.
+    # SOUL.md don't break this test — it verifies the soul is injected, not its wording.
     soul = (Path(__file__).resolve().parents[2] / "SOUL.md").read_text(encoding="utf-8")
 
     def norm(s: str) -> str:
@@ -211,7 +211,7 @@ async def test_system_prompt_contains_soul(db, tmp_path):
 
 
 def test_build_user_content_plain_text():
-    # No image â†’ a plain string (the common, unchanged path).
+    # No image → a plain string (the common, unchanged path).
     assert build_user_content("hello", None) == "hello"
     assert build_user_content("hello", "") == "hello"
 
@@ -249,7 +249,7 @@ async def test_image_attaches_to_latest_user_message(db, tmp_path):
         p.get("type") == "image_url" and "PNGDATA" in p["image_url"]["url"]
         for p in content
     )
-    # The image is never persisted to history â€” only the text is stored.
+    # The image is never persisted to history — only the text is stored.
     cur = await db.execute(
         "SELECT content FROM messages WHERE session_id='s1' AND role='user'"
     )

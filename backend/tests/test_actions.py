@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pytest
 
-from ai_pet_companion.config import MIGRATIONS_DIR, Config
-from ai_pet_companion.db import migrate, open_db
-from ai_pet_companion.tools import build_registry
-from ai_pet_companion.tools.registry import ToolContext
+from neuraclaw.config import MIGRATIONS_DIR, Config
+from neuraclaw.db import migrate, open_db
+from neuraclaw.tools import build_registry
+from neuraclaw.tools.registry import ToolContext
 
 ACTIONS_CONFIG = {
     "trust": {"max_auto_risk": 1, "auto_approve_tools": ["open_url", "open_app"]},
@@ -32,7 +32,7 @@ def captured(monkeypatch) -> list[str]:
     """Capture launch targets instead of really opening anything."""
     calls: list[str] = []
     monkeypatch.setattr(
-        "ai_pet_companion.tools.builtin.actions.spawn", lambda target: calls.append(target)
+        "neuraclaw.tools.builtin.actions.spawn", lambda target: calls.append(target)
     )
     return calls
 

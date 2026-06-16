@@ -1,21 +1,21 @@
-/** emotion.ts â€” the companion's emotion vector, derived ONLY from real agent
+/** emotion.ts — the companion's emotion vector, derived ONLY from real agent
  *  cadence. The Synapse stream already tells us when tools run, memories form,
  *  skills are drafted and levels are gained; the FSM tells us what the pet is
  *  doing. From that real rhythm we read a continuous {arousal, valence, curiosity,
- *  confidence} and let it colour the pet's glow â€” so the light visibly breathes
+ *  confidence} and let it colour the pet's glow — so the light visibly breathes
  *  with what the agent is actually doing.
  *
  *  Honesty rules (binding): every input is a real signal. We never infer the
- *  *user's* feelings, and we never fake a negative â€” valence is "neutral â†’ joyful"
+ *  *user's* feelings, and we never fake a negative — valence is "neutral → joyful"
  *  (0.5 = content baseline), lifted only by real wins (level-up, skill draft,
  *  celebrate), because nothing in the system measures sadness. Pure + unit-tested;
  *  the renderer just eases toward what this returns. */
 
 export interface EmotionVector {
-  arousal: number; // 0 calm â€¦ 1 activated
-  valence: number; // 0.5 neutral â€¦ 1 joyful (no faked negative â€” no signal for it)
-  curiosity: number; // 0 â€¦ 1 â€” drawn toward new input
-  confidence: number; // 0 â€¦ 1 â€” capable / on-task
+  arousal: number; // 0 calm … 1 activated
+  valence: number; // 0.5 neutral … 1 joyful (no faked negative — no signal for it)
+  curiosity: number; // 0 … 1 — drawn toward new input
+  confidence: number; // 0 … 1 — capable / on-task
 }
 
 export interface EmotionInput {
@@ -29,11 +29,11 @@ export interface EmotionInput {
 
 const JOY_TAU = 8000; // a win's joy fades over ~8s
 const PRIDE_TAU = 15000; // confidence from a recent skill draft lingers ~15s
-const CALM_TAU = 12000; // long idle â†’ fully calm
-const EVENT_SAT = 4; // 4+ events in the window â†’ activity saturates
+const CALM_TAU = 12000; // long idle → fully calm
+const EVENT_SAT = 4; // 4+ events in the window → activity saturates
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
-/** 1 when fresh â†’ 0 after `tau` ms (a linear decay of a recent spike). */
+/** 1 when fresh → 0 after `tau` ms (a linear decay of a recent spike). */
 const fade = (ms: number, tau: number) => clamp01(1 - ms / tau);
 
 /** Map the real cadence onto a continuous emotion vector. */
@@ -58,12 +58,12 @@ export function deriveEmotion(i: EmotionInput): EmotionVector {
  *  joyful. `warmth` 0 = the neutral ember tone, 1 = the hottest happy glow. */
 export function emotionGlow(e: EmotionVector): { lightMul: number; warmth: number } {
   return {
-    lightMul: 0.85 + e.arousal * 0.4, // 0.85 calm â€¦ 1.25 activated
-    warmth: clamp01((e.valence - 0.5) / 0.5), // neutral â†’ 0, joyful â†’ 1
+    lightMul: 0.85 + e.arousal * 0.4, // 0.85 calm … 1.25 activated
+    warmth: clamp01((e.valence - 0.5) / 0.5), // neutral → 0, joyful → 1
   };
 }
 
-/** A one-word read of the emotion vector for the HUD â€” the same real signal the
+/** A one-word read of the emotion vector for the HUD — the same real signal the
  *  glow rides, named. Order matters (most specific first). */
 export function moodWord(e: EmotionVector): string {
   if (e.valence > 0.8) return "Elated"; // a real win shows even when otherwise calm

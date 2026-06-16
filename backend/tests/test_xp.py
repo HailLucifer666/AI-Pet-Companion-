@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from ai_pet_companion.config import MIGRATIONS_DIR
-from ai_pet_companion.core.synapse import synapse
-from ai_pet_companion.db import migrate, open_db
-from ai_pet_companion.pet import xp
+from neuraclaw.config import MIGRATIONS_DIR
+from neuraclaw.core.synapse import synapse
+from neuraclaw.db import migrate, open_db
+from neuraclaw.pet import xp
 
 
 @pytest.fixture
@@ -126,13 +126,13 @@ async def test_memory_layer_awards_and_claws_back_xp(db):
     """End-to-end: store.add_memory awards memory_formed; forget claws it back."""
     from unittest.mock import patch
 
-    from ai_pet_companion.memory import store
+    from neuraclaw.memory import store
 
     async def fake_embed(texts):
         return [[0.0] * 384 for _ in texts]
 
     await xp.ensure_pet(db, name="Claw")
-    with patch("ai_pet_companion.memory.embedder.embed", side_effect=fake_embed):
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
         mid = await store.add_memory(db, type="fact", content="a durable fact for wiring")
     assert mid is not None
     assert (await xp.get_pet(db))["xp"] == 5
@@ -144,7 +144,7 @@ async def test_memory_layer_awards_and_claws_back_xp(db):
 async def test_hatch_creates_pet_regenerates_soul_seeds_memories(db, tmp_path):
     from unittest.mock import patch
 
-    from ai_pet_companion.pet import hatch
+    from neuraclaw.pet import hatch
 
     def fake_vector(text: str) -> list[float]:
         vec = [0.0] * 384
@@ -157,14 +157,14 @@ async def test_hatch_creates_pet_regenerates_soul_seeds_memories(db, tmp_path):
         return [fake_vector(t) for t in texts]
 
     soul = tmp_path / "SOUL.md"
-    with patch("ai_pet_companion.memory.embedder.embed", side_effect=fake_embed):
+    with patch("neuraclaw.memory.embedder.embed", side_effect=fake_embed):
         pet = await hatch.hatch(
             db,
             soul,
             creature_name="Ember",
             user_name="Arghya",
             voice="warm",
-            focus="shipping ai_pet_companion",
+            focus="shipping NeuraClaw",
             boundaries="never email without asking",
         )
 
@@ -172,7 +172,7 @@ async def test_hatch_creates_pet_regenerates_soul_seeds_memories(db, tmp_path):
     assert pet["user_name"] == "Arghya"
     text = soul.read_text(encoding="utf-8")
     assert "Ember" in text and "Arghya" in text and "never email without asking" in text
-    # Four distinct seeded memories form â†’ 4 Ã— 5 XP.
+    # Four distinct seeded memories form → 4 × 5 XP.
     assert pet["xp"] >= 15
     cur = await db.execute("SELECT COUNT(*) FROM memories")
     assert (await cur.fetchone())[0] >= 3

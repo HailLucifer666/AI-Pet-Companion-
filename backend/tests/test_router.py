@@ -1,8 +1,8 @@
 import pytest
 
-from ai_pet_companion.config import Config, ProviderConfig
-from ai_pet_companion.providers import ProviderError, Router, ToolsUnsupportedError, parse_ref
-from ai_pet_companion.providers.base import ChatResponse
+from neuraclaw.config import Config, ProviderConfig
+from neuraclaw.providers import ProviderError, Router, ToolsUnsupportedError, parse_ref
+from neuraclaw.providers.base import ChatResponse
 
 
 def make_config(**overrides) -> Config:

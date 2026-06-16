@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 /* â”€â”€ AI Pet Companion design system â€” "Bioluminescent Terminal" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    A dark instrument panel something alive inhabits. Deep layered ink
@@ -198,4 +198,17 @@ h1, h2, h3 {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ── Tauri Native Shell Mode ────────────────────────────
+   When running inside the native wrapper, the background is 
+   transparent to allow the desktop overlay effect. */
+html.tauri-mode,
+html.tauri-mode body,
+html.tauri-mode #root {
+  background: transparent !important;
+}
+
+html.tauri-mode .bg-ink-950 {
+  background-color: transparent !important;
 }

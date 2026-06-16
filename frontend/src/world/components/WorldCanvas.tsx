@@ -1,4 +1,4 @@
-/** WorldCanvas â€” the React seam to the imperative WorldEngine. Owns exactly one
+/** WorldCanvas — the React seam to the imperative WorldEngine. Owns exactly one
  *  engine for the lifetime of the mounted host div; StrictMode's double-mount is
  *  handled inside the engine (destroyed-flag + cleanup-first), so this stays tiny.
  *  role="img" + label gives the canvas an accessible name for screen readers. */
@@ -22,7 +22,7 @@ export function WorldCanvas({ className }: { className?: string }) {
       ref={hostRef}
       className={className}
       role="img"
-      aria-label="The Grove â€” a living world that grows alongside your companion"
+      aria-label="The Grove — a living world that grows alongside your companion"
     />
   );
 }

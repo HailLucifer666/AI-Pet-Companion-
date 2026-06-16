@@ -1,8 +1,8 @@
-/** Particles3D â€” ambient light-motes drifting over the Grove. A single additive
+/** Particles3D — ambient light-motes drifting over the Grove. A single additive
  *  Points cloud (one draw call) whose motion comes from the pure `flow` field, so
- *  the air always reads as gently alive â€” the biggest cheap "vibrant" win, lifted
+ *  the air always reads as gently alive — the biggest cheap "vibrant" win, lifted
  *  in spirit from low-poly worlds like Gravity Garden but coloured by OUR tokens
- *  (warm ember + a cool accent). Reduced-motion â†’ the motes are present but still.
+ *  (warm ember + a cool accent). Reduced-motion → the motes are present but still.
  */
 
 import { useEffect, useMemo, useRef } from "react";
@@ -12,21 +12,18 @@ import * as THREE from "three";
 import { makeField, motePosition } from "./particles/flow";
 import { WORLD } from "./palette";
 import { WORLD_SCALE } from "./terrain";
-import { useQualityStore } from "./hooks/useQualityLadder";
 
+const COUNT = 260; // motes over the ×5 island (cheap Points — still one draw call); thinned for a cleaner sky
 const FIELD_R = 13 * WORLD_SCALE;
 
 export function Particles3D() {
   const reduced = useReducedMotion() ?? false;
-  const tier = useQualityStore((s) => s.tier);
-  const count = tier === 'low' ? 50 : tier === 'medium' ? 120 : 260;
-
   const points = useRef<THREE.Points>(null);
 
   const { geom, field } = useMemo(() => {
-    const field = makeField(count, 0x6c10, FIELD_R);
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
+    const field = makeField(COUNT, 0x6c10, FIELD_R);
+    const positions = new Float32Array(COUNT * 3);
+    const colors = new Float32Array(COUNT * 3);
     const warm = new THREE.Color(WORLD.emberHi);
     const cool = new THREE.Color(WORLD.mote);
     const tmp = { x: 0, y: 0, z: 0 };
@@ -44,7 +41,7 @@ export function Particles3D() {
     geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
     return { geom, field };
-  }, [count]);
+  }, []);
 
   useEffect(() => () => geom.dispose(), [geom]);
 

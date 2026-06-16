@@ -8,15 +8,19 @@ import {
   ChevronDown,
   ChevronRight,
   MessageSquare,
+  Mic,
   Plus,
   Send,
   Square,
   Trash2,
+  Volume2,
+  VolumeX,
   Wrench,
 } from "lucide-react";
 import { api, queryKeys, type SessionSummary } from "../../lib/api";
 import { streamSSE } from "../../lib/sse";
 import { useUndoableDelete } from "../../lib/useUndoableDelete";
+import { useVoice } from "../../lib/useVoice";
 import { useModelStore, modelOverride } from "../../state/useModelStore";
 import { ModelSelector } from "../../components/ModelSelector";
 import {
@@ -30,7 +34,7 @@ import {
   Textarea,
 } from "../../components/ui";
 
-/* â”€â”€ Stream state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Stream state ────────────────────────────────────────────────── */
 
 interface ToolActivity {
   tool: string;
@@ -48,7 +52,7 @@ interface StreamState {
 
 const idleStream: StreamState = { text: "", tools: [], error: null, running: false };
 
-/* â”€â”€ Markdown body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Markdown body ───────────────────────────────────────────────── */
 
 function Body({ text }: { text: string }) {
   return (
@@ -84,7 +88,7 @@ function ToolRow({ activity }: { activity: ToolActivity }) {
   );
 }
 
-/* â”€â”€ Message bubbles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Message bubbles ─────────────────────────────────────────────── */
 
 function UserBubble({ text }: { text: string }) {
   return (
@@ -121,7 +125,7 @@ function AssistantBlock({
   );
 }
 
-/* â”€â”€ Session sidebar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Session sidebar ─────────────────────────────────────────────── */
 
 function SessionList({
   activeId,
@@ -202,7 +206,7 @@ function SessionList({
   );
 }
 
-/* â”€â”€ Main view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main view ───────────────────────────────────────────────────── */
 
 export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
   const params = useParams();
@@ -222,6 +226,9 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
   const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const prefilled = useRef(false);
+
+  const voice = useVoice();
+  const [muted, setMuted] = useState(false);
 
   // A suggested prompt handed over from the hatch ritual lands here once.
   useEffect(() => {
@@ -245,14 +252,16 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [history?.messages.length, stream.text, stream.tools.length]);
 
-  async function send() {
-    const message = input.trim();
+  async function send(explicitText?: string) {
+    const message = (explicitText ?? input).trim();
     if (!message || stream.running) return;
     setInput("");
     setStream({ ...idleStream, running: true });
+    voice.cancelSpeech();
     const controller = new AbortController();
     abortRef.current = controller;
     let newSessionId = sessionId;
+    let acc = "";
     try {
       for await (const event of streamSSE(
         "/api/chat",
@@ -262,6 +271,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
         if (event.type === "session" && !sessionId) {
           newSessionId = event.session_id as string;
         } else if (event.type === "delta") {
+          acc += (event.text as string);
           setStream((s) => ({ ...s, text: s.text + (event.text as string) }));
         } else if (event.type === "tool_start") {
           setStream((s) => ({
@@ -291,13 +301,19 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     } finally {
       abortRef.current = null;
       setStream((s) => ({ ...s, running: false }));
+      
+      const final = acc.trim();
+      if (final && !muted) {
+        voice.speak(final);
+      }
+      
       queryClient.invalidateQueries({ queryKey: queryKeys.sessions });
       if (newSessionId) {
         await queryClient.invalidateQueries({
           queryKey: queryKeys.sessionMessages(newSessionId),
         });
         // Keep a surfaced error visible (the reply lives in reloaded history, but
-        // a failed/errored turn â€” common for a pinned model with no failover â€”
+        // a failed/errored turn — common for a pinned model with no failover —
         // persists nothing, so the error banner must survive the reset).
         setStream((s) => (s.error ? { ...idleStream, error: s.error } : idleStream));
         if (newSessionId !== sessionId) goToSession(newSessionId);
@@ -307,7 +323,34 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
 
   function stop() {
     abortRef.current?.abort();
+    voice.cancelSpeech();
   }
+
+  const toggleMic = () => {
+    if (voice.listening) {
+      voice.stopListening();
+      return;
+    }
+    voice.startListening((text, final) => {
+      setInput(text);
+      if (final && text.trim()) {
+        voice.stopListening();
+        void send(text);
+      }
+    });
+  };
+
+  const toggleMute = () => {
+    setMuted((m) => {
+      if (!m) voice.cancelSpeech();
+      return !m;
+    });
+  };
+
+  useEffect(() => () => {
+    abortRef.current?.abort();
+    voice.cancelSpeech();
+  }, [voice]);
 
   const visibleMessages =
     history?.messages.filter((m) => m.role === "user" || (m.role === "assistant" && m.content)) ??
@@ -329,7 +372,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           ) : visibleMessages.length === 0 && !stream.running && !stream.text ? (
             <EmptyState
               icon={MessageSquare}
-              title="Talk to AI Pet Companion"
+              title="Talk to NeuraClaw"
               description="It can search the web, manage files in its workspace, take notes and remember what matters."
             />
           ) : (
@@ -368,7 +411,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
             <ModelSelector className="w-44 shrink-0" />
             <Textarea
               rows={Math.min(6, Math.max(1, input.split("\n").length))}
-              placeholder="Messageâ€¦ (Enter to send, Shift+Enter for newline)"
+              placeholder={voice.listening ? "Listening…" : "Message… (Enter to send, Shift+Enter for newline)"}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -378,6 +421,30 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
                 }
               }}
             />
+            <div className="flex items-center gap-1 shrink-0 mb-1 mr-1">
+              {voice.sttSupported && (
+                <button
+                  onClick={toggleMic}
+                  aria-label={voice.listening ? "Stop listening" : "Speak"}
+                  className={`rounded-lg p-2 transition-colors ${
+                    voice.listening
+                      ? "animate-pulse bg-claw-600/30 text-claw-300"
+                      : "text-ink-400 hover:bg-ink-800/70 hover:text-ink-100"
+                  }`}
+                >
+                  <Mic className="size-4" />
+                </button>
+              )}
+              {voice.ttsSupported && (
+                <button
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute the companion's voice" : "Mute the companion's voice"}
+                  className="rounded-lg p-2 text-ink-400 transition-colors hover:bg-ink-800/70 hover:text-ink-100"
+                >
+                  {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+                </button>
+              )}
+            </div>
             {stream.running ? (
               <Button variant="danger" onClick={stop} aria-label="Stop generating">
                 <Square className="size-4" /> Stop

@@ -1,4 +1,4 @@
-/** SurfaceOverlay â€” a surface opened as a pane over the dimmed, blurred world.
+/** SurfaceOverlay — a surface opened as a pane over the dimmed, blurred world.
  *
  *  Radix Dialog gives focus-trap, Esc-to-close, return-focus and aria-modal for
  *  free (WCAG). The productivity surfaces render directly under the app's single
@@ -10,7 +10,7 @@
 
 import * as RDialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { NAV_PLACES } from "../../world3d/placeRegistry";
+import { NAV_PLACES } from "../../world/places";
 import { useWorldNav } from "../../state/worldNavStore";
 import { ChatView } from "../chat/ChatView";
 import { MemoryView } from "../memory/MemoryView";

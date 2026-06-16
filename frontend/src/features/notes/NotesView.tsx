@@ -43,7 +43,7 @@ function Editor({ note, onSaved }: { note: Note; onSaved: () => void }) {
           className="max-w-md border-none bg-transparent text-base font-medium"
         />
         <div className="flex-1" />
-        {dirty && <span className="text-xs text-ink-500">savingâ€¦</span>}
+        {dirty && <span className="text-xs text-ink-500">saving…</span>}
         <IconButton
           icon={preview ? Pencil : Eye}
           label={preview ? "Edit" : "Preview"}
@@ -57,7 +57,7 @@ function Editor({ note, onSaved }: { note: Note; onSaved: () => void }) {
       ) : (
         <textarea
           value={content}
-          placeholder="Write in markdownâ€¦"
+          placeholder="Write in markdown…"
           onChange={(e) => setContent(e.target.value)}
           className="min-h-0 flex-1 resize-none bg-transparent p-5 font-mono text-sm text-ink-100 placeholder:text-ink-500 focus:outline-none"
         />
@@ -103,7 +103,7 @@ export function NotesView() {
     <div className="flex h-full">
       <aside className="flex w-72 shrink-0 flex-col border-r border-ink-800 bg-ink-900/50">
         <div className="flex items-center gap-2 p-3">
-          <Input placeholder="Search notesâ€¦" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input placeholder="Search notes…" value={q} onChange={(e) => setQ(e.target.value)} />
           <IconButton icon={Plus} label="New note" onClick={() => create.mutate()} />
         </div>
         <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">

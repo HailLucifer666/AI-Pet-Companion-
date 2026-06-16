@@ -1,10 +1,10 @@
-/** The first-run ritual â€” the companion's birth.
+/** The first-run ritual — the companion's birth.
  *
  * A full-screen void with a waiting egg. Five quiet questions shape who it is,
  * a brain-check makes sure it has a mind to think with, then it hatches for real
  * (POST /api/hatch creates the pet row, regenerates SOUL.md, seeds first memories).
  * Rendered by the root gate whenever no pet exists yet. The only flashy moment in
- * an otherwise instrument-like app â€” and the one screenshot the whole product is
+ * an otherwise instrument-like app — and the one screenshot the whole product is
  * judged on. Honors reduced-motion: the egg simply *is*, no breathing.
  */
 
@@ -27,10 +27,10 @@ const QuickeningScene = lazy(() =>
 );
 
 const VOICES = [
-  { value: "warm", label: "Warm â€” encouraging, never saccharine" },
-  { value: "direct", label: "Direct â€” no filler, no flattery" },
-  { value: "playful", label: "Playful â€” real humor, still clear" },
-  { value: "formal", label: "Formal â€” precise and measured" },
+  { value: "warm", label: "Warm — encouraging, never saccharine" },
+  { value: "direct", label: "Direct — no filler, no flattery" },
+  { value: "playful", label: "Playful — real humor, still clear" },
+  { value: "formal", label: "Formal — precise and measured" },
 ];
 
 type Phase = "intro" | "questions" | "brain" | "hatching" | "revealed";
@@ -51,7 +51,7 @@ const EMPTY: Answers = {
   boundaries: "",
 };
 
-/* â”€â”€ The waiting egg â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── The waiting egg ─────────────────────────────────────────────────── */
 
 function Egg({ size, cracking }: { size: number; cracking?: boolean }) {
   const reduced = useReducedMotion();
@@ -95,7 +95,7 @@ function Egg({ size, cracking }: { size: number; cracking?: boolean }) {
   );
 }
 
-/* â”€â”€ Layout shell for the void â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Layout shell for the void ───────────────────────────────────────── */
 
 function Void({ children }: { children: React.ReactNode }) {
   return (
@@ -111,9 +111,9 @@ function Void({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* â”€â”€ Dawn burst: the first light â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Dawn burst: the first light ─────────────────────────────────────────
  * A single warm radial veil that pops the instant the egg hatches (dawn breaks),
- * then falls off cubic-out (bloomFlash) â€” the screen-wide echo of the egg's burst
+ * then falls off cubic-out (bloomFlash) — the screen-wide echo of the egg's burst
  * of light, in cinematic and plain modes alike. Reduced-motion: no flash. */
 const DAWN_MS = 1600;
 
@@ -147,10 +147,10 @@ function DawnBurst({ active, reduced }: { active: boolean; reduced: boolean }) {
   );
 }
 
-/* â”€â”€ Stage: the ritual's backdrop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Stage: the ritual's backdrop ────────────────────────────────────────
  * Plain Void by default. Under `cinematic` (WebGL present, no error yet) it sets
  * the same Void content over the in-world Quickening dawn scene, wrapped in an
- * ErrorBoundary so any 3D failure falls straight back to the Void â€” onboarding
+ * ErrorBoundary so any 3D failure falls straight back to the Void — onboarding
  * can never get trapped on a blank screen. Either way the dawn burst veils the
  * screen at the hatch moment. */
 function Stage({
@@ -189,7 +189,7 @@ function Stage({
   );
 }
 
-/* â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main ────────────────────────────────────────────────────────────── */
 
 export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; cinematicMode?: boolean }) {
   const navigate = useNavigate();
@@ -201,7 +201,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   const [answers, setAnswers] = useState<Answers>(EMPTY);
   const [hasBrain, setHasBrain] = useState(brain.ollama || brain.cloud_keys);
   const [creatureName, setCreatureName] = useState("");
-  const [cineFailed, setCineFailed] = useState(false); // a 3D panic â†’ fall back to the plain Void
+  const [cineFailed, setCineFailed] = useState(false); // a 3D panic → fall back to the plain Void
   const cinematic = cinematicMode && !cineFailed;
   const suggested = useSuggestedPrompts(answers, creatureName);
 
@@ -222,7 +222,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
       if (ctx.state === "suspended") void ctx.resume();
       playBirthChime(ctx);
     } catch {
-      /* audio blocked/unsupported â€” ignore */
+      /* audio blocked/unsupported — ignore */
     }
   }
 
@@ -248,7 +248,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   }
 
   function enterDen(prompt?: string) {
-    // Pet now exists â†’ invalidate so the root gate swaps the ritual for the app.
+    // Pet now exists → invalidate so the root gate swaps the ritual for the app.
     queryClient.invalidateQueries({ queryKey: queryKeys.pet });
     navigate("/den", prompt ? { state: { prompt } } : undefined);
   }
@@ -268,7 +268,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
             Something is waiting to wake.
           </h1>
           <p className="mt-2 text-sm text-ink-500">
-            A companion is about to hatch â€” yours alone, living on this machine. A
+            A companion is about to hatch — yours alone, living on this machine. A
             few questions shape who it becomes. Nothing leaves your computer.
           </p>
           <Button className="mt-6" onClick={() => setPhase("questions")}>
@@ -287,7 +287,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
           <>
             {!cinematic && <Egg size={200} cracking />}
             <div className="mt-8 flex items-center gap-2 text-sm text-ink-500">
-              <Spinner /> Wakingâ€¦
+              <Spinner /> Waking…
             </div>
           </>
         ) : (
@@ -377,7 +377,7 @@ export function HatchRitual({ brain, cinematicMode = false }: { brain: Brain; ci
   );
 }
 
-/* â”€â”€ Question field (one per step) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Question field (one per step) ───────────────────────────────────── */
 
 function QuestionField({
   qi,
@@ -400,14 +400,14 @@ function QuestionField({
     case 0:
       return (
         <Field label="What will you call it?">
-          <Input autoFocus placeholder="A nameâ€¦" maxLength={40} value={answers.creature_name}
+          <Input autoFocus placeholder="A name…" maxLength={40} value={answers.creature_name}
             onChange={(e) => set("creature_name", e.target.value)} onKeyDown={onKey} />
         </Field>
       );
     case 1:
       return (
         <Field label="And what should it call you?">
-          <Input autoFocus placeholder="Your nameâ€¦" maxLength={40} value={answers.user_name}
+          <Input autoFocus placeholder="Your name…" maxLength={40} value={answers.user_name}
             onChange={(e) => set("user_name", e.target.value)} onKeyDown={onKey} />
         </Field>
       );
@@ -422,7 +422,7 @@ function QuestionField({
       return (
         <Field label="What do you spend your days on?">
           <Textarea autoFocus rows={3} maxLength={500}
-            placeholder="Shipping a product, studying, writing â€” whatever it should help with."
+            placeholder="Shipping a product, studying, writing — whatever it should help with."
             value={answers.focus} onChange={(e) => set("focus", e.target.value)} />
         </Field>
       );
@@ -446,7 +446,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-/* â”€â”€ Brain-check step â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Brain-check step ────────────────────────────────────────────────── */
 
 function BrainStep({
   hasBrain,
@@ -518,7 +518,7 @@ function BrainStep({
             </span>
             <p className="mt-1 text-sm text-ink-500">
               Run a local model (Ollama) or paste a provider API key. Keys are written
-              to <code className="rounded bg-ink-850 px-1">.env</code> on this machine â€”
+              to <code className="rounded bg-ink-850 px-1">.env</code> on this machine —
               never sent anywhere, never shown again.
             </p>
           </div>
@@ -527,7 +527,7 @@ function BrainStep({
               options={envOptions} className="w-full" />
           )}
           <div className="flex gap-2">
-            <Input type="password" placeholder="Paste API keyâ€¦" value={key}
+            <Input type="password" placeholder="Paste API key…" value={key}
               onChange={(e) => setKey(e.target.value)} autoComplete="off" />
             <Button onClick={saveKey} disabled={saving || !key.trim() || !envName}>
               {saving ? <Spinner /> : <KeyRound className="size-4" />} Save
@@ -548,7 +548,7 @@ function BrainStep({
   );
 }
 
-/* â”€â”€ Suggested first prompts â€” personal, derived from the answers â”€â”€â”€â”€â”€â”€ */
+/* ── Suggested first prompts — personal, derived from the answers ────── */
 
 function useSuggestedPrompts(answers: Answers, name: string): string[] {
   return useMemo(() => {

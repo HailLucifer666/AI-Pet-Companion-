@@ -51,13 +51,13 @@ describe("deriveEmotion", () => {
 });
 
 describe("emotionGlow", () => {
-  it("calm â†’ dim baseline, activated â†’ brighter", () => {
+  it("calm → dim baseline, activated → brighter", () => {
     expect(emotionGlow(deriveEmotion(CALM)).lightMul).toBeCloseTo(0.85, 1);
     const hot = emotionGlow(deriveEmotion({ ...CALM, mode: "work", recentEvents: 5, msSinceActivity: 100 }));
     expect(hot.lightMul).toBeGreaterThan(1.1);
   });
 
-  it("neutral valence â†’ cool (0 warmth), joyful â†’ warm (â†’1)", () => {
+  it("neutral valence → cool (0 warmth), joyful → warm (→1)", () => {
     expect(emotionGlow({ arousal: 0, valence: 0.5, curiosity: 0, confidence: 0 }).warmth).toBe(0);
     expect(emotionGlow({ arousal: 0, valence: 1, curiosity: 0, confidence: 0 }).warmth).toBe(1);
   });

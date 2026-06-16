@@ -1,11 +1,11 @@
-/** QuickeningScene â€” the in-world backdrop for the first-run hatch. A dedicated,
+/** QuickeningScene — the in-world backdrop for the first-run hatch. A dedicated,
  *  lightweight 3D scene (NOT the full world) behind the ritual's questions: a dark
  *  grove that holds deep night while you answer, warms as each question lands, then
  *  cubic-eases into a FIRST DAWN at the moment of hatching. Lighting comes straight
  *  from the shared day/night palette (daylightAt) driven by the pure rampHour, so it
  *  reads identically to the real world the companion will wake into.
  *
- *  Pointer-events-none â€” the question overlay above it owns all input. Reduced-motion:
+ *  Pointer-events-none — the question overlay above it owns all input. Reduced-motion:
  *  the light snaps (no easing). Mounted only when WebGL is available + the cinematic
  *  hasn't errored (HatchRitual gates it behind hasWebGL + an ErrorBoundary). */
 
@@ -42,7 +42,7 @@ function toQuickening(p: HatchPhase): QuickeningPhase {
   return "dawn";
 }
 
-// A fixed ring of silhouette "trees" around the horizon â€” a grove, not the village.
+// A fixed ring of silhouette "trees" around the horizon — a grove, not the village.
 const TREES: [number, number][] = [
   [-9, -6], [-5, -11], [4, -12], [9, -7], [12, -2], [-12, 0], [7, 3], [-8, 4], [0, -14], [-3, 5],
 ];
@@ -110,7 +110,7 @@ function Dawn({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: 
   );
 }
 
-/* â”€â”€ The egg in the grove â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── The egg in the grove ────────────────────────────────────────────────
  * A glowing ovoid waiting on the dark ground at the centre of the scene, lit by
  * its own warm point light. It brightens as each question lands, swells into a
  * hot burst at the moment of hatching, then vanishes on reveal (the awakened
@@ -180,7 +180,7 @@ function Egg3D({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced:
   );
 }
 
-/* â”€â”€ Emergence motes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Emergence motes ─────────────────────────────────────────────────────
  * A one-shot burst of warm sparks that fountains up out of the egg the instant
  * it hatches and rises into the new dawn as the companion appears, then fades.
  * Additive, un-tonemapped points so they read as light. Reduced-motion: none. */
@@ -259,7 +259,7 @@ function EmergenceMotes({ phase, reduced }: { phase: HatchPhase; reduced: boolea
   );
 }
 
-/* â”€â”€ Dolly â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Dolly ───────────────────────────────────────────────────────────────
  * A slow, unbroken push toward the egg: far at the intro, drawing closer with
  * each question answered, holding its breath at the brain-check, pressing into
  * the burst at hatch, then easing back to let the first dawn breathe at reveal.
@@ -280,7 +280,7 @@ function DollyRig({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduc
 
   useFrame((_, delta) => {
     const [x, y, baseZ] = DOLLY[phase];
-    const z = phase === "questions" ? 8.6 - Math.min(qi, 4) * 0.45 : baseZ; // 8.6 â†’ 6.8
+    const z = phase === "questions" ? 8.6 - Math.min(qi, 4) * 0.45 : baseZ; // 8.6 → 6.8
     target.set(x, y, z);
     const k = reduced ? 1 : 1 - Math.exp(-2.2 * delta);
     cam.position.lerp(target, k);
@@ -289,11 +289,11 @@ function DollyRig({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduc
   return null;
 }
 
-/* â”€â”€ Region kindling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Region kindling ─────────────────────────────────────────────────────
  * The master-plan beat: each answer lights a region of the dark grove. Five
  * ember cairns ring the mid-grove behind the egg; as each question is answered
  * the matching one bursts (cubic-out) then settles to a steady warm glow, and
- * the last kindles as the brain-check is reached â€” so by the dawn the whole
+ * the last kindles as the brain-check is reached — so by the dawn the whole
  * grove is alive. Pure emissive (no dynamic lights). Reduced-motion: the
  * answered regions are simply lit, no burst. */
 const N_REGIONS = 5;
@@ -302,7 +302,7 @@ const REGION_FLASH = 0.9; // seconds
 function regionsLit(phase: HatchPhase, qi: number): number {
   if (phase === "intro") return 0;
   if (phase === "questions") return Math.min(qi, N_REGIONS); // one per answer given
-  return N_REGIONS; // brain / hatching / revealed â†’ all alight
+  return N_REGIONS; // brain / hatching / revealed → all alight
 }
 
 function RegionKindle({ phase, qi, reduced }: { phase: HatchPhase; qi: number; reduced: boolean }) {
@@ -314,7 +314,7 @@ function RegionKindle({ phase, qi, reduced }: { phase: HatchPhase; qi: number; r
   const regions = useMemo(() => {
     const out: [number, number, number][] = [];
     for (let i = 0; i < N_REGIONS; i++) {
-      const a = -0.9 + (1.8 * i) / (N_REGIONS - 1); // fan ~Â±51Â° behind the egg
+      const a = -0.9 + (1.8 * i) / (N_REGIONS - 1); // fan ~±51° behind the egg
       out.push([Math.sin(a) * 5.0, 0.3, -3.0 - Math.cos(a) * 1.3]);
     }
     return out;

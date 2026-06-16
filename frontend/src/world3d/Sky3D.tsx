@@ -1,4 +1,4 @@
-/** Sky3D â€” the visible sun and moon. Two emissive spheres (a sphere with an unlit,
+/** Sky3D — the visible sun and moon. Two emissive spheres (a sphere with an unlit,
  *  bloom-bright material reads as a glowing disc from any camera angle) placed along
  *  the live day/night light direction at a fixed CAMERA-RELATIVE distance, so they
  *  feel infinitely far (no parallax) and never clip the far plane. `fog={false}` keeps
@@ -43,7 +43,7 @@ export function Sky3D({ hour, reduced }: { hour: number; reduced: boolean }) {
   });
 
   // reduced-motion is handled by the demand frameloop (one frame per re-render on the
-  // minute clock) â€” the body simply sits at the current hour's position, no easing.
+  // minute clock) — the body simply sits at the current hour's position, no easing.
   void reduced;
 
   return (

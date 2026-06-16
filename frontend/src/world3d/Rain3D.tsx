@@ -1,7 +1,7 @@
-/** Rain3D â€” falling rain when the real weather calls for it. One InstancedMesh of
+/** Rain3D — falling rain when the real weather calls for it. One InstancedMesh of
  *  thin streaks in a column that tracks the pet (so rain is always around the
  *  view), recycled top-to-bottom. Density follows light/heavy; a storm adds
- *  occasional lightning (a brief sky flash). Reduced-motion â†’ no rain. */
+ *  occasional lightning (a brief sky flash). Reduced-motion → no rain. */
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -10,7 +10,7 @@ import { mulberry32 } from "../world/engine/rng";
 import { petPos } from "./petPosition";
 
 const MAX = 360;
-const RADIUS = 52; // wider spread â†’ rain veils the scene instead of pillaring on the pet (tracks the pet; partial scale for the bigger world)
+const RADIUS = 52; // wider spread → rain veils the scene instead of pillaring on the pet (tracks the pet; partial scale for the bigger world)
 const CORE_HOLE = 0.12; // keep a clear-ish core so streaks don't stack on the pet
 const FALL_H = 30; // column height; drops recycle to the top after passing the ground
 const RAIN_COLOR = 0xbcd4e6;

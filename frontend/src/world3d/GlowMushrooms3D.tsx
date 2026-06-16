@@ -1,8 +1,8 @@
-/** GlowMushrooms3D â€” bioluminescent caps scattered across the island's mid-band,
+/** GlowMushrooms3D — bioluminescent caps scattered across the island's mid-band,
  *  the ground-level glow of "The Mycelium" (lifted from the hero concept art). Each
  *  is a tiny stem + an emissive cap; only the first few carry a real point-light so
  *  nearby terrain picks up their colour (capped for perf). All caps + lights brighten
- *  at night via glowBoost â€” the "full-glow night" grade. Deterministic placement â†’
+ *  at night via glowBoost — the "full-glow night" grade. Deterministic placement →
  *  same field every launch; kept clear of the central meadow + Place markers.
  *  Reduced-motion: present and lit, just no flicker. */
 
@@ -14,8 +14,8 @@ import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
 import { glowBoost } from "./daylight";
 import { sky } from "./skyState";
 
-const COUNT = 26; // scattered bioluminescent spots â€” thinned for a cleaner, less-busy island
-const CAP_BASE = 1.1; // base emissive; Ã—glowBoost at night
+const COUNT = 26; // scattered bioluminescent spots — thinned for a cleaner, less-busy island
+const CAP_BASE = 1.1; // base emissive; ×glowBoost at night
 const LIGHT_BASE = 0.32;
 const MEADOW_R = 4.8 * WORLD_SCALE; // keep clear of the central roaming meadow
 const CAP_COLORS = [0x49d39a, 0x6be9ff, 0x9d7bff, 0x8be06a]; // bio cyan/violet/lime
@@ -45,7 +45,7 @@ function place(): Spot[] {
 }
 
 /** `lit` = how many caps carry a real point-light (the GPU-tier quality ladder caps
- *  it; 0 on weak GPUs). NEVER scale it with the island size â€” it's a light budget. */
+ *  it; 0 on weak GPUs). NEVER scale it with the island size — it's a light budget. */
 export function GlowMushrooms3D({ reduced, lit = 3 }: { reduced: boolean; lit?: number }) {
   const spots = useMemo(place, []);
   const caps = useRef<(MeshStandardMaterial | null)[]>([]);

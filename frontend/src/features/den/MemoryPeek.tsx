@@ -1,7 +1,7 @@
-/** MemoryPeek â€” click a memory crystal in the Den and read the REAL memory it
+/** MemoryPeek — click a memory crystal in the Den and read the REAL memory it
  *  stands for. Reads the selected memory_id from the memoryPeek store (set by an
  *  in-canvas crystal click), looks it up in the already-cached memory list, and
- *  shows its type, content and age in a glass card. Nothing faked â€” this is the
+ *  shows its type, content and age in a glass card. Nothing faked — this is the
  *  actual row the companion remembers. Esc or the close button dismisses it.
  *  Keyboard users reach the same memories through the rail's Memory surface. */
 
@@ -34,7 +34,7 @@ export function MemoryPeek() {
   const id = useMemoryPeek((s) => s.id);
   const close = useMemoryPeek((s) => s.close);
 
-  // The same cached query the Memory surface uses â€” no extra fetch in the common case.
+  // The same cached query the Memory surface uses — no extra fetch in the common case.
   const { data } = useQuery({
     queryKey: queryKeys.memory("", ""),
     queryFn: () => api.memory(),
@@ -77,12 +77,12 @@ export function MemoryPeek() {
         <>
           <p className="mt-2 text-sm leading-relaxed text-ink-100">{memory.content}</p>
           <p className="mt-2 text-[11px] text-ink-500">
-            {ageLabel(memory.created_at)} Â· {Math.round(memory.confidence * 100)}% confidence
+            {ageLabel(memory.created_at)} · {Math.round(memory.confidence * 100)}% confidence
           </p>
         </>
       ) : (
         <p className="mt-2 text-xs leading-relaxed text-ink-400">
-          This crystal just formed â€” open the Memory surface from the rail to read it.
+          This crystal just formed — open the Memory surface from the rail to read it.
         </p>
       )}
     </div>

@@ -3,9 +3,9 @@ requires = ["setuptools>=77.0,<83"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai_pet_companion"
+name = "neuraclaw"
 version = "3.0.0a0"
-description = "ai_pet_companion V3 - personal AI workspace and autonomous agent platform"
+description = "NeuraClaw V3 - personal AI workspace and autonomous agent platform"
 requires-python = ">=3.11"
 license = "MIT"
 dependencies = [

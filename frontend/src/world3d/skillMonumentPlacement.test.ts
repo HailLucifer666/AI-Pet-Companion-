@@ -5,13 +5,13 @@ const FX = -20; // forge world x at WORLD_SCALE=5
 const FZ = 19; // forge world z
 
 describe("skillMonumentPosition", () => {
-  it("is deterministic â€” same inputs, same spot", () => {
+  it("is deterministic — same inputs, same spot", () => {
     const a = skillMonumentPosition(0, 42, FX, FZ);
     const b = skillMonumentPosition(0, 42, FX, FZ);
     expect(a).toEqual(b);
   });
 
-  it("rings the forge at radius 6â€“8", () => {
+  it("rings the forge at radius 6–8", () => {
     for (let i = 0; i < 8; i++) {
       const p = skillMonumentPosition(i, i + 1, FX, FZ);
       const d = Math.hypot(p.x - FX, p.z - FZ);
@@ -20,7 +20,7 @@ describe("skillMonumentPosition", () => {
     }
   });
 
-  it("spreads â€” no two of the first 8 monuments collide within 0.5 units", () => {
+  it("spreads — no two of the first 8 monuments collide within 0.5 units", () => {
     const pts = Array.from({ length: 8 }, (_, i) => skillMonumentPosition(i, i + 1, FX, FZ));
     for (let i = 0; i < pts.length; i++) {
       for (let j = i + 1; j < pts.length; j++) {

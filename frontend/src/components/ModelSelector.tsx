@@ -1,7 +1,7 @@
-/** ModelSelector â€” choose which model answers. "Auto (role routing)" (default)
+/** ModelSelector — choose which model answers. "Auto (role routing)" (default)
  *  keeps the resilient role-failover behavior; picking a concrete model pins it
- *  for the turn with no failover. Options are REAL â€” discovered live from each
- *  reachable provider via /api/models/available â€” never a hardcoded list.
+ *  for the turn with no failover. Options are REAL — discovered live from each
+ *  reachable provider via /api/models/available — never a hardcoded list.
  *
  *  Backed by the shared useModelStore, so a choice made here, in Chat, or in
  *  Settings applies everywhere (including the Den's PetChat). */

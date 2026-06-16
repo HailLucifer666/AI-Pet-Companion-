@@ -1,6 +1,6 @@
-/** roadGraph â€” the cobble-road waypoint graph the companion walks (plaza â†’
- *  junction â†’ building entrance), plus a procedural terrain-following road-strip
- *  geometry builder. Pure (no three meshes, only math + typed arrays) â†’ unit-
+/** roadGraph — the cobble-road waypoint graph the companion walks (plaza →
+ *  junction → building entrance), plus a procedural terrain-following road-strip
+ *  geometry builder. Pure (no three meshes, only math + typed arrays) → unit-
  *  testable. Spoke tree, undirected; BFS finds the unique shortest sequence.
  *
  *  Node coordinates are DERIVED from `WORLD_SCALE` (not hardcoded), so the village
@@ -80,7 +80,7 @@ export function bfsPath(start: NodeId, goal: NodeId): NodeId[] {
   return [];
 }
 
-/** FSM Place string â†’ graph "front door" node. Keyed by string so it tolerates
+/** FSM Place string → graph "front door" node. Keyed by string so it tolerates
  *  Place values the union does not yet name (garden/hollow land here in V-2.5). */
 export const PLACE_ENTRY: Readonly<Record<string, NodeId>> = {
   home: "plaza",
@@ -112,7 +112,7 @@ export interface RoadGeometryData {
 
 const COB_R = 0x7a / 255,
   COB_G = 0x6e / 255,
-  COB_B = 0x54 / 255; // VILLAGE.roadCobble â€” lightened to read against the grass
+  COB_B = 0x54 / 255; // VILLAGE.roadCobble — lightened to read against the grass
 
 /** A flat-ish cobble strip from `from` to `to`, following the terrain height at
  *  each step (so the road drapes over the hills), one draw call. */

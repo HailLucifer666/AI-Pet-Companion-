@@ -34,7 +34,7 @@ describe("freshness", () => {
     expect(freshness(NOW - 3650 * DAY, NOW)).toBeCloseTo(0.18, 5);
   });
 
-  it("treats unknown recency (null) as fresh â€” never punishes", () => {
+  it("treats unknown recency (null) as fresh — never punishes", () => {
     expect(freshness(null, NOW)).toBe(1);
   });
 
@@ -51,7 +51,7 @@ describe("compostSpec", () => {
     expect(s.dim).toBeCloseTo(1, 5);
   });
 
-  it("a fully-composted memory sinks, shrinks, and dims â€” but keeps a floor", () => {
+  it("a fully-composted memory sinks, shrinks, and dims — but keeps a floor", () => {
     const s = compostSpec(0);
     expect(s.sink).toBeGreaterThan(0.3);
     expect(s.scale).toBeCloseTo(0.5, 5);

@@ -1,7 +1,7 @@
-/** greeting.ts â€” the companion's daily greeting, composed ONLY from real data: the
+/** greeting.ts — the companion's daily greeting, composed ONLY from real data: the
  *  real local hour (time-of-day salutation) and the real Den digest (how many
  *  memories it holds, how many skills it's learned, XP earned today). The pet
- *  speaks this line in its 3-D bubble when you enter the Den. No invented facts â€”
+ *  speaks this line in its 3-D bubble when you enter the Den. No invented facts —
  *  zero counts simply drop out of the sentence. Pure + unit-tested. */
 
 export interface GreetingDigest {
@@ -12,7 +12,7 @@ export interface GreetingDigest {
   xpToday: number;
 }
 
-/** A warm, time-of-day salutation from the real local hour (0â€“23). */
+/** A warm, time-of-day salutation from the real local hour (0–23). */
 export function salutationFor(hour: number): string {
   if (hour < 5) return "You're up late";
   if (hour < 12) return "Good morning";

@@ -1,9 +1,9 @@
-/** weather â€” real weather category â†’ render flags, as pure math (no three).
+/** weather — real weather category → render flags, as pure math (no three).
  *
  *  The backend resolves the user's city by IP and returns an Open-Meteo category
  *  (clear/cloudy/overcast/fog/rain/snow/storm). This maps that to what the Grove
  *  should paint: how much cloud, whether it rains/snows, how much to dim the sun,
- *  how tight the fog draws in, and whether lightning flashes. Pure â†’ unit-tested;
+ *  how tight the fog draws in, and whether lightning flashes. Pure → unit-tested;
  *  Atmosphere / Clouds3D / Rain3D read these flags. */
 
 import type { Weather, WeatherCategory } from "../lib/api";
@@ -12,7 +12,7 @@ export interface WeatherFx {
   clouds: number; // 0..1 cloud amount to draw
   rain: "none" | "light" | "heavy";
   snow: boolean;
-  fogScale: number; // multiplies fog near/far â€” <1 draws fog in (murkier)
+  fogScale: number; // multiplies fog near/far — <1 draws fog in (murkier)
   dim: number; // 0..1 reduction of sun/sky brightness
   lightning: boolean;
 }
@@ -43,7 +43,7 @@ export function weatherFx(category: WeatherCategory, cloudCover = 0): WeatherFx 
 }
 
 /** Resolve a Weather payload (possibly unavailable) to render flags. Unavailable
- *  â†’ clear, so the sky falls back cleanly to the day/night cycle. */
+ *  → clear, so the sky falls back cleanly to the day/night cycle. */
 export function fxFor(weather: Weather): WeatherFx {
   if (!weather.available || !weather.category) return CLEAR;
   return weatherFx(weather.category, weather.cloud_cover ?? 0);

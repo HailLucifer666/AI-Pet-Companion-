@@ -1,6 +1,6 @@
 """Text-tag tool fallback parser."""
 
-from ai_pet_companion.core.tooltags import parse_tool_tags, strip_tags
+from neuraclaw.core.tooltags import parse_tool_tags, strip_tags
 
 
 def test_parse_single_with_args():
