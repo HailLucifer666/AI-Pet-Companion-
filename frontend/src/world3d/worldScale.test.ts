@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D } from "./placeDefs";
+import { PLACES_3D } from "./placeRegistry";
 import { placeTarget } from "./locomotion";
 
 /** After growing the world ×WORLD_SCALE, the place markers + the pet anchors sit at

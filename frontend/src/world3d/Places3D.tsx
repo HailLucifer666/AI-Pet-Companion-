@@ -10,7 +10,7 @@ import { useWorldNav } from "../state/worldNavStore";
 import { useWorldStore } from "../state/worldStore";
 import { cx } from "../components/ui";
 import { WORLD } from "./palette";
-import { PLACES_3D, type Place3D as PlaceDef, type PlaceKind } from "./placeDefs";
+import { PLACES_3D, type PlaceEntry as PlaceDef, type PlaceKind } from "./placeRegistry";
 
 function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
   // The Hollow's fire flares while a real tool runs (the companion is working).

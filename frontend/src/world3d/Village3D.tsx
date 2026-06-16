@@ -19,7 +19,7 @@ import { glowBoost } from "./daylight";
 import { bloomFlash } from "./bloomCinematic";
 import { sky } from "./skyState";
 import { WORLD, VILLAGE } from "./palette";
-import { PLAZA_POS } from "./placeDefs";
+import { PLAZA_POS } from "./placeRegistry";
 import { BUILDING_DEFS, VILLAGE_ROADS, type BuildingDef } from "./villageLayout";
 import { buildRoadGeometry } from "./roadGraph";
 import { skillMonumentPosition } from "./skillMonumentPlacement";

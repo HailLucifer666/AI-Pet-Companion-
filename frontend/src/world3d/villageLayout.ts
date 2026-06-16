@@ -3,7 +3,7 @@
  *  coordinate is ever written twice and the whole village re-scales with
  *  `WORLD_SCALE` automatically. Pure (no three, no React) → unit-testable. */
 
-import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeDefs";
+import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeRegistry";
 
 export type BuildingKind = "tavern" | "workshop" | "greenhouse";
 

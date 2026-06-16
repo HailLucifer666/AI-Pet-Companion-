@@ -13,9 +13,11 @@ function on(x: number, z: number): [number, number, number] {
 }
 
 export type Place = "home" | "workbench" | "garden" | "pool" | "wander";
+export type PlaceKind = "hollow" | "garden" | "workbench" | "pool";
 
 export interface PlaceEntry {
   id: Place;
+  kind: PlaceKind;
   label: string;
   sub: string;
   route: string;
@@ -31,6 +33,7 @@ export const PLAZA_POS: [number, number, number] = on(-1 * W, -1 * W);
 export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   home: {
     id: "home",
+    kind: "hollow",
     label: "The Hollow",
     sub: "talk by the fire",
     route: "/chat",
@@ -42,6 +45,7 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   garden: {
     id: "garden",
+    kind: "garden",
     label: "Memory Garden",
     sub: "what it remembers",
     route: "/memory",
@@ -53,6 +57,7 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   workbench: {
     id: "workbench",
+    kind: "workbench",
     label: "The Workbench",
     sub: "notes & making",
     route: "/notes",
@@ -64,6 +69,7 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   pool: {
     id: "pool",
+    kind: "pool",
     label: "Inland Pool",
     sub: "",
     route: "",

@@ -8,7 +8,7 @@ import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D, PLAZA_POS } from "./placeDefs";
+import { PLACES_3D, PLAZA_POS } from "./placeRegistry";
 import { WORLD } from "./palette";
 import { InstancedModel, type NaturePlacement } from "./nature/InstancedModel";
 import { NATURE_TREES, NATURE_ROCKS, NATURE_BUSHES, NATURE_GRASS, natureUrl } from "./nature/models";
