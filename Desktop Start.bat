@@ -18,7 +18,7 @@ start "NeuraClaw Backend" /D "%~dp0" cmd /k ".venv\Scripts\python.exe -m neuracl
 
 echo [INFO] Starting Tauri Desktop App...
 cd frontend
-call npm run tauri dev
+call npx tauri dev
 
 pause
 endlocal
