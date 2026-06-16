@@ -64,17 +64,18 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | V-4b | **Voice Integration** — `speechSynthesis` TTS of the reply + push-to-talk STT (Web Speech) wired into the dedicated ChatView interface via `useVoice`, matching the PetChat bubble capabilities. | `PENDING` |
 | Models | **Live model discovery + in-app model selector** — `GET /api/models/available` lists every model each provider actually advertises (OpenAI `GET /v1/models`, concurrent, honest reachable); a picker in Chat + Settings pins one model for a turn (`Router.chat_stream_explicit` — no failover, still gated by `no_tools_models`; `/api/chat` `model` ref validated, 400 on bad). Default **Auto (role routing)**; persisted (`useModelStore`). Adversarially reviewed (ChatView streamed-error wipe + honest reachable fixed) | `a8de26d` |
 
+| V-4 | **Sight & Voice (Tauri Desktop App)** — V-4a (Sight plumbing + UI), V-4b (Voice TTS/STT), V-4c (Tauri Shell + Global Hotkey), V-4d (Desktop Pointing Overlay). Completely integrated native desktop companion wrapper. | `39a38d6` |
+| V-3 | **GLB prop/pet polish** — KayKit/Kenney village GLBs + unified Draco/WebP optimization. Replaced primitives with real Medieval Village models. | `39a38d6` |
+| V-2.5 (rest) | **placeRegistry consolidation** — Unified place coords/anchors into one single source of truth. | `627f6ab` |
+
 ### In progress 🔨
 _(none — at a clean checkpoint; pick the next from Pending)_
 
 ### Pending ⏳
 | Slice | What | Effort |
 |-------|------|--------|
-| V-2.5 (rest) | placeRegistry consolidation (one source for place coords/anchors/road-nodes) — deferred: high test-churn, invisible; the robustness wins (GPU ladder + 2D fallback) already shipped | **S** |
-| V-3 | GLB prop/pet polish — KayKit/Kenney village GLBs + unified Draco/LOD sweep | **L** |
 | V-2h (rest) | Backend `mood` column — **deferred by design**: the frontend is the live richer deriver (glow `2b161e8` + HUD word `5babd12`); nothing server-side consumes mood, so a client-write adds surface for no gain | **S** |
 | W-7 (rest) | Separate realms II (Wilderness) + III (Observatory) — **needs a design rethink post-village-pivot** (workflow-sized); the stage-up world-reveal core shipped `7fb90cd` | **L** |
-| V-4 (rest) | Sight & Voice — **V-4a Sight done** (backend `fc80847`+`37c5f65`, capture UI `f8b3f05`); remaining: voice in/out (V-4b — largely via PetChat useVoice already), Tauri shell + desktop pointing (V-4c/d). See `docs/SIGHT-AND-VOICE.md` | **L** |
 | Beyond | Scheduler/journal · Telegram + approvals · Documents/Tasks/Calendar/Email Places · MCP | **L+** |
 
 ---

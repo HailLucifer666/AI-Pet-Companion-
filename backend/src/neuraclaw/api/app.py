@@ -25,6 +25,12 @@ async def lifespan(app: FastAPI):
     app.state.router = Router(config, db)
     app.state.registry = build_registry(config)
 
+    # Initialize MCP
+    from ..core.mcp_client import McpManager
+    mcp_manager = McpManager(config)
+    await mcp_manager.start(app.state.registry)
+    app.state.mcp_manager = mcp_manager
+
     # Start the proactive scheduler loop
     scheduler_task = asyncio.create_task(
         scheduler.run_loop(db, app.state.router, app.state.registry, config)
@@ -33,6 +39,7 @@ async def lifespan(app: FastAPI):
     yield
 
     scheduler_task.cancel()
+    await mcp_manager.stop()
     await db.close()
 
 

@@ -55,6 +55,12 @@ actions:
   apps:                        # friendly name -> URI or executable on PATH
     spotify: "spotify:"        # e.g. add  notepad: notepad.exe
 
+mcp:
+  servers:
+    sqlite:
+      command: "uvx"
+      args: ["mcp-server-sqlite", "--db-path", "example.db"]
+
 agent:
   max_steps: 20            # tool-call loop budget per turn
   history_messages: 40     # recent messages kept in context

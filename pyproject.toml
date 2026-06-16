@@ -21,6 +21,7 @@ dependencies = [
     "python-dotenv>=1.0",
     "fastembed>=0.3",
     "ddgs>=9.0",
+    "mcp>=1.0.0",
 ]
 
 [project.optional-dependencies]

@@ -69,6 +69,16 @@ class ActionsConfig(BaseModel):
     apps: dict[str, str] = Field(default_factory=dict)
 
 
+class McpServerConfig(BaseModel):
+    command: str
+    args: list[str] = Field(default_factory=list)
+    env: dict[str, str] = Field(default_factory=dict)
+
+
+class McpConfig(BaseModel):
+    servers: dict[str, McpServerConfig] = Field(default_factory=dict)
+
+
 class Config(BaseModel):
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
     roles: dict[str, list[str]] = Field(default_factory=dict)
@@ -78,6 +88,7 @@ class Config(BaseModel):
     agent: AgentConfig = Field(default_factory=AgentConfig)
     pet: PetConfig = Field(default_factory=PetConfig)
     actions: ActionsConfig = Field(default_factory=ActionsConfig)
+    mcp: McpConfig = Field(default_factory=McpConfig)
 
 
 def _config_path() -> Path:
