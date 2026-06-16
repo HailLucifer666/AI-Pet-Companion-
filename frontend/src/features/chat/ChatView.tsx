@@ -281,8 +281,8 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
             const label = match[3];
             
             if ((window as any).__TAURI_INTERNALS__) {
-              import("@tauri-apps/api/window").then(({ WebviewWindow }) => {
-                const pointerWin = WebviewWindow.getByLabel("pointer");
+              import("@tauri-apps/api/window").then(async ({ Window }) => {
+                const pointerWin = await Window.getByLabel("pointer");
                 pointerWin?.show();
               });
               import("@tauri-apps/api/event").then(({ emit }) => {

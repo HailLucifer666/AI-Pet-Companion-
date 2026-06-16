@@ -161,6 +161,7 @@ function BuildingGLTF({ url, mats, scale = 1, rotY = 0 }: { url: string; mats: M
         else if (matName.includes("Stone_Light") || matName.includes("Plaster")) o.material = mats.stoneHi;
         else if (matName.includes("Roof")) o.material = mats.roof;
         else if (matName.includes("Window")) o.material = mats.window;
+        else if (matName.includes("Fire")) o.material = mats.flame;
         else o.material = mats.stone; // default fallback
       }
     });
@@ -228,60 +229,18 @@ function Building({ def, mats }: { def: BuildingDef; mats: Mats }) {
   );
 }
 
-/** A campfire: a stone fire-ring, a small stack of logs, and warm layered flames
- *  with a bright core (reads as fire, not a white pyramid). `y0` = ground height. */
 function Campfire({ mats, y0 }: { mats: Mats; y0: number }) {
   return (
     <group position-y={y0}>
-      {/* stone fire-ring */}
-      <mesh position-y={0.18} castShadow>
-        <cylinderGeometry args={[0.85, 0.95, 0.36, 9]} />
-        <primitive object={mats.stone} attach="material" />
-      </mesh>
-      {/* crossed logs */}
-      {[0, 1, 2].map((i) => (
-        <mesh key={i} position-y={0.34} rotation={[Math.PI / 2, 0, (i / 3) * Math.PI]} castShadow>
-          <cylinderGeometry args={[0.09, 0.11, 1.3, 6]} />
-          <primitive object={mats.timber} attach="material" />
-        </mesh>
-      ))}
-      {/* layered warm flames — three small cones + a bright inner core */}
-      <mesh position={[0.12, 0.62, 0.06]}>
-        <coneGeometry args={[0.32, 0.7, 6]} />
-        <primitive object={mats.flame} attach="material" />
-      </mesh>
-      <mesh position={[-0.14, 0.56, -0.08]}>
-        <coneGeometry args={[0.26, 0.56, 6]} />
-        <primitive object={mats.flame} attach="material" />
-      </mesh>
-      <mesh position={[0.0, 0.82, 0.0]}>
-        <coneGeometry args={[0.16, 0.48, 6]} />
-        <primitive object={mats.flameTip} attach="material" />
-      </mesh>
+      <BuildingGLTF url="/models/village/Bonfire_Lit.glb" mats={mats} scale={1.0} />
     </group>
   );
 }
 
-/** A little stone wishing-well with a timber post + plank roof. */
 function Well({ mats }: { mats: Mats }) {
   return (
     <group>
-      <mesh position-y={0.4} castShadow receiveShadow>
-        <cylinderGeometry args={[0.7, 0.75, 0.8, 10]} />
-        <primitive object={mats.stone} attach="material" />
-      </mesh>
-      <mesh position={[-0.55, 1.2, 0]} castShadow>
-        <boxGeometry args={[0.12, 1.5, 0.12]} />
-        <primitive object={mats.timber} attach="material" />
-      </mesh>
-      <mesh position={[0.55, 1.2, 0]} castShadow>
-        <boxGeometry args={[0.12, 1.5, 0.12]} />
-        <primitive object={mats.timber} attach="material" />
-      </mesh>
-      <mesh position-y={1.95} rotation-y={Math.PI / 4} castShadow>
-        <coneGeometry args={[0.95, 0.5, 4]} />
-        <primitive object={mats.roof} attach="material" />
-      </mesh>
+      <BuildingGLTF url="/models/village/Well.glb" mats={mats} scale={1.0} />
     </group>
   );
 }
