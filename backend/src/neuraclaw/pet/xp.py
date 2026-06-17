@@ -62,7 +62,7 @@ def level_for_xp(xp: int) -> int:
 
 async def get_pet(db: aiosqlite.Connection) -> dict | None:
     cur = await db.execute(
-        "SELECT id, name, user_name, voice, stage, xp, mood, traits_json,"
+        "SELECT id, name, user_name, voice, stage, xp, mood, energy, traits_json,"
         " hatched_at, last_seen_at FROM pet WHERE id = 1"
     )
     row = await cur.fetchone()

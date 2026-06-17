@@ -244,11 +244,15 @@ async def den(request: Request):
     memory_count = (await cur.fetchone())["n"]
     cur = await db.execute("SELECT COUNT(*) AS n FROM skills WHERE status = 'active'")
     skill_count = (await cur.fetchone())["n"]
+    cur = await db.execute("SELECT summary_md FROM journal ORDER BY day DESC LIMIT 1")
+    last_journal_row = await cur.fetchone()
+    last_journal = last_journal_row["summary_md"] if last_journal_row else None
     return {
         "pet": pet,
         "recent_xp": recent_xp,
         "memory_count": memory_count,
         "skill_count": skill_count,
+        "last_journal": last_journal,
     }
 
 
@@ -295,6 +299,60 @@ async def transcribe_voice(file: UploadFile = File(...)):
     except Exception as e:
         log.error(f"STT error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Autonomy ──────────────────────────────────────────────────────────
+
+@api_router.get("/proactive")
+async def list_proactive(request: Request):
+    cur = await request.app.state.db.execute(
+        "SELECT id, session_id, text, kind, engaged, created_at FROM proactive_messages ORDER BY id DESC LIMIT 30"
+    )
+    return {"messages": [dict(r) for r in await cur.fetchall()]}
+
+@api_router.post("/proactive/{msg_id}/engage")
+async def engage_proactive(msg_id: int, request: Request):
+    db = request.app.state.db
+    cur = await db.execute("UPDATE proactive_messages SET engaged = 1 WHERE id = ? AND engaged = 0", (msg_id,))
+    await db.commit()
+    if cur.rowcount > 0:
+        await xp.award(db, "proactive_useful", ref=f"proactive_{msg_id}")
+    return {"ok": True}
+
+@api_router.get("/jobs/runs")
+async def list_job_runs(request: Request):
+    cur = await request.app.state.db.execute(
+        "SELECT r.id, j.name, r.status, r.error, r.created_at "
+        "FROM job_runs r JOIN jobs j ON r.job_id = j.id "
+        "ORDER BY r.id DESC LIMIT 50"
+    )
+    return {"runs": [dict(r) for r in await cur.fetchall()]}
+
+@api_router.get("/journal")
+async def list_journals(request: Request):
+    cur = await request.app.state.db.execute(
+        "SELECT day, summary_md, mood, created_at FROM journal ORDER BY day DESC LIMIT 7"
+    )
+    return {"entries": [dict(r) for r in await cur.fetchall()]}
+
+@api_router.get("/autonomy")
+async def autonomy_status(request: Request):
+    db = request.app.state.db
+    config = request.app.state.config
+    import datetime
+    from ..core import autonomy_state
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    acts = await autonomy_state.acts_today(db, today)
+    last_hb = await autonomy_state.last_heartbeat_at(db)
+    
+    return {
+        "enabled": config.proactivity.enabled,
+        "acts_today": acts,
+        "max": config.proactivity.max_proactive_per_day,
+        "quiet": False,
+        "last_heartbeat_at": last_hb.isoformat() if last_hb else None
+    }
+
 
 # ── Chat ──────────────────────────────────────────────────────────────
 

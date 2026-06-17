@@ -2,7 +2,7 @@
 
 > *A local-first AI companion that lives in a 3D low-poly world and visualizes only real computation.*
 > Living status doc — updated each slice. Source of truth for plan detail: the master plan in `.claude/plans/`.
-> **Last updated:** 2026-06-15 · **Branch / sync point:** GitHub `master` (`a8de26d`) · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a Sight complete** (multimodal backend + vision signal + capture UI — needs a backend restart + live eyeball), **in-app model selection complete** (live discovery + per-turn model override). Every headline beat lands — remaining V-4 work is voice polish + the Tauri native shell + deferred refactors.
+> **Last updated:** 2026-06-17 · **Branch / sync point:** GitHub `master` · **Current:** V-2.5, V-2h, W-7 Widening core, **W-8 complete**, **W-6 Quickening fully complete**, **V-4a Sight complete**, **V-4b Voice complete**, **V-4c Tauri Shell complete** (MSVC compiler fallback + redirected caches off C:). Every headline beat lands — remaining V-4 work is V-4d desktop pointing + deferred refactors.
 >
 > **🖥️↔💻 Two-machine sync:** this file + `git log` are the portable memory (the `.claude/plans/` master plan is machine-local). **Sit down → `pull.bat` (or `git pull --rebase`) FIRST. Leave → commit + push.** Never switch machines with unpushed work. See AGENTS.md § Two-machine sync.
 
@@ -61,7 +61,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | V-4a (backend) | **Multimodal chat plumbing** — optional `ChatRequest.image_b64` + pure `build_user_content()` (text→multimodal array); `run_turn` attaches the image to the current turn only (never persisted); route auto-picks a `vision` role; provider unchanged. Pure core + injection unit-tested. Foundation for Sight & Voice — no capture UI yet | `fc80847` |
 | V-4a (backend) | **`GET /api/vision`** — vision-brain availability + **remote signal** (does a captured screen leave the device?) via pure `resolve_vision()` over the `vision` role chain; the truthful basis for the capture-UI privacy warning. Pure core unit-tested | `37c5f65` |
 | V-4a (frontend) | **Sight capture UI** — 👁 in PetChat captures one screen frame (`useScreenCapture`, feature-detected) → attaches to the next chat turn (multimodal); gated on a real vision brain; **amber privacy warning when the model is remote** (`/api/vision`), reassurance when local; image never persisted. **Live-eyeball only** (getDisplayMedia) — smoke confirms gating+render | `f8b3f05` |
-| V-4b | **Voice Integration** — `speechSynthesis` TTS of the reply + push-to-talk STT (Web Speech) wired into the dedicated ChatView interface via `useVoice`, matching the PetChat bubble capabilities. | `PENDING` |
+| V-4b | **Voice Integration** — `speechSynthesis` TTS of the reply + push-to-talk STT (Web Speech) wired into the dedicated ChatView interface via `useVoice`, matching the PetChat bubble capabilities. | `04a91b2` |
 | Models | **Live model discovery + in-app model selector** — `GET /api/models/available` lists every model each provider actually advertises (OpenAI `GET /v1/models`, concurrent, honest reachable); a picker in Chat + Settings pins one model for a turn (`Router.chat_stream_explicit` — no failover, still gated by `no_tools_models`; `/api/chat` `model` ref validated, 400 on bad). Default **Auto (role routing)**; persisted (`useModelStore`). Adversarially reviewed (ChatView streamed-error wipe + honest reachable fixed) | `a8de26d` |
 
 | V-4 | **Sight & Voice (Tauri Desktop App)** — V-4a (Sight plumbing + UI), V-4b (Voice TTS/STT), V-4c (Tauri Shell + Global Hotkey), V-4d (Desktop Pointing Overlay). Completely integrated native desktop companion wrapper. | `39a38d6` |
@@ -150,10 +150,10 @@ NeuraClaw (trunk: local-first AI companion, real computation only)
 │   ├── ⏳ V-2i Mind's Eye (L) — zoom into the real memory graph: cosine edges, confidence brightness, live-retrieval spotlight  [REAL-NOW subset]
 │   └── ⏳ B-1+W-8 Diegetic streaming chat (M) — token.stream on the bus → pet speaks the reply in a 3D bubble  [REAL-WITH-WORK]
 │
-├── ⏳ SIGHT & VOICE (V-4) .... the Teaching Buddy — clicky-inspired (see docs/SIGHT-AND-VOICE.md)
-│   ├── ⏳ V-4a Multimodal teaching (M) — getDisplayMedia screenshot → vision brain → pet explains  [REAL-WITH-WORK · browser]
-│   ├── ⏳ V-4b Voice (M) — speechSynthesis TTS + push-to-talk Web Speech STT  [REAL · browser]
-│   ├── ⏳ V-4c Tauri shell (L) — native wrap: global hotkey + OS screen capture + local Whisper STT  [REAL · native]
+├── 🔨 SIGHT & VOICE (V-4) .... the Teaching Buddy — clicky-inspired (see docs/SIGHT-AND-VOICE.md)
+│   ├── ✅ V-4a Multimodal teaching (M) — getDisplayMedia screenshot → vision brain → pet explains  [REAL-WITH-WORK · browser]
+│   ├── ✅ V-4b Voice (M) — speechSynthesis TTS + push-to-talk Web Speech STT  [REAL · browser]
+│   ├── ✅ V-4c Tauri shell (L) — native wrap: global hotkey + OS screen capture + local Whisper STT  [REAL · native]
 │   ├── ⏳ V-4d Desktop pointing (L) — [POINT:x,y] → transparent click-through overlay, animated pet-cursor  [REAL · native]
 │   └── ⚠️ privacy: hosted vision brain = screenshot leaves device → opt-in only, never persisted, UI warns; local Ollama-vision option
 │

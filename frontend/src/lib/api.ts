@@ -138,6 +138,7 @@ export interface Pet {
   stage: 1 | 2 | 3 | 4;
   xp: number;
   mood: string;
+  energy: number;
   traits_json: string;
   hatched_at: string;
   last_seen_at: string;
@@ -167,6 +168,7 @@ export interface DenDigest {
   recent_xp: XpEvent[];
   memory_count: number;
   skill_count: number;
+  last_journal: string | null;
 }
 
 export type WeatherCategory = "clear" | "cloudy" | "overcast" | "fog" | "rain" | "snow" | "storm";
@@ -209,6 +211,38 @@ export interface HatchBody {
   voice: string;
   focus: string;
   boundaries: string;
+}
+
+export interface ProactiveMessage {
+  id: number;
+  session_id: string;
+  text: string;
+  kind: string;
+  engaged: number;
+  created_at: string;
+}
+
+export interface JobRun {
+  id: number;
+  name: string;
+  status: string;
+  error: string | null;
+  created_at: string;
+}
+
+export interface JournalEntry {
+  day: string;
+  summary_md: string;
+  mood: string;
+  created_at: string;
+}
+
+export interface AutonomyStatus {
+  enabled: boolean;
+  acts_today: number;
+  max: number;
+  quiet: boolean;
+  last_heartbeat_at: string | null;
 }
 
 export class ApiError extends Error {
@@ -296,6 +330,12 @@ export const api = {
   createDocument: (body: Partial<Document>) => request<{ id: number }>("POST", "/documents", body),
   updateDocument: (id: number, body: Partial<Document>) => request<{ ok: boolean }>("PUT", `/documents/${id}`, body),
   deleteDocument: (id: number) => request<{ ok: boolean }>("DELETE", `/documents/${id}`),
+
+  proactive: () => get<{ messages: ProactiveMessage[] }>("/proactive"),
+  engageProactive: (id: number) => request<{ ok: boolean }>("POST", `/proactive/${id}/engage`),
+  jobRuns: () => get<{ runs: JobRun[] }>("/jobs/runs"),
+  journal: () => get<{ entries: JournalEntry[] }>("/journal"),
+  autonomy: () => get<AutonomyStatus>("/autonomy"),
 };
 
 /** react-query key conventions â€” one place, every surface follows it. */
@@ -319,4 +359,8 @@ export const queryKeys = {
   tasks: (q: string) => ["tasks", q] as const,
   events: (q: string) => ["events", q] as const,
   documents: (q: string) => ["documents", q] as const,
+  proactive: ["proactive"] as const,
+  jobRuns: ["jobRuns"] as const,
+  journal: ["journal"] as const,
+  autonomy: ["autonomy"] as const,
 };

@@ -58,6 +58,20 @@ class PetConfig(BaseModel):
     ignore_ladder: bool = False
 
 
+class ProactivityConfig(BaseModel):
+    enabled: bool = True
+    # Local clock hours [start, end) during which NO heartbeat fires (quiet hours).
+    quiet_start_hour: int = Field(default=22, ge=0, le=23)
+    quiet_end_hour: int = Field(default=8, ge=0, le=23)   # wraps midnight if start>end
+    # Hard ceiling on heartbeats that ESCALATE to an act (per local day).
+    max_proactive_per_day: int = Field(default=6, ge=0, le=48)
+    # Minimum minutes between two escalated (acted) heartbeats.
+    min_minutes_between_acts: int = Field(default=45, ge=0, le=1440)
+    # Nightly journal local hour:minute.
+    journal_hour: int = Field(default=23, ge=0, le=23)
+    journal_minute: int = Field(default=50, ge=0, le=59)
+
+
 class ActionsConfig(BaseModel):
     """Local-action allowlists for the open_url / open_app tools."""
 
@@ -89,6 +103,7 @@ class Config(BaseModel):
     pet: PetConfig = Field(default_factory=PetConfig)
     actions: ActionsConfig = Field(default_factory=ActionsConfig)
     mcp: McpConfig = Field(default_factory=McpConfig)
+    proactivity: ProactivityConfig = Field(default_factory=ProactivityConfig)
 
 
 def _config_path() -> Path:

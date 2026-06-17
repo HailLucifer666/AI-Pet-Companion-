@@ -72,6 +72,8 @@ interface WorldStore {
   speech: string; // the companion's currently-spoken chat line (streams into PetBubble); "" = silent
   emotion: EmotionVector; // derived from real agent cadence (tick) — drives the pet's glow
   mood: string; // a one-word read of `emotion` for the HUD
+  petMood: string;
+  petEnergy: number;
   weather: string; // current weather category (e.g. 'clear', 'storm', 'rain')
   dispatch: (event: WorldEvent) => void;
   addCrystal: (id: number, memoryType: MemoryType) => void;
@@ -87,6 +89,7 @@ interface WorldStore {
   hydrate: () => Promise<void>;
   setStage: (stage: number) => void;
   setWeather: (weather: string) => void;
+  setPetMood: (mood: string, energy: number) => void;
   tickIdle: () => void;
 }
 
@@ -106,6 +109,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
   speech: "",
   emotion: { arousal: 0.3, valence: 0.5, curiosity: 0.3, confidence: 0.4 },
   mood: "Content",
+  petMood: "content",
+  petEnergy: 80,
   weather: "clear",
 
   dispatch: (event) => set((state) => ({ lumen: reduceLumenform(state.lumen, event, Date.now()) })),
@@ -182,6 +187,9 @@ export const useWorldStore = create<WorldStore>((set) => ({
         recencyById: recencyMap(graph.nodes),
         stage: Math.min(4, Math.max(1, petRes.pet?.stage || 1)) as 1 | 2 | 3 | 4,
         activeRealm: getRealmForStage(petRes.pet?.stage || 1),
+        petMood: petRes.pet?.mood || "content",
+        petEnergy: petRes.pet?.energy ?? 80,
+        mood: petRes.pet?.mood || "content",
       });
     } catch {
       // Offline / backend down: the live stream still plants crystals + ticks XP.
@@ -199,6 +207,9 @@ export const useWorldStore = create<WorldStore>((set) => ({
       audioEngine.updateWeather(weather);
       return { weather };
     }),
+
+  setPetMood: (mood, energy) =>
+    set(() => ({ petMood: mood, petEnergy: energy, mood: mood })),
 
   tickIdle: () =>
     set((state) => {
@@ -256,6 +267,10 @@ export function connect(): void {
       store.setStage(Number(ev.stage) || 1);
       store.widen(); // the world opens up as the companion matures (The Widening)
       audioEngine.playHatching();
+      return;
+    }
+    if (ev.type === "pet.mood") {
+      store.setPetMood(String(ev.mood || "content"), Number(ev.energy ?? 80));
       return;
     }
     if (ev.type === "xp.awarded") {

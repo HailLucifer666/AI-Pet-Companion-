@@ -41,6 +41,16 @@ async def build_system_prompt(db: aiosqlite.Connection, query: str) -> str:
             + "\n".join(f"- ({m.type}) {m.content}" for m in memories[:24])
         )
 
+    cur = await db.execute(
+        "SELECT day, summary_md FROM journal ORDER BY day DESC LIMIT 3"
+    )
+    recent = await cur.fetchall()
+    if recent:
+        parts.append(
+            "## Recent journal (your NOW scratchpad)\n"
+            + "\n".join(f"### {r['day']}\n{r['summary_md']}" for r in recent)
+        )
+
     skills = await loader.active_index(db)
     if skills:
         parts.append(

@@ -2,6 +2,38 @@
 setlocal
 cd /d "%~dp0"
 
+:: Enforce redirected cache directories to keep build assets off C: drive
+set "CARGO_HOME=F:\C Drive Packages Dump\cargo"
+set "RUSTUP_HOME=F:\C Drive Packages Dump\rustup"
+set "NPM_CONFIG_CACHE=F:\C Drive Packages Dump\npm-cache"
+set "TMP=F:\C Drive Packages Dump\Temp"
+set "TEMP=F:\C Drive Packages Dump\Temp"
+set "PATH=F:\C Drive Packages Dump\cargo\bin;%PATH%"
+
+:: Set up MSVC build environment if not automatically detected by vswhere
+set "VSWHERE_PATH=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+set "HAS_MSVC=0"
+
+if exist "%VSWHERE_PATH%" (
+    for /f "usebackq tokens=*" %%i in (`"%VSWHERE_PATH%" -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do (
+        set "HAS_MSVC=1"
+    )
+)
+
+if "%HAS_MSVC%"=="0" (
+    echo [Tauri Build] MSVC compiler not registered in vswhere.
+    echo [Tauri Build] Checking for manual installation at F:\VS C++...
+    if exist "F:\VS C++\VC\Auxiliary\Build\vcvars64.bat" (
+        echo [Tauri Build] Found F:\VS C++ environment configuration. Sourcing compiler environment...
+        call "F:\VS C++\VC\Auxiliary\Build\vcvars64.bat"
+    ) else (
+        echo [Tauri Build] WARNING: Could not find MSVC compiler via vswhere or at F:\VS C++. Compilation may fail.
+    )
+) else (
+    echo [Tauri Build] MSVC compiler found via vswhere.
+)
+echo.
+
 echo ===========================================
 echo Building AI Pet Companion - Tauri Installer
 echo ===========================================
