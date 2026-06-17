@@ -14,6 +14,7 @@ import { api, type MemoryGraphEdge, type MemoryGraphNode, type MemoryType } from
 import { parseSqliteUtc } from "../world3d/compost";
 import { connectSynapse } from "../lib/synapse";
 import type { SSEEvent } from "../lib/sse";
+import { audioEngine } from "../lib/audioEngine";
 import { mulberry32 } from "../world/engine/rng";
 import { PULSE_DURATION, type PulseOrigin } from "../world3d/pulse";
 import {
@@ -184,7 +185,11 @@ export const useWorldStore = create<WorldStore>((set) => ({
   setStage: (stage) =>
     set(() => ({ stage: Math.min(4, Math.max(1, stage)) as 1 | 2 | 3 | 4 })),
 
-  setWeather: (weather) => set(() => ({ weather })),
+  setWeather: (weather) =>
+    set(() => {
+      audioEngine.updateWeather(weather);
+      return { weather };
+    }),
 
   tickIdle: () =>
     set((state) => {
@@ -241,6 +246,7 @@ export function connect(): void {
     if (ev.type === "pet.stage") {
       store.setStage(Number(ev.stage) || 1);
       store.widen(); // the world opens up as the companion matures (The Widening)
+      audioEngine.playHatching();
       return;
     }
     if (ev.type === "xp.awarded") {
@@ -251,12 +257,14 @@ export function connect(): void {
       store.setXp(Number(ev.total) || 0);
       store.bloom();
       store.addPulse("garden"); // an inbound mote draws energy into the arch as it blooms
+      audioEngine.playLevelUp();
       return;
     }
     if (ev.type === "memory.formed") {
       store.addCrystal(Number(ev.memory_id) || 0, String(ev.memory_type || "fact") as MemoryType);
       store.dispatch({ kind: "memory-formed", memoryId: Number(ev.memory_id) || 0 });
       store.addPulse("garden");
+      audioEngine.playMemoryFormed();
       void store.refreshThreads(); // the web gained a node — re-link it
       return;
     }

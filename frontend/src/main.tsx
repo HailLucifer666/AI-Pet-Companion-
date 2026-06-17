@@ -12,10 +12,21 @@ import "./styles/theme.css";
 import { App } from "./App";
 import { Toaster } from "./components/ui";
 
+import { audioEngine } from "./lib/audioEngine";
+
 // If running inside Tauri, enable the transparent native shell mode
 if ("__TAURI_INTERNALS__" in window || "__TAURI__" in window) {
   document.documentElement.classList.add("tauri-mode");
 }
+
+// Initialize audio context on first user interaction to satisfy autoplay policies
+const initAudio = () => {
+  audioEngine.init();
+  window.removeEventListener("click", initAudio);
+  window.removeEventListener("keydown", initAudio);
+};
+window.addEventListener("click", initAudio);
+window.addEventListener("keydown", initAudio);
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 10_000 } },

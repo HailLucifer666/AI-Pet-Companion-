@@ -36,6 +36,7 @@ import { detectGpuTier, qualityFlags } from "./quality";
 import { stageReveal } from "./widening";
 import { useWorldStore } from "../state/worldStore";
 import { useSkills } from "./useSkills";
+import { useQualityStore, QualityManager } from "./hooks/useQualityLadder";
 
 interface ControlsLike {
   target: Vector3;
@@ -185,9 +186,9 @@ export function World3D() {
   // weather) since react-query context doesn't cross the r3f renderer boundary.
   const skills = useSkills();
 
-  // Detect the GPU tier once → a flag set that drops the GPU-heavy flourishes
-  // (bloom, MSAA, shadows, extra lights, dpr) first on weak hardware so fps holds.
-  const q = useMemo(() => qualityFlags(detectGpuTier()), []);
+  // Read the dynamic quality tier from store
+  const tier = useQualityStore((s) => s.tier);
+  const q = useMemo(() => qualityFlags(tier), [tier]);
 
   // The Widening: the world opens as the companion matures (real pet.stage). Each
   // stage widens the survey range + pushes the horizon fog back.
@@ -225,6 +226,8 @@ export function World3D() {
       gl={{ antialias: false, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
     >
       <Suspense fallback={null}>
+      {/* Dynamic FPS quality scaling listener */}
+      <QualityManager />
       {/* Sky, light + fog — driven by real time of day × real weather. */}
       <Atmosphere hour={hour} fx={fx} reduced={reduced} shadows={q.shadows} shadowMapSize={q.shadowMapSize} fogFar={reveal.fogFar} />
 

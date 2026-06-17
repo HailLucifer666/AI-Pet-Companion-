@@ -8,6 +8,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { petPos } from "./petPosition";
+import { useQualityStore } from "./hooks/useQualityLadder";
 
 const MAX = 360;
 const RADIUS = 52; // wider spread → rain veils the scene instead of pillaring on the pet (tracks the pet; partial scale for the bigger world)
@@ -56,7 +57,13 @@ export function Rain3D({
   const nextFlash = useRef(0);
   const light = useRef<THREE.PointLight>(null);
 
-  const active = rain === "heavy" ? MAX : rain === "light" ? 150 : 0;
+  const tier = useQualityStore((s) => s.tier);
+  const active =
+    rain === "heavy"
+      ? (tier === "high" ? MAX : tier === "medium" ? 180 : 60)
+      : rain === "light"
+      ? (tier === "high" ? 150 : tier === "medium" ? 80 : 30)
+      : 0;
   const lengthScale = rain === "heavy" ? 1.15 : 1;
 
   useFrame((state, delta) => {

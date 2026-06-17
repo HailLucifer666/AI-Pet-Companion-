@@ -9,6 +9,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { WORLD_SCALE } from "./terrain";
+import { useQualityStore } from "./hooks/useQualityLadder";
 
 const PUFFS = 60; // ~16 clusters of 3–4 puffs, spread over the bigger sky
 const CLOUD_COLOR = 0xdfe6ee;
@@ -61,18 +62,23 @@ export function Clouds3D({ amount, reduced }: { amount: number; reduced: boolean
   const mesh = useRef<THREE.InstancedMesh>(null);
   const mat = useRef<THREE.MeshStandardMaterial>(null);
   const group = useRef<THREE.Group>(null);
+  
+  const tier = useQualityStore((s) => s.tier);
+  const count = tier === "high" ? PUFFS : tier === "medium" ? Math.floor(PUFFS / 2) : Math.floor(PUFFS / 6);
 
   useLayoutEffect(() => {
     if (!mesh.current) return;
-    puffs.forEach((p, i) => {
+    mesh.current.count = count;
+    for (let i = 0; i < count; i++) {
+      const p = puffs[i];
       P.set(p.x, p.y, p.z);
       Q.identity();
       S.set(p.sx, p.sy, p.sz);
       M.compose(P, Q, S);
       mesh.current!.setMatrixAt(i, M);
-    });
+    }
     mesh.current.instanceMatrix.needsUpdate = true;
-  }, [puffs]);
+  }, [puffs, count]);
 
   useFrame((state, delta) => {
     if (group.current && !reduced) {

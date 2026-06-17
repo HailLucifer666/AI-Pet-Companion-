@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, queryKeys } from "../../lib/api";
 import { Badge, Button, Card, Spinner } from "../../components/ui";
 import { ModelSelector } from "../../components/ModelSelector";
+import { audioEngine } from "../../lib/audioEngine";
 
 const RISK_NAMES = ["READ", "WRITE", "EXECUTE", "NETWORK_SENSITIVE"];
 
@@ -76,6 +78,8 @@ function SpotifyCard() {
 
 export function SettingsView() {
   const { data, isLoading } = useQuery({ queryKey: queryKeys.settings, queryFn: api.settings });
+  const [muted, setMuted] = useState(() => audioEngine.getMuted());
+  const [volume, setVolume] = useState(() => audioEngine.getVolume());
 
   if (isLoading || !data) {
     return (
@@ -113,6 +117,51 @@ export function SettingsView() {
       </Card>
 
       <SpotifyCard />
+
+      <Card>
+        <h2 className="font-display font-medium">Sound Settings</h2>
+        <p className="mt-0.5 text-xs text-ink-500">
+          Control volume and ambient sounds in the 3D Grove.
+        </p>
+        <div className="mt-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-ink-200">Mute Sounds</span>
+            <button
+              onClick={() => {
+                const nextMuted = !muted;
+                audioEngine.setMuted(nextMuted);
+                setMuted(nextMuted);
+              }}
+              className={`rounded-full px-3 py-1 text-xs font-semibold border transition-all ${
+                muted
+                  ? "bg-danger/20 border-danger text-danger"
+                  : "bg-ink-900 border-ink-700 text-ink-300 hover:border-ink-500"
+              }`}
+            >
+              {muted ? "Muted" : "Active"}
+            </button>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs text-ink-400">
+              <span>Volume</span>
+              <span>{Math.round(volume * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={(e) => {
+                const nextVol = parseFloat(e.target.value);
+                audioEngine.setVolume(nextVol);
+                setVolume(nextVol);
+              }}
+              className="w-full accent-claw-500 h-1.5 bg-ink-850 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+        </div>
+      </Card>
 
       <Card>
         <h2 className="font-display font-medium">Active model</h2>

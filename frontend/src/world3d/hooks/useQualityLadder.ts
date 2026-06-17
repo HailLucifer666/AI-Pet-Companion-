@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
-import { Tier } from '../quality';
+import { detectGpuTier, Tier } from '../quality';
 
 interface QualityState {
   tier: Tier;
@@ -10,7 +10,7 @@ interface QualityState {
 }
 
 export const useQualityStore = create<QualityState>((set) => ({
-  tier: 'high',
+  tier: detectGpuTier(),
   fps: 60,
   setTier: (tier) => set({ tier }),
 }));
