@@ -176,7 +176,10 @@ export default function DenView() {
   return (
     <div ref={setHost} className="relative h-full w-full overflow-hidden bg-ink-950">
       {webgl ? (
-        <ErrorBoundary fallback={<WorldFallback />}>
+        <ErrorBoundary
+          fallback={<WorldFallback />}
+          onError={(e) => console.error("[World3D] crashed, showing 2D fallback:", e)}
+        >
           <World3D />
         </ErrorBoundary>
       ) : (

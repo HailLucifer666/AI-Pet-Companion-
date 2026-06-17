@@ -26,23 +26,30 @@ export function QualityManager() {
   const upgradeTimer = useRef(0);
 
   useEffect(() => {
-    // Probe Renderer String on mount
-    const context = gl.getContext();
-    const rendererInfo = context.getExtension('WEBGL_debug_renderer_info');
-    let renderer = '';
-    if (rendererInfo) {
-      renderer = context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
-    } else {
-      // For WebGL2 rendering context, RENDERER is on the prototype chain or we can use the constant 0x1F01
-      renderer = context.getParameter(0x1F01)?.toLowerCase() || '';
-    }
-    
-    // Heuristic for starting tier
-    let initialTier: Tier = 'high';
-    if (renderer.includes('intel') || renderer.includes('uhd') || renderer.includes('mesa') || renderer.includes('apple m1')) {
-      initialTier = 'medium';
-    } else if (renderer.includes('software') || renderer.includes('llvmpipe') || renderer.includes('swiftshader')) {
-      initialTier = 'low';
+    let initialTier: Tier = 'medium'; // safe default
+    try {
+      // Probe Renderer String on mount
+      const context = gl.getContext();
+      const rendererInfo = context.getExtension('WEBGL_debug_renderer_info');
+      let renderer = '';
+      if (rendererInfo) {
+        renderer = String(context.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL) || '').toLowerCase();
+      } else {
+        // For WebGL2 rendering context, RENDERER is on the prototype chain or we can use the constant 0x1F01
+        renderer = String(context.getParameter(0x1F01) || '').toLowerCase();
+      }
+      
+      // Heuristic for starting tier
+      if (renderer.includes('intel') || renderer.includes('uhd') || renderer.includes('mesa') || renderer.includes('apple m1')) {
+        initialTier = 'medium';
+      } else if (renderer.includes('software') || renderer.includes('llvmpipe') || renderer.includes('swiftshader')) {
+        initialTier = 'low';
+      } else if (renderer) {
+        // If we got a string but didn't match the low/medium filters, assume high
+        initialTier = 'high';
+      }
+    } catch (e) {
+      console.warn("QualityManager: Failed to read WebGL renderer, defaulting to medium tier.", e);
     }
 
     setTier(initialTier);

@@ -80,6 +80,7 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
   const panHoldUntil = useRef(0); // hold the follow until this time after a drag
 
   const lastBloom = useRef(0);
+  const lastWiden = useRef(0);
   const fovPunch = useRef(0);
 
   // Own the wheel: ease zoom instead of OrbitControls' hard dolly steps. Zoom stays
@@ -175,7 +176,7 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
     const ground = islandHeight(camera.position.x, camera.position.z, ISLAND_MAX_R);
     if (camera.position.y < ground + CAM_CLEAR) camera.position.y = ground + CAM_CLEAR;
 
-    // FOV punch on level up (bloomAt)
+    // FOV punch on level up (bloomAt) or stage up (wideningAt)
     const st = useWorldStore.getState();
     if (st.bloomAt !== lastBloom.current && st.bloomAt > 0) {
       lastBloom.current = st.bloomAt;
@@ -183,6 +184,14 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
       targetDist.current = Math.min(targetDist.current, 8); // brief auto-zoom
       lastInput.current = t; // hold drift
       panHoldUntil.current = 0; // stop holding pan so it focuses pet
+    }
+    if (st.wideningAt !== lastWiden.current && st.wideningAt > 0) {
+      lastWiden.current = st.wideningAt;
+      fovPunch.current = -12; // massive pullback (negative punch means FOV drops, making it zoom in briefly then pull out... wait, FOV punch should be positive to pull back)
+      fovPunch.current = 20; // massive FOV pullback!
+      targetDist.current = cap; // snap camera to the new max distance to reveal the new realm!
+      lastInput.current = t;
+      panHoldUntil.current = 0;
     }
     
     const targetFov = 42 + fovPunch.current;
@@ -203,28 +212,36 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
 
 function LevelUpFlash() {
   const bloomAt = useWorldStore((s) => s.bloomAt);
+  const wideningAt = useWorldStore((s) => s.wideningAt);
   const [op, setOp] = useState(0);
+  const [color, setColor] = useState("var(--color-claw-500)");
 
   useEffect(() => {
-    if (bloomAt === 0) return;
+    const triggerAt = Math.max(bloomAt, wideningAt);
+    if (triggerAt === 0) return;
+    
+    const isWiden = triggerAt === wideningAt;
+    setColor(isWiden ? "white" : "var(--color-claw-500)");
+    
     let raf = 0;
-    const start = bloomAt;
+    const start = triggerAt;
     const tick = () => {
       const now = performance.now();
       const since = now - start;
       if (since < 0) { raf = requestAnimationFrame(tick); return; }
       
       let f = 0;
+      const duration = isWiden ? 2000 : 800; // Widening flash lasts longer
       if (since < 50) f = since / 50;
-      else if (since < 800) f = 1 - (since - 50) / 750;
+      else if (since < duration) f = 1 - (since - 50) / (duration - 50);
       
-      setOp(f * 0.4);
-      if (since < 800) raf = requestAnimationFrame(tick);
+      setOp(f * (isWiden ? 0.8 : 0.4));
+      if (since < duration) raf = requestAnimationFrame(tick);
       else setOp(0);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [bloomAt]);
+  }, [bloomAt, wideningAt]);
 
   if (op <= 0) return null;
   return (
@@ -233,7 +250,7 @@ function LevelUpFlash() {
       className="pointer-events-none absolute inset-0 z-40"
       style={{
         opacity: op,
-        background: "radial-gradient(circle at 50% 50%, var(--color-claw-500) 0%, transparent 80%)",
+        background: `radial-gradient(circle at 50% 50%, ${color} 0%, transparent 80%)`,
         mixBlendMode: "screen"
       }}
     />

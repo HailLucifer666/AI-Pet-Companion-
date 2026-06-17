@@ -27,8 +27,8 @@ export function getRealmForStage(stage: number): RealmId {
 export const REALMS: Record<RealmId, RealmDef> = {
   "I": {
     id: "I",
-    name: "The Bioluminescent Grove",
-    stageGate: 1, 
+    name: "The Bioluminescent Hamlet",
+    stageGate: 1,
     surveyDist: 95,
     fogFar: 240,
     // The core village loop
@@ -36,8 +36,8 @@ export const REALMS: Record<RealmId, RealmDef> = {
   },
   "II": {
     id: "II",
-    name: "The Digital Wilderness",
-    stageGate: 3, 
+    name: "The Outer Ruins",
+    stageGate: 3,
     surveyDist: 128,
     fogFar: 310,
     // Expands to include Archives and Tasks/Calendar (Trail markers)
@@ -45,8 +45,8 @@ export const REALMS: Record<RealmId, RealmDef> = {
   },
   "III": {
     id: "III",
-    name: "The Observatory",
-    stageGate: 4, 
+    name: "The High Keep",
+    stageGate: 4,
     surveyDist: 150,
     fogFar: 350,
     // (Future places will be added here)

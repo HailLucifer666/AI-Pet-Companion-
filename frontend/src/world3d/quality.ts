@@ -30,9 +30,9 @@ const HIGH = /(nvidia|geforce|rtx|gtx|radeon|apple m\d|iris.{0,8}xe|\barc\b)/;
 
 /** Sort a GL `UNMASKED_RENDERER` string into a tier. Unknown/empty → "medium"
  *  (the safe middle — never assume a weak machine without evidence). */
-export function tierFromRenderer(renderer: string | null | undefined): Tier {
+export function tierFromRenderer(renderer: string | null | undefined | any): Tier {
   if (!renderer) return "medium";
-  const r = renderer.toLowerCase();
+  const r = String(renderer).toLowerCase();
   if (LOW.test(r)) return "low";
   if (HIGH.test(r)) return "high";
   return "medium";
