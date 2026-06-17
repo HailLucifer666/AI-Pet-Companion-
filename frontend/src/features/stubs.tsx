@@ -3,7 +3,6 @@
 import {
   Brain,
   Calendar,
-  FileText,
   ListTodo,
   Mail,
   MessageSquare,
@@ -46,13 +45,7 @@ export const ResearchStub = () => (
     description="Multi-step deep research with cited reports. Arrives in Phase 3."
   />
 );
-export const DocumentsStub = () => (
-  <Stub
-    icon={FileText}
-    title="Documents"
-    description="Multi-tab editor for markdown, HTML and CSV with AI assist. Arrives in Phase 3."
-  />
-);
+
 export const NotesStub = () => (
   <Stub
     icon={StickyNote}

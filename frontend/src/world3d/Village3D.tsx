@@ -220,8 +220,66 @@ function Greenhouse({ mats }: { mats: Mats }) {
   );
 }
 
+function TasksWell({ mats }: { mats: Mats }) {
+  return (
+    <group>
+      <BuildingGLTF url="/models/village/Well.glb" mats={mats} scale={1.2} />
+      {/* Floating ember crystal for the tasks */ }
+      <mesh position-y={1.8} castShadow>
+        <octahedronGeometry args={[0.15, 0]} />
+        <primitive object={mats.crystal} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+function CalendarStone({ mats }: { mats: Mats }) {
+  return (
+    <group>
+      {/* Tall stone obelisk */}
+      <mesh position-y={1.5} castShadow>
+        <boxGeometry args={[0.6, 3.0, 0.6]} />
+        <primitive object={mats.stone} attach="material" />
+      </mesh>
+      {/* Glowing ring/clock at the top */}
+      <mesh position-y={3.2} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[0.3, 0.05, 8, 24]} />
+        <primitive object={mats.crystal} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
+function Archives({ mats }: { mats: Mats }) {
+  return (
+    <group>
+      {/* Mill.glb is used as a placeholder for the Archives */}
+      <BuildingGLTF url="/models/village/Mill.glb" mats={mats} scale={0.7} rotY={0} />
+      
+      {/* A small glowing crystal above the door to signify knowledge */}
+      <mesh position-y={1.8} position-x={-0.2} position-z={1.2}>
+        <octahedronGeometry args={[0.2, 0]} />
+        <primitive object={mats.crystal} attach="material" />
+      </mesh>
+      <Lantern mats={mats} x={1.2} z={1.4} h={1.3} />
+    </group>
+  );
+}
+
 function Building({ def, mats }: { def: BuildingDef; mats: Mats }) {
-  const Body = def.kind === "tavern" ? Tavern : def.kind === "workshop" ? Forge : Greenhouse;
+  const Body =
+    def.kind === "tavern"
+      ? Tavern
+      : def.kind === "workshop"
+      ? Forge
+      : def.kind === "archives"
+      ? Archives
+      : def.kind === "tasks"
+      ? TasksWell
+      : def.kind === "calendar"
+      ? CalendarStone
+      : Greenhouse;
+      
   return (
     <group position={[def.pos[0], def.pos[1] - 0.1, def.pos[2]]} rotation-y={def.rotationY}>
       <Body mats={mats} />

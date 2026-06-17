@@ -126,3 +126,59 @@ async def delete_event(event_id: int, request: Request):
     if cur.rowcount == 0:
         raise HTTPException(404, "No such event")
     return {"ok": True}
+
+
+# ── Documents ─────────────────────────────────────────────────────────
+
+class DocumentBody(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(default="")
+    doc_type: str = Field(default="md", pattern="^(md|html|csv)$")
+
+@prod_router.get("/documents")
+async def list_documents(request: Request, q: str = ""):
+    db = request.app.state.db
+    if q.strip():
+        terms = " OR ".join(f'"{t.replace(chr(34), chr(34) * 2)}"' for t in q.split() if t.strip())
+        cur = await db.execute(
+            "SELECT d.id, d.title, d.content, d.doc_type, d.created_at, d.updated_at"
+            " FROM documents_fts f JOIN documents d ON d.id = f.rowid"
+            " WHERE documents_fts MATCH ? ORDER BY rank LIMIT 100",
+            (terms,),
+        )
+    else:
+        cur = await db.execute(
+            "SELECT id, title, content, doc_type, created_at, updated_at FROM documents"
+            " ORDER BY updated_at DESC LIMIT 200"
+        )
+    docs = [dict(r) for r in await cur.fetchall()]
+    return {"documents": docs}
+
+@prod_router.post("/documents")
+async def create_document(body: DocumentBody, request: Request):
+    cur = await request.app.state.db.execute(
+        "INSERT INTO documents (title, content, doc_type) VALUES (?, ?, ?)",
+        (body.title, body.content, body.doc_type),
+    )
+    await request.app.state.db.commit()
+    return {"id": cur.lastrowid}
+
+@prod_router.put("/documents/{doc_id}")
+async def update_document(doc_id: int, body: DocumentBody, request: Request):
+    cur = await request.app.state.db.execute(
+        "UPDATE documents SET title = ?, content = ?, doc_type = ?, updated_at = datetime('now')"
+        " WHERE id = ?",
+        (body.title, body.content, body.doc_type, doc_id),
+    )
+    await request.app.state.db.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(404, "No such document")
+    return {"ok": True}
+
+@prod_router.delete("/documents/{doc_id}")
+async def delete_document(doc_id: int, request: Request):
+    cur = await request.app.state.db.execute("DELETE FROM documents WHERE id = ?", (doc_id,))
+    await request.app.state.db.commit()
+    if cur.rowcount == 0:
+        raise HTTPException(404, "No such document")
+    return {"ok": True}

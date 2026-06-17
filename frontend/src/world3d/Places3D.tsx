@@ -63,6 +63,36 @@ function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
       </group>
     );
   }
+  if (kind === "archives") {
+    return (
+      <group>
+        <mesh position-y={0.3} castShadow>
+          <octahedronGeometry args={[0.2, 0]} />
+          <meshStandardMaterial color={WORLD.botEye} emissive={WORLD.botEye} emissiveIntensity={hovered ? 2.5 : 1.2} flatShading />
+        </mesh>
+      </group>
+    );
+  }
+  if (kind === "tasks") {
+    return (
+      <group>
+        <mesh position-y={0.3} castShadow>
+          <icosahedronGeometry args={[0.2, 0]} />
+          <meshStandardMaterial color={WORLD.garden} emissive={WORLD.garden} emissiveIntensity={hovered ? 2.5 : 1.2} flatShading />
+        </mesh>
+      </group>
+    );
+  }
+  if (kind === "calendar") {
+    return (
+      <group>
+        <mesh position-y={0.3} castShadow>
+          <torusGeometry args={[0.15, 0.05, 8, 16]} />
+          <meshStandardMaterial color={WORLD.ember} emissive={WORLD.ember} emissiveIntensity={hovered ? 2.5 : 1.2} flatShading />
+        </mesh>
+      </group>
+    );
+  }
   // workbench
   return (
     <group>

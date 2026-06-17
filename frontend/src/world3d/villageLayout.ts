@@ -5,12 +5,16 @@
 
 import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeRegistry";
 
-export type BuildingKind = "tavern" | "workshop" | "greenhouse";
+export type BuildingKind = "tavern" | "workshop" | "greenhouse" | "archives" | "tasks" | "calendar";
 
 const KIND_MAP: Record<PlaceKind, BuildingKind> = {
   hollow: "tavern",
   workbench: "workshop",
   garden: "greenhouse",
+  archives: "archives",
+  tasks: "tasks",
+  calendar: "calendar",
+  pool: "tavern", // Unused, pool is not navigable
 };
 
 export interface BuildingDef {

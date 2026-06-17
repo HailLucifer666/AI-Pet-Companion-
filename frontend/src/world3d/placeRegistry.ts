@@ -12,8 +12,8 @@ function on(x: number, z: number): [number, number, number] {
   return [x, islandHeight(x, z, ISLAND_MAX_R), z];
 }
 
-export type Place = "home" | "workbench" | "garden" | "pool" | "wander";
-export type PlaceKind = "hollow" | "garden" | "workbench" | "pool";
+export type Place = "home" | "workbench" | "garden" | "pool" | "wander" | "archives" | "tasks" | "calendar";
+export type PlaceKind = "hollow" | "garden" | "workbench" | "pool" | "archives" | "tasks" | "calendar";
 
 export interface PlaceEntry {
   id: Place;
@@ -66,6 +66,42 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
     navigable: true,
     nx: 0.76,
     ny: 0.66,
+  },
+  archives: {
+    id: "archives",
+    kind: "archives",
+    label: "The Archives",
+    sub: "formal documents",
+    route: "/documents",
+    pos: on(-1 * W, -6 * W),
+    anchor: { x: -1 * W + 0.8, z: -6 * W + 0.8 },
+    navigable: true,
+    nx: 0.8,
+    ny: 0.8,
+  },
+  tasks: {
+    id: "tasks",
+    kind: "tasks",
+    label: "The Wishing Well",
+    sub: "chores & goals",
+    route: "/tasks",
+    pos: on(-7 * W, 1 * W),
+    anchor: { x: -7 * W + 0.8, z: 1 * W + 0.8 },
+    navigable: true,
+    nx: 0.2,
+    ny: 0.8,
+  },
+  calendar: {
+    id: "calendar",
+    kind: "calendar",
+    label: "The Standing Stone",
+    sub: "schedule & time",
+    route: "/calendar",
+    pos: on(1 * W, 5.5 * W),
+    anchor: { x: 1 * W - 0.8, z: 5.5 * W - 0.8 },
+    navigable: true,
+    nx: 0.8,
+    ny: 0.2,
   },
   pool: {
     id: "pool",

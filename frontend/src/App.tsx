@@ -11,11 +11,11 @@ import { MemoryView } from "./features/memory/MemoryView";
 import { NotesView } from "./features/notes/NotesView";
 import { SettingsView } from "./features/settings/SettingsView";
 import {
-  DocumentsStub,
   EmailStub,
   ResearchStub,
   SkillsStub,
 } from "./features/stubs";
+import { DocumentsView } from "./features/documents/DocumentsView";
 import { TasksView } from "./features/tasks/TasksView";
 import { CalendarView } from "./features/calendar/CalendarView";
 import { Styleguide } from "./features/styleguide/Styleguide";
@@ -41,7 +41,7 @@ function Shell() {
         <Route path="/chat" element={<ChatView />} />
         <Route path="/chat/:sessionId" element={<ChatView />} />
         <Route path="/research" element={<ResearchStub />} />
-        <Route path="/documents" element={<DocumentsStub />} />
+        <Route path="/documents" element={<DocumentsView />} />
         <Route path="/notes" element={<NotesView />} />
         <Route path="/tasks" element={<TasksView />} />
         <Route path="/calendar" element={<CalendarView />} />
