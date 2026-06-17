@@ -20,23 +20,37 @@ export function DesktopPointerOverlay() {
       try {
         const win = getCurrentWindow();
         await win.setIgnoreCursorEvents(true);
-        await win.show();
+        // Keep window hidden initially on mount
+        await win.hide();
       } catch (e) {
-        console.warn("Could not set ignore cursor events or show window:", e);
+        console.warn("Could not set ignore cursor events:", e);
       }
     };
     setup();
 
     let timeout: ReturnType<typeof setTimeout>;
     
-    const unlisten = listen<PointPayload>("draw-pointer", (event) => {
+    const unlisten = listen<PointPayload>("draw-pointer", async (event) => {
       console.log("Overlay received point:", event.payload);
       setPoint(event.payload);
       
+      try {
+        const win = getCurrentWindow();
+        await win.show();
+      } catch (e) {
+        console.warn("Could not show overlay window:", e);
+      }
+      
       // Auto-hide the pointer after 5 seconds
       clearTimeout(timeout);
-      timeout = setTimeout(() => {
+      timeout = setTimeout(async () => {
         setPoint(null);
+        try {
+          const win = getCurrentWindow();
+          await win.hide();
+        } catch (e) {
+          console.warn("Could not hide overlay window:", e);
+        }
       }, 5000);
     });
 

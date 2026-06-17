@@ -64,7 +64,7 @@ The 3D world is a living **bioluminescent medieval village**: a screen-faced rob
 | V-4b | **Voice Integration** — `speechSynthesis` TTS of the reply + push-to-talk STT (Web Speech) wired into the dedicated ChatView interface via `useVoice`, matching the PetChat bubble capabilities. | `04a91b2` |
 | Models | **Live model discovery + in-app model selector** — `GET /api/models/available` lists every model each provider actually advertises (OpenAI `GET /v1/models`, concurrent, honest reachable); a picker in Chat + Settings pins one model for a turn (`Router.chat_stream_explicit` — no failover, still gated by `no_tools_models`; `/api/chat` `model` ref validated, 400 on bad). Default **Auto (role routing)**; persisted (`useModelStore`). Adversarially reviewed (ChatView streamed-error wipe + honest reachable fixed) | `a8de26d` |
 
-| V-4 | **Sight & Voice (Tauri Desktop App)** — V-4a (Sight plumbing + UI), V-4b (Voice TTS/STT), V-4c (Tauri Shell + Global Hotkey), V-4d (Desktop Pointing Overlay). Completely integrated native desktop companion wrapper. | `39a38d6` |
+| ✅ V-4 | **Sight & Voice (Tauri Desktop App)** — V-4a (Sight plumbing + UI), V-4b (Voice TTS/STT), V-4c (Tauri Shell + Global Hotkey), V-4d (Desktop Pointing Overlay). Completely integrated native desktop companion wrapper. | `f163e08` |
 | V-3 | **GLB prop/pet polish** — KayKit/Kenney village GLBs + unified Draco/WebP optimization. Replaced primitives with real Medieval Village models. | `39a38d6` |
 | V-2.5 (rest) | **placeRegistry consolidation** — Unified place coords/anchors into one single source of truth. | `627f6ab` |
 
@@ -150,11 +150,11 @@ NeuraClaw (trunk: local-first AI companion, real computation only)
 │   ├── ⏳ V-2i Mind's Eye (L) — zoom into the real memory graph: cosine edges, confidence brightness, live-retrieval spotlight  [REAL-NOW subset]
 │   └── ⏳ B-1+W-8 Diegetic streaming chat (M) — token.stream on the bus → pet speaks the reply in a 3D bubble  [REAL-WITH-WORK]
 │
-├── 🔨 SIGHT & VOICE (V-4) .... the Teaching Buddy — clicky-inspired (see docs/SIGHT-AND-VOICE.md)
+├── ✅ SIGHT & VOICE (V-4) .... the Teaching Buddy — clicky-inspired (see docs/SIGHT-AND-VOICE.md)
 │   ├── ✅ V-4a Multimodal teaching (M) — getDisplayMedia screenshot → vision brain → pet explains  [REAL-WITH-WORK · browser]
 │   ├── ✅ V-4b Voice (M) — speechSynthesis TTS + push-to-talk Web Speech STT  [REAL · browser]
 │   ├── ✅ V-4c Tauri shell (L) — native wrap: global hotkey + OS screen capture + local Whisper STT  [REAL · native]
-│   ├── ⏳ V-4d Desktop pointing (L) — [POINT:x,y] → transparent click-through overlay, animated pet-cursor  [REAL · native]
+│   ├── ✅ V-4d Desktop pointing (L) — [POINT:x,y] → transparent click-through overlay, animated pet-cursor  [REAL · native]
 │   └── ⚠️ privacy: hosted vision brain = screenshot leaves device → opt-in only, never persisted, UI warns; local Ollama-vision option
 │
 ├── 🔨 THE PET, FOR REAL (V-3)  ✅ robot pet shipped (V-2-BOT) · ⏳ GLB prop/pet polish + Draco/LOD

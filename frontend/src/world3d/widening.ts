@@ -14,7 +14,8 @@ export interface StageReveal {
 
 /** The survey/fog targets for a life stage. Driven by the Realm system. */
 export function stageReveal(stage: number): StageReveal {
-  const realmId = getRealmForStage(stage || 1);
+  const rounded = isNaN(stage) ? 1 : Math.round(stage);
+  const realmId = getRealmForStage(rounded || 1);
   const def = REALMS[realmId];
   return { surveyDist: def.surveyDist, fogFar: def.fogFar };
 }
