@@ -20,6 +20,7 @@ import { TasksView } from "./features/tasks/TasksView";
 import { CalendarView } from "./features/calendar/CalendarView";
 import { Styleguide } from "./features/styleguide/Styleguide";
 import { DesktopPointerOverlay } from "./features/pointer/DesktopPointerOverlay";
+import { useGlobalShortcut } from "./lib/useGlobalShortcut";
 
 // The world (Pixi) is heavy — lazy-load it so it never touches the main bundle.
 const DenView = lazy(() => import("./features/den/DenView"));
@@ -68,11 +69,19 @@ function Shell() {
  *  If the backend is unreachable we fall through to the shell (which shows the
  *  offline status) rather than trapping the user on a blank ritual. */
 export function App() {
+  useGlobalShortcut();
+
+  const isOverlay = window.location.search.includes("window=overlay");
+
   const { data, isLoading, isError } = useQuery({
     queryKey: queryKeys.pet,
     queryFn: api.pet,
     retry: false,
   });
+
+  if (isOverlay) {
+    return <DesktopPointerOverlay />;
+  }
 
   if (isLoading) {
     return (

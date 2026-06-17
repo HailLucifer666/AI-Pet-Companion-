@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import {
   ChevronDown,
   ChevronRight,
+  Monitor,
   MessageSquare,
   Mic,
   Plus,
@@ -15,12 +16,14 @@ import {
   Trash2,
   Volume2,
   VolumeX,
+  X,
   Wrench,
 } from "lucide-react";
 import { api, queryKeys, type SessionSummary } from "../../lib/api";
 import { streamSSE } from "../../lib/sse";
 import { useUndoableDelete } from "../../lib/useUndoableDelete";
 import { useVoice } from "../../lib/useVoice";
+import { useScreenCapture } from "../../lib/useScreenCapture";
 import { useModelStore, modelOverride } from "../../state/useModelStore";
 import { ModelSelector } from "../../components/ModelSelector";
 import {
@@ -229,6 +232,8 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
 
   const voice = useVoice();
   const [muted, setMuted] = useState(false);
+  const { supported: capSupported, capturing, captureFrame } = useScreenCapture();
+  const [attachedImage, setAttachedImage] = useState<string | null>(null);
 
   // A suggested prompt handed over from the hatch ritual lands here once.
   useEffect(() => {
@@ -265,7 +270,13 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     try {
       for await (const event of streamSSE(
         "/api/chat",
-        { message, session_id: sessionId ?? null, role, model: modelOverride(selectedModel) },
+        { 
+          message, 
+          session_id: sessionId ?? null, 
+          role, 
+          model: modelOverride(selectedModel),
+          image_b64: attachedImage || undefined 
+        },
         { signal: controller.signal },
       )) {
         if (event.type === "session" && !sessionId) {
@@ -322,6 +333,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
     } finally {
       abortRef.current = null;
       setStream((s) => ({ ...s, running: false }));
+      setAttachedImage(null);
       
       const final = acc.trim();
       if (final && !muted) {
@@ -366,6 +378,13 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
       if (!m) voice.cancelSpeech();
       return !m;
     });
+  };
+
+  const handleCapture = async () => {
+    const frame = await captureFrame();
+    if (frame) {
+      setAttachedImage(frame);
+    }
   };
 
   useEffect(() => () => {
@@ -421,29 +440,52 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           )}
         </div>
         <div className="border-t border-ink-800 bg-ink-900/40 p-4">
-          <div className="mx-auto flex max-w-3xl items-end gap-2">
-            <Select
-              ariaLabel="Model role"
-              value={role}
-              onValueChange={setRole}
-              options={roles.map((r) => ({ value: r, label: r }))}
-              className="w-24 shrink-0"
-            />
-            <ModelSelector className="w-44 shrink-0" />
-            <Textarea
-              rows={Math.min(6, Math.max(1, input.split("\n").length))}
-              placeholder={voice.listening ? "Listening…" : "Message… (Enter to send, Shift+Enter for newline)"}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send();
-                }
-              }}
-            />
-            <div className="flex items-center gap-1 shrink-0 mb-1 mr-1">
-              {voice.sttSupported && (
+          <div className="mx-auto flex max-w-3xl flex-col gap-2">
+            {attachedImage && (
+              <div className="relative self-start">
+                <img src={attachedImage} alt="Screen capture" className="h-24 w-auto rounded-md border border-ink-800 object-cover" />
+                <button
+                  onClick={() => setAttachedImage(null)}
+                  className="absolute -right-2 -top-2 rounded-full bg-ink-800 p-1 text-ink-300 hover:bg-ink-700 hover:text-ink-100 shadow-sm"
+                  aria-label="Remove image"
+                >
+                  <X className="size-3" />
+                </button>
+              </div>
+            )}
+            <div className="flex items-end gap-2">
+              <Select
+                ariaLabel="Model role"
+                value={role}
+                onValueChange={setRole}
+                options={roles.map((r) => ({ value: r, label: r }))}
+                className="w-24 shrink-0"
+              />
+              <ModelSelector className="w-44 shrink-0" />
+              <Textarea
+                rows={Math.min(6, Math.max(1, input.split("\n").length))}
+                placeholder={voice.listening ? "Listening…" : "Message… (Enter to send, Shift+Enter for newline)"}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void send();
+                  }
+                }}
+              />
+              <div className="flex items-center gap-1 shrink-0 mb-1 mr-1">
+                {capSupported && (
+                  <button
+                    onClick={handleCapture}
+                    disabled={capturing}
+                    aria-label="Capture screen"
+                    className="rounded-lg p-2 text-ink-400 transition-colors hover:bg-ink-800/70 hover:text-ink-100 disabled:opacity-50"
+                  >
+                    {capturing ? <Spinner className="size-4" /> : <Monitor className="size-4" />}
+                  </button>
+                )}
+                {voice.sttSupported && (
                 <button
                   onClick={toggleMic}
                   aria-label={voice.listening ? "Stop listening" : "Speak"}
@@ -465,16 +507,17 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
                   {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
                 </button>
               )}
+              </div>
+              {stream.running ? (
+                <Button variant="danger" onClick={stop} aria-label="Stop generating">
+                  <Square className="size-4" /> Stop
+                </Button>
+              ) : (
+                <Button onClick={() => void send()} disabled={!input.trim() && !attachedImage}>
+                  <Send className="size-4" /> Send
+                </Button>
+              )}
             </div>
-            {stream.running ? (
-              <Button variant="danger" onClick={stop} aria-label="Stop generating">
-                <Square className="size-4" /> Stop
-              </Button>
-            ) : (
-              <Button onClick={() => void send()} disabled={!input.trim()}>
-                <Send className="size-4" /> Send
-              </Button>
-            )}
           </div>
         </div>
       </div>

@@ -24,7 +24,7 @@ import { WORLD } from "./palette";
 import { emotionGlow, type EmotionVector } from "./emotion";
 import { PetBubble } from "./PetBubble";
 import { FaceScreen } from "./pet/FaceScreen";
-import { gazeYaw, glowIntensity, shadowScale } from "./petAnim";
+import { gazeYaw, glowIntensity, shadowScale, breathScale, headNodY, gazePitch, earFlickDelta } from "./petAnim";
 
 const LIFT = 0.72; // hover height — the robot floats above the ground
 const ACCEL = 3.2; // how briskly velocity chases the desired velocity (ease in/out)
@@ -51,16 +51,20 @@ export function Lumenform3D() {
   const baseScale = 0.95 + stage * 0.12; // grows with life stage — the companion is the subject
   const twoAntennae = stage >= 2;
   const plated = stage >= 3;
-  const start = useMemo(() => placeTarget("home"), []);
+  const start = useMemo(() => placeTarget("hollow"), []);
 
   // Transform refs the locomotion + glow drive (frozen contract — petPos reads group).
   const group = useRef<Group>(null);
   const light = useRef<PointLight>(null);
   const headGroup = useRef<Group>(null); // gaze yaw — the face looks where it's called
+  const faceGroup = useRef<Group>(null); // blink scale (y)
+  const blinkClock = useRef(0);
+  const nextBlinkAt = useRef(2.5);
   const antL = useRef<Group>(null);
   const antR = useRef<Group>(null);
   const tipL = useRef<Mesh>(null);
   const tipR = useRef<Mesh>(null);
+  const bodyGroup = useRef<Group>(null);
   const shadow = useRef<Mesh>(null);
   const sparkleGroup = useRef<Group>(null);
   const sparkleRefs = [
@@ -70,7 +74,15 @@ export function Lumenform3D() {
     useRef<Mesh>(null),
     useRef<Mesh>(null),
     useRef<Mesh>(null),
+    useRef<Mesh>(null),
   ];
+  const armL = useRef<Mesh>(null);
+  const armR = useRef<Mesh>(null);
+
+  const lastYOff = useRef(0);
+  const lastGesture = useRef<string>("");
+  const flickStart = useRef(-1);
+  const flickSide = useRef<"L" | "R" | "none">("none");
 
   // Live planar position + smoothed velocity + facing, carried frame-to-frame.
   const pos = useRef({ x: start.x, z: start.z });
@@ -148,6 +160,7 @@ export function Lumenform3D() {
       setTip(tipR.current, 1.2 * boost);
       if (antL.current) antL.current.rotation.z = 0;
       if (antR.current) antR.current.rotation.z = 0;
+      if (bodyGroup.current) bodyGroup.current.scale.set(1, 1, 1);
       if (shadow.current) shadow.current.scale.setScalar(1);
       if (sparkleGroup.current) sparkleGroup.current.scale.setScalar(0);
       return;
@@ -210,6 +223,46 @@ export function Lumenform3D() {
       }
       const targetYaw = gazeYaw(lookX - pos.current.x, lookZ - pos.current.z, heading.current);
       dampAngle(headG.rotation, 'y', targetYaw, lured || anticipating ? 0.12 : 0.4, delta);
+      headG.position.y = HEAD_Y + headNodY(t, working, gesture);
+
+      const dhoriz = Math.hypot(lookX - pos.current.x, lookZ - pos.current.z);
+      const lookY = (lured || anticipating) ? groundY(lookX, lookZ) + LIFT : camera.position.y;
+      const targetPitch = gazePitch(lookY - y, dhoriz, gesture);
+      dampAngle(headG.rotation, 'x', targetPitch, 0.2, delta);
+    }
+
+    const breath = breathScale(t, gesture, working);
+    const inv = 1 / Math.sqrt(breath);
+    
+    // Squash/stretch based on vertical velocity
+    const yVel = dt > 0 ? (yOff - lastYOff.current) / dt : 0;
+    lastYOff.current = yOff;
+    const stretch = 1 + Math.max(-0.15, Math.min(0.2, yVel * 0.12));
+    const squash = 1 / stretch;
+
+    if (bodyGroup.current) {
+      bodyGroup.current.scale.set(inv * squash, breath * stretch, inv * squash);
+    }
+
+    let eyeScaleY = 1;
+    if (gesture !== lastGesture.current) {
+      lastGesture.current = gesture;
+      nextBlinkAt.current = blinkClock.current; // force blink on state change
+    }
+
+    if (gesture === "nap") {
+      eyeScaleY = 0.08;
+    } else {
+      blinkClock.current += delta;
+      const since = blinkClock.current - nextBlinkAt.current;
+      if (since > 0 && since < 0.15) {
+        eyeScaleY = 0.1; // blink closed
+      } else if (since >= 0.15) {
+        nextBlinkAt.current = blinkClock.current + 2 + Math.random() * 3;
+      }
+    }
+    if (faceGroup.current) {
+      faceGroup.current.scale.y = eyeScaleY;
     }
 
     // Emotion (derived from real cadence in the store's 700ms tick) → ease the
@@ -237,10 +290,41 @@ export function Lumenform3D() {
     setTip(tipL.current, tipE * boost);
     setTip(tipR.current, tipE * boost);
 
-    // Antennae sway (a touch of life); droop a little when napping.
+    // Antennae sway + random flicks
+    if (Math.random() < 0.002 * delta * 60 && t - flickStart.current > 2) {
+      flickStart.current = t;
+      flickSide.current = Math.random() > 0.5 ? "L" : "R";
+    }
+    const [flickL, flickR] = earFlickDelta(t, flickStart.current, flickSide.current);
+
     const sway = gesture === "nap" ? 0.0 : 0.12;
-    if (antL.current) antL.current.rotation.z = Math.sin(t * 1.6) * sway + (gesture === "nap" ? 0.5 : 0);
-    if (antR.current) antR.current.rotation.z = Math.sin(t * 1.6 + 1.2) * sway - (gesture === "nap" ? 0.5 : 0);
+    if (antL.current) antL.current.rotation.z = Math.sin(t * 1.6) * sway + (gesture === "nap" ? 0.5 : 0) + flickL;
+    if (antR.current) antR.current.rotation.z = Math.sin(t * 1.6 + 1.2) * sway - (gesture === "nap" ? 0.5 : 0) + flickR;
+
+    // Per-gesture arm poses
+    let armTargetRotZ = -0.5; // default right arm Z
+    let armTargetRotX = 0;
+    if (gesture === "celebrate") {
+      armTargetRotZ = 0.5 + Math.sin(t * 8) * 0.2; // arms up
+      armTargetRotX = -0.2;
+    } else if (gesture === "nap") {
+      armTargetRotZ = -0.8; // arms droop
+    } else if (moving) {
+      armTargetRotZ = -0.4 + Math.sin(t * 6) * 0.15 * gait; // swing
+      armTargetRotX = Math.sin(t * 6 + Math.PI / 2) * 0.2 * gait;
+    } else if (working) {
+      armTargetRotZ = -0.2 + Math.sin(t * 4) * 0.1;
+      armTargetRotX = -0.3; // forward to work
+    }
+
+    if (armL.current) {
+      dampAngle(armL.current.rotation, 'z', -armTargetRotZ, 0.15, delta);
+      dampAngle(armL.current.rotation, 'x', armTargetRotX, 0.15, delta);
+    }
+    if (armR.current) {
+      dampAngle(armR.current.rotation, 'z', armTargetRotZ, 0.15, delta);
+      dampAngle(armR.current.rotation, 'x', armTargetRotX, 0.15, delta);
+    }
 
     // Shadow: a contact blob that shrinks as it floats higher.
     if (shadow.current) shadow.current.scale.setScalar(shadowScale(yOff));
@@ -277,33 +361,37 @@ export function Lumenform3D() {
       {/* the warm point light inside the body — tight so Bloom hits the bot, not a halo */}
       <pointLight ref={light} color={WORLD.botGlow} intensity={1.5} distance={4.5} decay={2.5} position={[0, 0.2, 0]} />
 
-      {/* ── body: a floating dark plated ovoid ── */}
-      <mesh castShadow receiveShadow scale={[1, 0.82, 0.92]}>
-        <sphereGeometry args={[0.34, 24, 18]} />
-        <meshStandardMaterial color={WORLD.botBody} roughness={0.45} metalness={0.4} flatShading={false} />
-      </mesh>
-
-      {/* a thin glowing seam around the belly — a little life on the dark shell */}
-      <mesh rotation-x={Math.PI / 2} position={[0, -0.02, 0]}>
-        <torusGeometry args={[0.3, 0.012, 8, 32]} />
-        <meshStandardMaterial color={WORLD.botEye} emissive={WORLD.botEye} emissiveIntensity={1.1} toneMapped={false} />
-      </mesh>
-
-      {/* shoulder plate at higher stages */}
-      {plated && (
-        <mesh position={[0, 0.12, 0]} rotation-x={Math.PI / 2}>
-          <torusGeometry args={[0.33, 0.04, 8, 24]} />
-          <meshStandardMaterial color={WORLD.botPlate} roughness={0.4} metalness={0.5} />
+      <group ref={bodyGroup}>
+        {/* ── body: a floating dark plated ovoid ── */}
+        <mesh castShadow receiveShadow scale={[1, 0.82, 0.92]}>
+          <sphereGeometry args={[0.34, 24, 18]} />
+          <meshStandardMaterial color={WORLD.botBody} roughness={0.45} metalness={0.4} flatShading={false} />
         </mesh>
-      )}
 
-      {/* ── stubby arms ── */}
-      {[-1, 1].map((sx) => (
-        <mesh key={sx} position={[sx * 0.33, -0.02, 0.02]} rotation-z={sx * -0.5} castShadow>
+        {/* a thin glowing seam around the belly — a little life on the dark shell */}
+        <mesh rotation-x={Math.PI / 2} position={[0, -0.02, 0]}>
+          <torusGeometry args={[0.3, 0.012, 8, 32]} />
+          <meshStandardMaterial color={WORLD.botEye} emissive={WORLD.botEye} emissiveIntensity={1.1} toneMapped={false} />
+        </mesh>
+
+        {/* shoulder plate at higher stages */}
+        {plated && (
+          <mesh position={[0, 0.12, 0]} rotation-x={Math.PI / 2}>
+            <torusGeometry args={[0.33, 0.04, 8, 24]} />
+            <meshStandardMaterial color={WORLD.botPlate} roughness={0.4} metalness={0.5} />
+          </mesh>
+        )}
+
+        {/* ── stubby arms ── */}
+        <mesh ref={armL} position={[-0.33, -0.02, 0.02]} rotation-z={0.5} castShadow>
           <capsuleGeometry args={[0.05, 0.12, 4, 8]} />
           <meshStandardMaterial color={WORLD.botBody} roughness={0.5} metalness={0.35} />
         </mesh>
-      ))}
+        <mesh ref={armR} position={[0.33, -0.02, 0.02]} rotation-z={-0.5} castShadow>
+          <capsuleGeometry args={[0.05, 0.12, 4, 8]} />
+          <meshStandardMaterial color={WORLD.botBody} roughness={0.5} metalness={0.35} />
+        </mesh>
+      </group>
 
       {/* ── head: rounded dark shell + the glowing screen-face (looks where called) ── */}
       <group ref={headGroup} position={[0, HEAD_Y, 0.04]}>
@@ -312,7 +400,9 @@ export function Lumenform3D() {
           <meshStandardMaterial color={WORLD.botBody} roughness={0.4} metalness={0.45} />
         </mesh>
         {/* the screen-face on the front (+Z) */}
-        <FaceScreen width={0.34} />
+        <group ref={faceGroup}>
+          <FaceScreen width={0.34} />
+        </group>
 
         {/* ── antennae: 1 from hatch, 2 from the Juvenile stage; glowing tips ── */}
         <group ref={antL} position={[-0.1, 0.22, 0]}>

@@ -4,19 +4,12 @@
  *  growing a list here is enough to add variety — no scatter-logic change. */
 
 export const NATURE_TREES = [
-  "BirchTree_1",
-  "BirchTree_2",
-  "BirchTree_3",
   "PineTree_1",
   "PineTree_2",
-  "PineTree_3",
-  "MapleTree_1",
-  "MapleTree_2",
   "NormalTree_1",
-  "NormalTree_2",
 ];
-export const NATURE_ROCKS = ["Rock_1", "Rock_2", "Rock_3", "Rock_4", "Rock_5"];
-export const NATURE_BUSHES = ["Bush", "Bush_Flowers"];
+export const NATURE_ROCKS = ["Rock_1", "Rock_2", "Rock_4"];
+export const NATURE_BUSHES = ["Bush_Small"];
 export const NATURE_GRASS = ["Grass_Large"];
 
 export const NATURE_ALL = [...NATURE_TREES, ...NATURE_ROCKS, ...NATURE_BUSHES, ...NATURE_GRASS];

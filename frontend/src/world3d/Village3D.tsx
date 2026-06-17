@@ -199,6 +199,21 @@ function Forge({ mats }: { mats: Mats }) {
         <boxGeometry args={[0.9, 0.7, 0.06]} />
         <primitive object={mats.workWindow} attach="material" />
       </mesh>
+
+      {/* Floating data plates / cyan seams around the workbench */}
+      <mesh position={[0.7, 0.7, 1.4]} rotation-x={-0.1} rotation-y={-0.2}>
+        <planeGeometry args={[0.35, 0.2]} />
+        <primitive object={mats.workWindow} attach="material" />
+      </mesh>
+      <mesh position={[-0.3, 0.5, 1.4]} rotation-x={-0.1} rotation-y={0.2}>
+        <planeGeometry args={[0.25, 0.15]} />
+        <primitive object={mats.workWindow} attach="material" />
+      </mesh>
+      {/* Tech seam glowing on the stone base */}
+      <mesh position={[0.2, 0.15, 1.3]} rotation-x={-Math.PI / 2}>
+        <planeGeometry args={[1.2, 0.05]} />
+        <primitive object={mats.workWindow} attach="material" />
+      </mesh>
       
       <Lantern mats={mats} x={1.3} z={1.5} h={1.2} />
     </group>
@@ -291,6 +306,11 @@ function Campfire({ mats, y0 }: { mats: Mats; y0: number }) {
   return (
     <group position-y={y0}>
       <BuildingGLTF url="/models/village/Bonfire_Lit.glb" mats={mats} scale={1.0} />
+      {/* Ember rim — a warm glowing ring marking the hollow's boundary */}
+      <mesh position-y={0.06} rotation-x={-Math.PI / 2}>
+        <ringGeometry args={[0.85, 0.95, 24]} />
+        <primitive object={mats.flame} attach="material" />
+      </mesh>
     </group>
   );
 }
@@ -443,7 +463,7 @@ export function Village3D({ reduced, skills }: { reduced: boolean; skills: Skill
     const boost = glowBoost(sky.dayness);
     const { lumen, forgeAt } = useWorldStore.getState();
     const working = lumen.mode === "work";
-    const atHome = lumen.place === "home";
+    const atHome = lumen.place === "hollow";
     const t = state.clock.elapsedTime;
     // The Forging: a cubic-out eruption of the forge on a real skill draft.
     const forgeFlash = reduced || !forgeAt ? 0 : bloomFlash(nowMs() - forgeAt, FORGE_MS);

@@ -3,11 +3,11 @@
  *  coordinate is ever written twice and the whole village re-scales with
  *  `WORLD_SCALE` automatically. Pure (no three, no React) → unit-testable. */
 
-import { PLACES_3D, PLAZA_POS, type PlaceKind } from "./placeRegistry";
+import { ALL_PLACES, PLAZA_POS, type Place } from "./placeRegistry";
 
 export type BuildingKind = "tavern" | "workshop" | "greenhouse" | "archives" | "tasks" | "calendar";
 
-const KIND_MAP: Record<PlaceKind, BuildingKind> = {
+const KIND_MAP: Record<Place, BuildingKind> = {
   hollow: "tavern",
   workbench: "workshop",
   garden: "greenhouse",
@@ -15,10 +15,11 @@ const KIND_MAP: Record<PlaceKind, BuildingKind> = {
   tasks: "tasks",
   calendar: "calendar",
   pool: "tavern", // Unused, pool is not navigable
+  wander: "tavern",
 };
 
 export interface BuildingDef {
-  id: string; // matches PLACES_3D id ("hollow" | "garden" | "workbench")
+  id: string; // matches ALL_PLACES id ("hollow" | "garden" | "workbench")
   kind: BuildingKind;
   pos: [number, number, number];
   rotationY: number; // radians — building faces the plaza
@@ -36,14 +37,14 @@ export interface RoadSpec {
 
 const [px, , pz] = PLAZA_POS;
 
-export const BUILDING_DEFS: BuildingDef[] = PLACES_3D.map((p) => ({
+export const BUILDING_DEFS: BuildingDef[] = ALL_PLACES.map((p) => ({
   id: p.id,
-  kind: KIND_MAP[p.kind],
+  kind: KIND_MAP[p.id as Place],
   pos: p.pos,
   rotationY: Math.atan2(px - p.pos[0], pz - p.pos[2]),
 }));
 
-export const VILLAGE_ROADS: RoadSpec[] = PLACES_3D.map((p) => ({
+export const VILLAGE_ROADS: RoadSpec[] = ALL_PLACES.map((p) => ({
   id: `plaza-${p.id}`,
   fromX: px,
   fromZ: pz,

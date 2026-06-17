@@ -1,0 +1,1532 @@
+('F:\\AI Pet Companion '
+ '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\neuraclaw-sidecar-x86_64-pc-windows-msvc.pkg',
+ {'BINARY': True,
+  'DATA': True,
+  'EXECUTABLE': True,
+  'EXTENSION': True,
+  'PYMODULE': True,
+  'PYSOURCE': True,
+  'PYZ': False,
+  'SPLASH': True,
+  'SYMLINK': False},
+ [('pyi-contents-directory _internal', '', 'OPTION'),
+  ('PYZ-00.pyz',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\PYZ-00.pyz',
+   'PYZ'),
+  ('struct',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\localpycs\\struct.pyc',
+   'PYMODULE'),
+  ('pyimod01_archive',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\localpycs\\pyimod01_archive.pyc',
+   'PYMODULE'),
+  ('pyimod02_importers',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\localpycs\\pyimod02_importers.pyc',
+   'PYMODULE'),
+  ('pyimod03_ctypes',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\localpycs\\pyimod03_ctypes.pyc',
+   'PYMODULE'),
+  ('pyimod04_pywin32',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\localpycs\\pyimod04_pywin32.pyc',
+   'PYMODULE'),
+  ('pyiboot01_bootstrap',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
+   'PYSOURCE'),
+  ('pyi_rth_pkgutil',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_pkgutil.py',
+   'PYSOURCE'),
+  ('pyi_rth_multiprocessing',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_multiprocessing.py',
+   'PYSOURCE'),
+  ('pyi_rth_inspect',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
+   'PYSOURCE'),
+  ('pyi_rth_setuptools',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_setuptools.py',
+   'PYSOURCE'),
+  ('pyi_rth_pkgres',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_pkgres.py',
+   'PYSOURCE'),
+  ('pyi_rth_pywintypes',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\rthooks\\pyi_rth_pywintypes.py',
+   'PYSOURCE'),
+  ('pyi_rth_cryptography_openssl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\rthooks\\pyi_rth_cryptography_openssl.py',
+   'PYSOURCE'),
+  ('__main__',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\__main__.py',
+   'PYSOURCE'),
+  ('python311.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python311.dll',
+   'BINARY'),
+  ('numpy.libs\\libscipy_openblas64_-63c857e738469261263c764a36be9436.dll',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy.libs\\libscipy_openblas64_-63c857e738469261263c764a36be9436.dll',
+   'BINARY'),
+  ('numpy.libs\\msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy.libs\\msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll',
+   'BINARY'),
+  ('pywin32_system32\\pywintypes311.dll',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pywin32_system32\\pywintypes311.dll',
+   'BINARY'),
+  ('onnxruntime\\capi\\onnxruntime.dll',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\onnxruntime\\capi\\onnxruntime.dll',
+   'BINARY'),
+  ('onnxruntime\\capi\\onnxruntime_providers_shared.dll',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\onnxruntime\\capi\\onnxruntime_providers_shared.dll',
+   'BINARY'),
+  ('vcruntime140.dll',
+   'C:\\Program Files\\Python39\\vcruntime140.dll',
+   'BINARY'),
+  ('msvcp140.dll', 'C:\\Windows\\system32\\msvcp140.dll', 'BINARY'),
+  ('vcruntime140_1.dll',
+   'C:\\Program Files\\Python39\\vcruntime140_1.dll',
+   'BINARY'),
+  ('select.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\select.pyd',
+   'EXTENSION'),
+  ('unicodedata.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\unicodedata.pyd',
+   'EXTENSION'),
+  ('_lzma.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_lzma.pyd',
+   'EXTENSION'),
+  ('_bz2.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_bz2.pyd',
+   'EXTENSION'),
+  ('_socket.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_socket.pyd',
+   'EXTENSION'),
+  ('_decimal.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_decimal.pyd',
+   'EXTENSION'),
+  ('_hashlib.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_hashlib.pyd',
+   'EXTENSION'),
+  ('_ctypes.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_ctypes.pyd',
+   'EXTENSION'),
+  ('_overlapped.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_overlapped.pyd',
+   'EXTENSION'),
+  ('_ssl.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_ssl.pyd',
+   'EXTENSION'),
+  ('_queue.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_queue.pyd',
+   'EXTENSION'),
+  ('_multiprocessing.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_multiprocessing.pyd',
+   'EXTENSION'),
+  ('pyexpat.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\pyexpat.pyd',
+   'EXTENSION'),
+  ('_asyncio.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_asyncio.pyd',
+   'EXTENSION'),
+  ('_uuid.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_uuid.pyd',
+   'EXTENSION'),
+  ('_elementtree.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_elementtree.pyd',
+   'EXTENSION'),
+  ('PIL\\_imagingft.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_imagingft.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_imaging.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_imaging.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\_core\\_multiarray_tests.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\_core\\_multiarray_tests.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\_core\\_multiarray_umath.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('81d243bd2c585b0f4821__mypyc.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\81d243bd2c585b0f4821__mypyc.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('charset_normalizer\\cd.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\charset_normalizer\\cd.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('charset_normalizer\\md.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\charset_normalizer\\md.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('win32\\win32pdh.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\win32\\win32pdh.pyd',
+   'EXTENSION'),
+  ('numpy\\linalg\\_umath_linalg.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\linalg\\_umath_linalg.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\mtrand.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\mtrand.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\bit_generator.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\bit_generator.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_sfc64.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_sfc64.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_philox.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_philox.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_pcg64.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_pcg64.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_mt19937.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_mt19937.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_generator.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_generator.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_common.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_common.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\random\\_bounded_integers.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\random\\_bounded_integers.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('numpy\\fft\\_pocketfft_umath.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy\\fft\\_pocketfft_umath.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('yaml\\_yaml.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\yaml\\_yaml.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_webp.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_webp.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_imagingtk.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_imagingtk.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_avif.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_avif.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_imagingcms.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_imagingcms.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('PIL\\_imagingmath.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\PIL\\_imagingmath.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('_brotli.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\_brotli.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('_zoneinfo.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_zoneinfo.pyd',
+   'EXTENSION'),
+  ('pydantic_core\\_pydantic_core.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic_core\\_pydantic_core.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('primp\\primp.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\primp\\primp.pyd',
+   'EXTENSION'),
+  ('lxml\\etree.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\etree.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\_elementpath.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\_elementpath.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\html\\diff.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\html\\diff.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\html\\_difflib.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\html\\_difflib.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\sax.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\sax.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\objectify.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\objectify.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('lxml\\builder.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\builder.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('_sqlite3.pyd',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\_sqlite3.pyd',
+   'EXTENSION'),
+  ('jiter\\jiter.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jiter\\jiter.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('websockets\\speedups.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets\\speedups.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('win32\\win32job.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\win32\\win32job.pyd',
+   'EXTENSION'),
+  ('win32\\win32api.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\win32\\win32api.pyd',
+   'EXTENSION'),
+  ('win32\\_win32sysloader.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\win32\\_win32sysloader.pyd',
+   'EXTENSION'),
+  ('rpds\\rpds.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\rpds\\rpds.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('_cffi_backend.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\_cffi_backend.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('cryptography\\hazmat\\bindings\\_rust.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography\\hazmat\\bindings\\_rust.pyd',
+   'EXTENSION'),
+  ('watchfiles\\_rust_notify.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\watchfiles\\_rust_notify.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('httptools\\parser\\url_parser.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\httptools\\parser\\url_parser.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('httptools\\parser\\parser.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\httptools\\parser\\parser.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('win32\\win32evtlog.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\win32\\win32evtlog.pyd',
+   'EXTENSION'),
+  ('tokenizers\\tokenizers.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tokenizers\\tokenizers.pyd',
+   'EXTENSION'),
+  ('mmh3.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mmh3.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('py_rust_stemmers\\py_rust_stemmers.cp311-win_amd64.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\py_rust_stemmers\\py_rust_stemmers.cp311-win_amd64.pyd',
+   'EXTENSION'),
+  ('onnxruntime\\capi\\onnxruntime_pybind11_state.pyd',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\onnxruntime\\capi\\onnxruntime_pybind11_state.pyd',
+   'EXTENSION'),
+  ('hf_xet\\hf_xet.pyd',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\hf_xet\\hf_xet.pyd',
+   'EXTENSION'),
+  ('api-ms-win-crt-conio-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-conio-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-runtime-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-runtime-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-environment-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-environment-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-process-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-process-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-time-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-time-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-locale-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-locale-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-filesystem-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-filesystem-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-heap-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-heap-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-stdio-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-stdio-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-string-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-string-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-math-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-math-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-convert-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-convert-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-utility-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-utility-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-crt-private-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-crt-private-l1-1-0.dll',
+   'BINARY'),
+  ('MSVCP140_1.dll', 'C:\\Windows\\system32\\MSVCP140_1.dll', 'BINARY'),
+  ('libcrypto-3-x64.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\libcrypto-3-x64.dll',
+   'BINARY'),
+  ('libffi-8.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\libffi-8.dll',
+   'BINARY'),
+  ('libssl-3-x64.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\libssl-3-x64.dll',
+   'BINARY'),
+  ('api-ms-win-core-synch-l1-2-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-synch-l1-2-0.dll',
+   'BINARY'),
+  ('python3.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python3.dll',
+   'BINARY'),
+  ('sqlite3.dll',
+   'C:\\Users\\acarg\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\DLLs\\sqlite3.dll',
+   'BINARY'),
+  ('ucrtbase.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\ucrtbase.dll',
+   'BINARY'),
+  ('api-ms-win-core-memory-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-memory-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-sysinfo-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-sysinfo-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-libraryloader-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-libraryloader-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-localization-l1-2-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-localization-l1-2-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-heap-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-heap-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-file-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-file-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-profile-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-profile-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-processthreads-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-processthreads-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-errorhandling-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-errorhandling-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-rtlsupport-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-rtlsupport-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-file-l2-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-file-l2-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-util-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-util-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-debug-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-debug-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-console-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-console-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-processenvironment-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-processenvironment-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-namedpipe-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-namedpipe-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-synch-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-synch-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-datetime-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-datetime-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-handle-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-handle-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-interlocked-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-interlocked-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-timezone-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-timezone-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-file-l1-2-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-file-l1-2-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-processthreads-l1-1-1.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-processthreads-l1-1-1.dll',
+   'BINARY'),
+  ('api-ms-win-core-string-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-string-l1-1-0.dll',
+   'BINARY'),
+  ('api-ms-win-core-fibers-l1-1-0.dll',
+   'C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance '
+   'Toolkit\\api-ms-win-core-fibers-l1-1-0.dll',
+   'BINARY'),
+  ('fastembed-0.8.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('fastembed-0.8.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\METADATA',
+   'DATA'),
+  ('fastembed-0.8.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\RECORD',
+   'DATA'),
+  ('fastembed-0.8.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\WHEEL',
+   'DATA'),
+  ('fastembed-0.8.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('fastembed-0.8.0.dist-info\\licenses\\NOTICE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed-0.8.0.dist-info\\licenses\\NOTICE',
+   'DATA'),
+  ('fastembed\\__init__.py',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\fastembed\\__init__.py',
+   'DATA'),
+  ('fastembed\\common\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\__init__.py',
+   'DATA'),
+  ('fastembed\\common\\model_description.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\model_description.py',
+   'DATA'),
+  ('fastembed\\common\\model_management.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\model_management.py',
+   'DATA'),
+  ('fastembed\\common\\onnx_model.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\onnx_model.py',
+   'DATA'),
+  ('fastembed\\common\\preprocessor_utils.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\preprocessor_utils.py',
+   'DATA'),
+  ('fastembed\\common\\types.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\types.py',
+   'DATA'),
+  ('fastembed\\common\\utils.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\common\\utils.py',
+   'DATA'),
+  ('fastembed\\embedding.py',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\fastembed\\embedding.py',
+   'DATA'),
+  ('fastembed\\image\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\__init__.py',
+   'DATA'),
+  ('fastembed\\image\\image_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\image_embedding.py',
+   'DATA'),
+  ('fastembed\\image\\image_embedding_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\image_embedding_base.py',
+   'DATA'),
+  ('fastembed\\image\\onnx_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\onnx_embedding.py',
+   'DATA'),
+  ('fastembed\\image\\onnx_image_model.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\onnx_image_model.py',
+   'DATA'),
+  ('fastembed\\image\\transform\\functional.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\transform\\functional.py',
+   'DATA'),
+  ('fastembed\\image\\transform\\operators.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\image\\transform\\operators.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\__init__.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\colbert.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\colbert.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\jina_colbert.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\jina_colbert.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\late_interaction_embedding_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\late_interaction_embedding_base.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\late_interaction_text_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\late_interaction_text_embedding.py',
+   'DATA'),
+  ('fastembed\\late_interaction\\token_embeddings.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction\\token_embeddings.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\__init__.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\colmodernvbert.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\colmodernvbert.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\colpali.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\colpali.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\late_interaction_multimodal_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\late_interaction_multimodal_embedding.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\late_interaction_multimodal_embedding_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\late_interaction_multimodal_embedding_base.py',
+   'DATA'),
+  ('fastembed\\late_interaction_multimodal\\onnx_multimodal_model.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\late_interaction_multimodal\\onnx_multimodal_model.py',
+   'DATA'),
+  ('fastembed\\parallel_processor.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\parallel_processor.py',
+   'DATA'),
+  ('fastembed\\postprocess\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\postprocess\\__init__.py',
+   'DATA'),
+  ('fastembed\\postprocess\\muvera.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\postprocess\\muvera.py',
+   'DATA'),
+  ('fastembed\\py.typed',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\fastembed\\py.typed',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\__init__.py',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\custom_text_cross_encoder.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\custom_text_cross_encoder.py',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\onnx_text_cross_encoder.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\onnx_text_cross_encoder.py',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\onnx_text_model.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\onnx_text_model.py',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\text_cross_encoder.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\text_cross_encoder.py',
+   'DATA'),
+  ('fastembed\\rerank\\cross_encoder\\text_cross_encoder_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\rerank\\cross_encoder\\text_cross_encoder_base.py',
+   'DATA'),
+  ('fastembed\\sparse\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\__init__.py',
+   'DATA'),
+  ('fastembed\\sparse\\bm25.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\bm25.py',
+   'DATA'),
+  ('fastembed\\sparse\\bm42.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\bm42.py',
+   'DATA'),
+  ('fastembed\\sparse\\minicoil.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\minicoil.py',
+   'DATA'),
+  ('fastembed\\sparse\\sparse_embedding_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\sparse_embedding_base.py',
+   'DATA'),
+  ('fastembed\\sparse\\sparse_text_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\sparse_text_embedding.py',
+   'DATA'),
+  ('fastembed\\sparse\\splade_pp.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\splade_pp.py',
+   'DATA'),
+  ('fastembed\\sparse\\utils\\minicoil_encoder.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\utils\\minicoil_encoder.py',
+   'DATA'),
+  ('fastembed\\sparse\\utils\\sparse_vectors_converter.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\utils\\sparse_vectors_converter.py',
+   'DATA'),
+  ('fastembed\\sparse\\utils\\tokenizer.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\utils\\tokenizer.py',
+   'DATA'),
+  ('fastembed\\sparse\\utils\\vocab_resolver.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\sparse\\utils\\vocab_resolver.py',
+   'DATA'),
+  ('fastembed\\text\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\__init__.py',
+   'DATA'),
+  ('fastembed\\text\\clip_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\clip_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\custom_text_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\custom_text_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\multitask_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\multitask_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\onnx_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\onnx_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\onnx_text_model.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\onnx_text_model.py',
+   'DATA'),
+  ('fastembed\\text\\pooled_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\pooled_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\pooled_normalized_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\pooled_normalized_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\text_embedding.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\text_embedding.py',
+   'DATA'),
+  ('fastembed\\text\\text_embedding_base.py',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fastembed\\text\\text_embedding_base.py',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\INSTALLER',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\METADATA',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\RECORD',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\REQUESTED',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\REQUESTED',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\WHEEL',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\direct_url.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\direct_url.json',
+   'DATA'),
+  ('neuraclaw-3.0.0a0.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\neuraclaw-3.0.0a0.dist-info\\top_level.txt',
+   'DATA'),
+  ('neuraclaw\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\__main__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\__main__.py',
+   'DATA'),
+  ('neuraclaw\\api\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\api\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\api\\app.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\api\\app.py',
+   'DATA'),
+  ('neuraclaw\\api\\productivity.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\api\\productivity.py',
+   'DATA'),
+  ('neuraclaw\\api\\routes.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\api\\routes.py',
+   'DATA'),
+  ('neuraclaw\\config.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\config.py',
+   'DATA'),
+  ('neuraclaw\\core\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\core\\agent.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\agent.py',
+   'DATA'),
+  ('neuraclaw\\core\\context.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\context.py',
+   'DATA'),
+  ('neuraclaw\\core\\mcp_client.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\mcp_client.py',
+   'DATA'),
+  ('neuraclaw\\core\\scheduler.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\scheduler.py',
+   'DATA'),
+  ('neuraclaw\\core\\synapse.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\synapse.py',
+   'DATA'),
+  ('neuraclaw\\core\\tooltags.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\tooltags.py',
+   'DATA'),
+  ('neuraclaw\\core\\vision.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\core\\vision.py',
+   'DATA'),
+  ('neuraclaw\\db\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\db\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\db\\connection.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\db\\connection.py',
+   'DATA'),
+  ('neuraclaw\\db\\migrator.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\db\\migrator.py',
+   'DATA'),
+  ('neuraclaw\\integrations\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\integrations\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\integrations\\media_keys.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\integrations\\media_keys.py',
+   'DATA'),
+  ('neuraclaw\\integrations\\spotify.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\integrations\\spotify.py',
+   'DATA'),
+  ('neuraclaw\\memory\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\memory\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\memory\\embedder.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\memory\\embedder.py',
+   'DATA'),
+  ('neuraclaw\\memory\\extractor.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\memory\\extractor.py',
+   'DATA'),
+  ('neuraclaw\\memory\\store.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\memory\\store.py',
+   'DATA'),
+  ('neuraclaw\\pet\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\pet\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\pet\\hatch.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\pet\\hatch.py',
+   'DATA'),
+  ('neuraclaw\\pet\\ladder.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\pet\\ladder.py',
+   'DATA'),
+  ('neuraclaw\\pet\\xp.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\pet\\xp.py',
+   'DATA'),
+  ('neuraclaw\\providers\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\providers\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\providers\\base.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\providers\\base.py',
+   'DATA'),
+  ('neuraclaw\\providers\\openai_compat.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\providers\\openai_compat.py',
+   'DATA'),
+  ('neuraclaw\\providers\\router.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\providers\\router.py',
+   'DATA'),
+  ('neuraclaw\\skillsys\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\skillsys\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\skillsys\\loader.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\skillsys\\loader.py',
+   'DATA'),
+  ('neuraclaw\\skillsys\\manager.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\skillsys\\manager.py',
+   'DATA'),
+  ('neuraclaw\\skillsys\\reflector.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\skillsys\\reflector.py',
+   'DATA'),
+  ('neuraclaw\\tools\\__init__.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\tools\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\__init__.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\__init__.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\actions.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\actions.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\files.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\tools\\builtin\\files.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\knowledge.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\knowledge.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\productivity.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\productivity.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\shell.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\tools\\builtin\\shell.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\skills_tool.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\skills_tool.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\spotify_tool.py',
+   'F:\\AI Pet Companion '
+   '!\\backend\\src\\neuraclaw\\tools\\builtin\\spotify_tool.py',
+   'DATA'),
+  ('neuraclaw\\tools\\builtin\\web.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\tools\\builtin\\web.py',
+   'DATA'),
+  ('neuraclaw\\tools\\registry.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\tools\\registry.py',
+   'DATA'),
+  ('neuraclaw\\weather.py',
+   'F:\\AI Pet Companion !\\backend\\src\\neuraclaw\\weather.py',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\WHEEL',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\METADATA',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\LICENSE',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\top_level.txt',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\RECORD',
+   'DATA'),
+  ('setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\importlib_metadata-8.0.0.dist-info\\REQUESTED',
+   'DATA'),
+  ('setuptools\\_vendor\\jaraco\\text\\Lorem ipsum.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\jaraco\\text\\Lorem '
+   'ipsum.txt',
+   'DATA'),
+  ('certifi\\py.typed',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\certifi\\py.typed',
+   'DATA'),
+  ('certifi\\cacert.pem',
+   'F:\\AI Pet Companion !\\.venv\\Lib\\site-packages\\certifi\\cacert.pem',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\rng\\iso-schematron.rng',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\rng\\iso-schematron.rng',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\XSD2Schtrn.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\XSD2Schtrn.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_svrl_for_xslt1.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_svrl_for_xslt1.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_abstract_expand.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_abstract_expand.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_schematron_skeleton_for_xslt1.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_schematron_skeleton_for_xslt1.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_dsdl_include.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_dsdl_include.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\readme.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\readme.txt',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\RNG2Schtrn.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\RNG2Schtrn.xsl',
+   'DATA'),
+  ('lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_schematron_message.xsl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\lxml\\isoschematron\\resources\\xsl\\iso-schematron-xslt1\\iso_schematron_message.xsl',
+   'DATA'),
+  ('fake_useragent\\data\\browsers.jsonl',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent\\data\\browsers.jsonl',
+   'DATA'),
+  ('fake_useragent\\py.typed',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent\\py.typed',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\WHEEL',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\licenses\\COPYING',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\licenses\\COPYING',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\RECORD',
+   'DATA'),
+  ('jsonschema\\benchmarks\\issue232\\issue.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema\\benchmarks\\issue232\\issue.json',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\entry_points.txt',
+   'DATA'),
+  ('jsonschema-4.26.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema-4.26.0.dist-info\\METADATA',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\sboms\\sbom.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\sboms\\sbom.json',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\licenses\\LICENSE.BSD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\licenses\\LICENSE.BSD',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\sboms\\cryptography-rust.cyclonedx.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\sboms\\cryptography-rust.cyclonedx.json',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\RECORD',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\WHEEL',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\METADATA',
+   'DATA'),
+  ('cryptography-49.0.0.dist-info\\licenses\\LICENSE.APACHE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\cryptography-49.0.0.dist-info\\licenses\\LICENSE.APACHE',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft6\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft6\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\format-assertion',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\format-assertion',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\unevaluated',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\unevaluated',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\meta-data',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\meta-data',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\format',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\format',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\validation',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\validation',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft3\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft3\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\core',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\core',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\meta-data',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\meta-data',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\core',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\core',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\validation',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\validation',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\format-annotation',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\format-annotation',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft4\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft4\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\applicator',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\applicator',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft7\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft7\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\content',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\content',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\metaschema.json',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\metaschema.json',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft202012\\vocabularies\\content',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft202012\\vocabularies\\content',
+   'DATA'),
+  ('jsonschema_specifications\\schemas\\draft201909\\vocabularies\\applicator',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\jsonschema_specifications\\schemas\\draft201909\\vocabularies\\applicator',
+   'DATA'),
+  ('attrs-26.1.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\attrs-26.1.0.dist-info\\WHEEL',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\top_level.txt',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('pydantic-2.13.4.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic-2.13.4.dist-info\\INSTALLER',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\METADATA',
+   'DATA'),
+  ('click-8.4.1.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\click-8.4.1.dist-info\\RECORD',
+   'DATA'),
+  ('pydantic-2.13.4.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic-2.13.4.dist-info\\WHEEL',
+   'DATA'),
+  ('attrs-26.1.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\attrs-26.1.0.dist-info\\METADATA',
+   'DATA'),
+  ('websockets-16.0.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\top_level.txt',
+   'DATA'),
+  ('websockets-16.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\pcg64\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\pcg64\\LICENSE.md',
+   'DATA'),
+  ('websockets-16.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\METADATA',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\top_level.txt',
+   'DATA'),
+  ('click-8.4.1.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\click-8.4.1.dist-info\\INSTALLER',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\RECORD',
+   'DATA'),
+  ('websockets-16.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\entry_points.txt',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\entry_points.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\LICENSE.md',
+   'DATA'),
+  ('pydantic-2.13.4.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic-2.13.4.dist-info\\RECORD',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\METADATA',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\REQUESTED',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\REQUESTED',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\RECORD',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\WHEEL',
+   'DATA'),
+  ('websockets-16.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\RECORD',
+   'DATA'),
+  ('click-8.4.1.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\click-8.4.1.dist-info\\WHEEL',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\include\\numpy\\libdivide\\LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\include\\numpy\\libdivide\\LICENSE.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\WHEEL',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\licenses\\LICENCE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\licenses\\LICENCE',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\fft\\pocketfft\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\fft\\pocketfft\\LICENSE.md',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\umath\\svml\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\umath\\svml\\LICENSE',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\licenses\\AUTHORS',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\licenses\\AUTHORS',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\INSTALLER',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\METADATA',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\top_level.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\top_level.txt',
+   'DATA'),
+  ('websockets-16.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\WHEEL',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\splitmix64\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\splitmix64\\LICENSE.md',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\WHEEL',
+   'DATA'),
+  ('pydantic-2.13.4.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic-2.13.4.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\REQUESTED',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\REQUESTED',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\sfc64\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\sfc64\\LICENSE.md',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\highway\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\highway\\LICENSE',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\multiarray\\dragon4_LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\multiarray\\dragon4_LICENSE.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\npysort\\x86-simd-sort\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\npysort\\x86-simd-sort\\LICENSE.md',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\DELVEWHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\DELVEWHEEL',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\RECORD',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\INSTALLER',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\RECORD',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\RECORD',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\distributions\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\distributions\\LICENSE.md',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\WHEEL',
+   'DATA'),
+  ('pydantic-2.13.4.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\pydantic-2.13.4.dist-info\\METADATA',
+   'DATA'),
+  ('websockets-16.0.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\websockets-16.0.dist-info\\entry_points.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\common\\pythoncapi-compat\\COPYING',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\_core\\src\\common\\pythoncapi-compat\\COPYING',
+   'DATA'),
+  ('h2-4.3.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\h2-4.3.0.dist-info\\METADATA',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\entry_points.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\linalg\\lapack_lite\\LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\linalg\\lapack_lite\\LICENSE.txt',
+   'DATA'),
+  ('click-8.4.1.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\click-8.4.1.dist-info\\METADATA',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\entry_points.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\entry_points.txt',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\mt19937\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\mt19937\\LICENSE.md',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\METADATA',
+   'DATA'),
+  ('attrs-26.1.0.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\attrs-26.1.0.dist-info\\RECORD',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\INSTALLER',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\INSTALLER',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\philox\\LICENSE.md',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\random\\src\\philox\\LICENSE.md',
+   'DATA'),
+  ('mcp-1.27.2.dist-info\\RECORD',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\mcp-1.27.2.dist-info\\RECORD',
+   'DATA'),
+  ('click-8.4.1.dist-info\\licenses\\LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\click-8.4.1.dist-info\\licenses\\LICENSE.txt',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\METADATA',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\METADATA',
+   'DATA'),
+  ('tqdm-4.68.2.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\tqdm-4.68.2.dist-info\\WHEEL',
+   'DATA'),
+  ('setuptools\\_vendor\\wheel-0.45.1.dist-info\\LICENSE.txt',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\setuptools\\_vendor\\wheel-0.45.1.dist-info\\LICENSE.txt',
+   'DATA'),
+  ('attrs-26.1.0.dist-info\\INSTALLER',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\attrs-26.1.0.dist-info\\INSTALLER',
+   'DATA'),
+  ('attrs-26.1.0.dist-info\\licenses\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\attrs-26.1.0.dist-info\\licenses\\LICENSE',
+   'DATA'),
+  ('numpy-2.4.6.dist-info\\licenses\\numpy\\ma\\LICENSE',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\numpy-2.4.6.dist-info\\licenses\\numpy\\ma\\LICENSE',
+   'DATA'),
+  ('fake_useragent-2.2.0.dist-info\\WHEEL',
+   'F:\\AI Pet Companion '
+   '!\\.venv\\Lib\\site-packages\\fake_useragent-2.2.0.dist-info\\WHEEL',
+   'DATA'),
+  ('base_library.zip',
+   'F:\\AI Pet Companion '
+   '!\\build\\neuraclaw-sidecar-x86_64-pc-windows-msvc\\base_library.zip',
+   'DATA')],
+ 'python311.dll',
+ False,
+ False,
+ False,
+ [],
+ None,
+ None,
+ None)

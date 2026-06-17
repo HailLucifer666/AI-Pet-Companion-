@@ -10,7 +10,9 @@
  *  idle scheduler is suppressed — no motion for motion's sake.
  */
 
-import type { Place } from "../../places";
+import { type Place } from "../../../world3d/placeRegistry";
+import { type RealmId } from "../../../world3d/realmData";
+import { toolCategoryToPlace } from "./toolRouter";
 
 export type Gesture = "none" | "plant" | "celebrate" | "gaze" | "nap" | "play" | "wander";
 
@@ -27,7 +29,7 @@ export interface LumenformState {
 }
 
 export type WorldEvent =
-  | { kind: "tool-start" }
+  | { kind: "tool-start"; tool: string; realmId: RealmId }
   | { kind: "tool-end" }
   | { kind: "done" }
   | { kind: "thinking" }
@@ -35,7 +37,7 @@ export type WorldEvent =
   | { kind: "skill-drafted" };
 
 export const INITIAL: LumenformState = {
-  place: "home",
+  place: "hollow",
   mode: "rest",
   gesture: "none",
   gestureUntil: 0,
@@ -73,12 +75,13 @@ export function reduceLumenform(
   switch (event.kind) {
     case "tool-start":
       // Work drains energy
-      return { ...state, place: "workbench", mode: "work", gesture: "none", gestureUntil: 0, since: now, energy: Math.max(0, state.energy - 0.1) };
+      const dest = toolCategoryToPlace(event.tool, event.realmId);
+      return { ...state, place: dest, mode: "work", gesture: "none", gestureUntil: 0, since: now, energy: Math.max(0, state.energy - 0.1) };
     case "tool-end":
       // Still at the bench; more tools may follow. Just clear any transient.
-      return state.mode === "work" ? state : { ...state, place: "workbench", mode: "work", since: now };
+      return state.mode === "work" ? state : { ...state, place: state.place, mode: "work", since: now };
     case "done":
-      return { ...state, place: "home", mode: "rest", gesture: "none", gestureUntil: 0, since: now };
+      return { ...state, place: "hollow", mode: "rest", gesture: "none", gestureUntil: 0, since: now };
     case "memory-formed":
       // Walk the road to the Memory Garden (greenhouse) and plant there
       return withGesture({ ...state, place: "garden", since: now, mood: Math.min(1.0, state.mood + 0.2), energy: Math.min(1.0, state.energy + 0.1) }, "plant", now);
@@ -112,7 +115,7 @@ export function scheduleIdle(
 
   // A gesture just expired → settle back before choosing the next thing.
   if (state.gesture !== "none") {
-    const settledPlace = state.gesture === "wander" ? "home" : state.place;
+    const settledPlace = state.gesture === "wander" ? "hollow" : state.place;
     return { ...state, gesture: "none", gestureUntil: 0, place: settledPlace, since: now };
   }
 

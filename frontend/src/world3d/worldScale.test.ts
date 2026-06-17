@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D } from "./placeRegistry";
+import { ALL_PLACES } from "./placeRegistry";
 import { placeTarget } from "./locomotion";
 
 /** After growing the world ×WORLD_SCALE, the place markers + the pet anchors sit at
@@ -14,7 +14,7 @@ describe("world scale", () => {
   });
 
   it("every place marker lands on grassy land within the island", () => {
-    for (const p of PLACES_3D) {
+    for (const p of ALL_PLACES) {
       const [x, y, z] = p.pos;
       expect(Math.hypot(x, z)).toBeLessThan(ISLAND_MAX_R);
       expect(y).toBeGreaterThan(0.3); // above the waterline
@@ -23,7 +23,7 @@ describe("world scale", () => {
   });
 
   it("every pet anchor lands on grassy land within the island", () => {
-    for (const place of ["home", "workbench", "pool"] as const) {
+    for (const place of ["hollow", "workbench", "pool"] as const) {
       const a = placeTarget(place);
       const y = islandHeight(a.x, a.z, ISLAND_MAX_R);
       expect(Math.hypot(a.x, a.z)).toBeLessThan(ISLAND_MAX_R);

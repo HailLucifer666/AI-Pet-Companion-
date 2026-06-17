@@ -33,7 +33,7 @@ const S = new THREE.Vector3();
 const YAXIS = new THREE.Vector3(0, 1, 0);
 
 function useParts(url: string): { parts: Part[]; norm: THREE.Matrix4 } {
-  const { scene } = useGLTF(url);
+  const { scene } = useGLTF(url, "/draco/");
   return useMemo(() => {
     scene.updateWorldMatrix(true, true);
     const box = new THREE.Box3().setFromObject(scene);
@@ -79,6 +79,7 @@ function PartMesh({
       mesh.setMatrixAt(i, M);
     });
     mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingSphere(); // Three.js will calculate the bounding sphere wrapping all instances
   }, [places, base, baseScale]);
 
   return <instancedMesh ref={ref} args={[part.geometry, part.material, places.length]} castShadow receiveShadow />;

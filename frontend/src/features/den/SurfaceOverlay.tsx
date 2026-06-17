@@ -10,7 +10,8 @@
 
 import * as RDialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { NAV_PLACES } from "../../world/places";
+import { useWorldStore } from "../../state/worldStore";
+import { getRealmPlaces } from "../../world3d/placeRegistry";
 import { useWorldNav } from "../../state/worldNavStore";
 import { ChatView } from "../chat/ChatView";
 import { MemoryView } from "../memory/MemoryView";
@@ -32,7 +33,9 @@ function Surface({ route }: { route: string }) {
 export function SurfaceOverlay({ container }: { container: HTMLElement | null }) {
   const route = useWorldNav((s) => s.route);
   const close = useWorldNav((s) => s.close);
-  const place = NAV_PLACES.find((p) => p.route === route);
+  const activeRealm = useWorldStore((s) => s.activeRealm);
+  const navPlaces = getRealmPlaces(activeRealm);
+  const place = navPlaces.find((p) => p.route === route);
 
   return (
     <RDialog.Root open={route !== null} onOpenChange={(open) => !open && close()}>

@@ -9,26 +9,26 @@ import {
 const at = (over: Partial<LumenformState> = {}): LumenformState => ({ ...INITIAL, ...over });
 
 describe("reduceLumenform — real events drive work", () => {
-  it("starts resting at home", () => {
-    expect(INITIAL.place).toBe("home");
+  it("starts resting at hollow", () => {
+    expect(INITIAL.place).toBe("hollow");
     expect(INITIAL.mode).toBe("rest");
   });
 
   it("walks to the Workbench and goes busy on tool-start", () => {
-    const s = reduceLumenform(INITIAL, { kind: "tool-start" }, 1000);
+    const s = reduceLumenform(INITIAL, { kind: "tool-start", tool: "research", realmId: "I" }, 1000);
     expect(s.place).toBe("workbench");
     expect(s.mode).toBe("work");
   });
 
-  it("returns home and rests on done", () => {
-    const working = reduceLumenform(INITIAL, { kind: "tool-start" }, 1000);
+  it("returns hollow and rests on done", () => {
+    const working = reduceLumenform(INITIAL, { kind: "tool-start", tool: "research", realmId: "I" }, 1000);
     const s = reduceLumenform(working, { kind: "done" }, 2000);
-    expect(s.place).toBe("home");
+    expect(s.place).toBe("hollow");
     expect(s.mode).toBe("rest");
   });
 
   it("stays at the bench across tool-end (more tools may follow)", () => {
-    const working = reduceLumenform(INITIAL, { kind: "tool-start" }, 1000);
+    const working = reduceLumenform(INITIAL, { kind: "tool-start", tool: "research", realmId: "I" }, 1000);
     const s = reduceLumenform(working, { kind: "tool-end" }, 1500);
     expect(s.mode).toBe("work");
     expect(s.place).toBe("workbench");
@@ -73,7 +73,7 @@ describe("scheduleIdle — a small private life", () => {
     const s = at({ gesture: "wander", place: "wander", gestureUntil: 100, since: 0 });
     const next = scheduleIdle(s, 5000, () => 0, false);
     expect(next.gesture).toBe("none");
-    expect(next.place).toBe("home"); // wander returns home
+    expect(next.place).toBe("hollow"); // wander returns hollow
   });
 
   it("picks an activity once it has rested long enough (low roll → wander)", () => {

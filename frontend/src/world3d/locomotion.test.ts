@@ -4,10 +4,10 @@ import { ISLAND_MAX_R } from "./terrain";
 
 describe("placeTarget", () => {
   it("resolves the fixed Places to distinct on-island spots", () => {
-    const home = placeTarget("home");
+    const hollow = placeTarget("hollow");
     const bench = placeTarget("workbench");
-    expect(home).not.toEqual(bench);
-    for (const p of [home, bench, placeTarget("pool")]) {
+    expect(hollow).not.toEqual(bench);
+    for (const p of [hollow, bench, placeTarget("pool")]) {
       expect(Number.isFinite(p.x) && Number.isFinite(p.z)).toBe(true);
       expect(Math.hypot(p.x, p.z)).toBeLessThan(ISLAND_MAX_R);
     }

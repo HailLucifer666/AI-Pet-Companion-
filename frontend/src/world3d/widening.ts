@@ -5,17 +5,16 @@
  *  up — "it will grow into this." Pure + unit-tested; World3D/Atmosphere just read
  *  these targets. The stage-up *moment* itself reuses the cubic-out bloomFlash. */
 
+import { getRealmForStage, REALMS } from "./realmData";
+
 export interface StageReveal {
   surveyDist: number; // camera max zoom-out — how much of the island you can take in
   fogFar: number; // how far the horizon fog reaches before dissolving the world
 }
 
-// Indexed by stage 1..4 (index 0 unused). Monotonic — the world only ever opens.
-const SURVEY = [95, 95, 110, 128, 150];
-const FOG_FAR = [240, 240, 275, 310, 350];
-
-/** The survey/fog targets for a life stage (clamped to 1..4). */
+/** The survey/fog targets for a life stage. Driven by the Realm system. */
 export function stageReveal(stage: number): StageReveal {
-  const s = Math.max(1, Math.min(4, Math.round(stage || 1)));
-  return { surveyDist: SURVEY[s], fogFar: FOG_FAR[s] };
+  const realmId = getRealmForStage(stage || 1);
+  const def = REALMS[realmId];
+  return { surveyDist: def.surveyDist, fogFar: def.fogFar };
 }

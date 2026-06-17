@@ -8,7 +8,7 @@ import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { mulberry32 } from "../world/engine/rng";
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
-import { PLACES_3D, PLAZA_POS } from "./placeRegistry";
+import { ALL_PLACES, PLAZA_POS } from "./placeRegistry";
 import { WORLD } from "./palette";
 import { InstancedModel, type NaturePlacement } from "./nature/InstancedModel";
 import { NATURE_TREES, NATURE_ROCKS, NATURE_BUSHES, NATURE_GRASS, natureUrl } from "./nature/models";
@@ -25,7 +25,7 @@ const MEADOW_R = 4.5 * W; // open clearing in the middle — where the pet roams
 const CLEAR_ZONES: { x: number; z: number; r: number }[] = [
   { x: POOL.x, z: POOL.z, r: POOL.r + 0.8 },
   { x: PLAZA_POS[0], z: PLAZA_POS[2], r: 5.5 }, // village plaza (hearth hub)
-  ...PLACES_3D.map((p) => ({ x: p.pos[0], z: p.pos[2], r: 4.0 })),
+  ...ALL_PLACES.map((p) => ({ x: p.pos[0], z: p.pos[2], r: 4.0 })),
 ];
 
 function colorForHeight(y: number): THREE.Color {

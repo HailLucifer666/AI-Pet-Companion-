@@ -25,7 +25,9 @@ import {
   type WorldEvent,
 } from "../world/entities/lumenform/LumenformFSM";
 import { makeCrystalSeed, MAX_CRYSTALS, type CrystalSeed } from "../world/entities/crystalSeed";
+import { toolCategoryToPlace } from "../world/entities/lumenform/toolRouter";
 import { deriveEmotion, moodWord, type EmotionVector } from "../world3d/emotion";
+import { type RealmId, getRealmForStage } from "../world3d/realmData";
 
 const reduced =
   typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -57,6 +59,7 @@ export interface Pulse {
 interface WorldStore {
   lumen: LumenformState;
   stage: 1 | 2 | 3 | 4;
+  activeRealm: RealmId;
   crystals: CrystalSeed[];
   xpFrac: number; // 0..1 toward the next level — fills the Spore Gate
   level: number;
@@ -90,6 +93,7 @@ interface WorldStore {
 export const useWorldStore = create<WorldStore>((set) => ({
   lumen: INITIAL,
   stage: 1,
+  activeRealm: "I",
   crystals: [],
   xpFrac: 0,
   level: 0,
@@ -176,6 +180,8 @@ export const useWorldStore = create<WorldStore>((set) => ({
         xpFrac: (((total % 100) + 100) % 100) / 100,
         threads: graph.edges,
         recencyById: recencyMap(graph.nodes),
+        stage: Math.min(4, Math.max(1, petRes.pet?.stage || 1)) as 1 | 2 | 3 | 4,
+        activeRealm: getRealmForStage(petRes.pet?.stage || 1),
       });
     } catch {
       // Offline / backend down: the live stream still plants crystals + ticks XP.
@@ -183,7 +189,10 @@ export const useWorldStore = create<WorldStore>((set) => ({
   },
 
   setStage: (stage) =>
-    set(() => ({ stage: Math.min(4, Math.max(1, stage)) as 1 | 2 | 3 | 4 })),
+    set(() => {
+      const s = Math.min(4, Math.max(1, stage)) as 1 | 2 | 3 | 4;
+      return { stage: s, activeRealm: getRealmForStage(s) };
+    }),
 
   setWeather: (weather) =>
     set(() => {
@@ -214,10 +223,10 @@ export const useWorldStore = create<WorldStore>((set) => ({
     }),
 }));
 
-function toWorldEvent(ev: SSEEvent): WorldEvent | null {
+function toWorldEvent(ev: SSEEvent, activeRealm: RealmId): WorldEvent | null {
   switch (ev.type) {
     case "agent.tool.start":
-      return { kind: "tool-start" };
+      return { kind: "tool-start", tool: typeof ev.tool === "string" ? ev.tool : "", realmId: activeRealm };
     case "agent.tool.end":
       return { kind: "tool-end" };
     case "agent.done":
@@ -275,12 +284,16 @@ export function connect(): void {
     }
     // A real tool run / skill draft sends a pulse from its origin, then still
     // drives the FSM (toWorldEvent) below.
-    if (ev.type === "agent.tool.start") store.addPulse("workbench");
+    if (ev.type === "agent.tool.start") {
+      const toolName = typeof ev.tool === "string" ? ev.tool : "";
+      const dest = toolName ? toolCategoryToPlace(toolName, store.activeRealm) : "workbench";
+      store.addPulse(dest as PulseOrigin);
+    }
     if (ev.type === "skill.drafted") {
       store.addPulse("workbench"); // forged at the Foundry — energy from the forge
       store.forge(); // the forge erupts (Village3D reads forgeAt)
     }
-    const event = toWorldEvent(ev);
+    const event = toWorldEvent(ev, store.activeRealm);
     if (event) store.dispatch(event);
   });
   idleTimer = setInterval(() => {

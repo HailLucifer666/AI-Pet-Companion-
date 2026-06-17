@@ -10,9 +10,9 @@ import { useWorldNav } from "../state/worldNavStore";
 import { useWorldStore } from "../state/worldStore";
 import { cx } from "../components/ui";
 import { WORLD } from "./palette";
-import { PLACES_3D, type PlaceEntry as PlaceDef, type PlaceKind } from "./placeRegistry";
+import { getRealmPlaces, type PlaceEntry as PlaceDef, type Place } from "./placeRegistry";
 
-function Marker({ kind, hovered }: { kind: PlaceKind; hovered: boolean }) {
+function Marker({ kind, hovered }: { kind: Place; hovered: boolean }) {
   // The Hollow's fire flares while a real tool runs (the companion is working).
   const working = useWorldStore((s) => s.lumen.mode === "work");
   if (kind === "hollow") {
@@ -142,7 +142,7 @@ function Place({ place }: { place: PlaceDef }) {
         open(place.route);
       }}
     >
-      <Marker kind={place.kind} hovered={hovered} />
+      <Marker kind={place.id} hovered={hovered} />
       <Html position={[0, 1.15, 0]} center distanceFactor={9} zIndexRange={[20, 0]}>
         <button
           onClick={() => open(place.route)}
@@ -167,9 +167,12 @@ function Place({ place }: { place: PlaceDef }) {
 }
 
 export function Places3D() {
+  const activeRealm = useWorldStore((s) => s.activeRealm);
+  const places = getRealmPlaces(activeRealm);
+
   return (
     <group>
-      {PLACES_3D.map((p) => (
+      {places.map((p) => (
         <Place key={p.id} place={p} />
       ))}
     </group>

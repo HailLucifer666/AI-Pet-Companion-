@@ -83,6 +83,8 @@ function WideningFlash() {
   );
 }
 
+import { DenFallback2D } from "../../world3d/DenFallback2D";
+
 /** Shown when WebGL can't start (no/blocked GPU). The 3D Grove can't render, but
  *  the companion is still alive — so we state its REAL stage/level/progress and
  *  point to the parts that still work (the chat, the rail). Static — no animation. */
@@ -92,73 +94,16 @@ function WorldFallback() {
   const xpFrac = useWorldStore((s) => s.xpFrac);
   return (
     <div
-      className="absolute inset-0 grid place-items-center bg-gradient-to-b from-ink-900 to-ink-950"
+      className="absolute inset-0 grid place-items-center"
       role="img"
       aria-label="The 3D Grove needs WebGL, which isn't available here. Your companion is still alive — chat with it below or use the rail."
     >
-      <style>{`
-        @keyframes fallback-float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
-        }
-        @keyframes fallback-shadow {
-          0%, 100% { transform: scale(1); opacity: 0.35; }
-          50% { transform: scale(0.75); opacity: 0.15; }
-        }
-        @keyframes fallback-blink {
-          0%, 90%, 100% { transform: scaleY(1); }
-          95% { transform: scaleY(0.1); }
-        }
-        .fallback-animate-float {
-          animation: fallback-float 3.5s ease-in-out infinite;
-        }
-        .fallback-animate-shadow {
-          animation: fallback-shadow 3.5s ease-in-out infinite;
-        }
-        .fallback-animate-blink {
-          animation: fallback-blink 4s ease-in-out infinite;
-        }
-      `}</style>
-      <div className="max-w-sm rounded-2xl border border-claw-500/30 bg-ink-950/70 p-6 text-center backdrop-blur-sm shadow-[0_0_50px_rgba(0,0,0,0.4)]">
-        {/* Animated 2D SVG Lumenform Bot */}
-        <div className="relative h-36 w-full flex flex-col items-center justify-center overflow-visible select-none">
-          <svg width="100" height="100" viewBox="0 0 100 100" className="fallback-animate-float overflow-visible">
-            {/* Antennae (grows based on stage) */}
-            <path d="M 50 35 L 50 15" className="stroke-claw-500" strokeWidth="2.5" strokeLinecap="round" />
-            <circle cx="50" cy="12" r="4.5" className="fill-claw-400" />
-            {stage >= 2 && (
-              <>
-                <path d="M 40 38 L 28 22" className="stroke-claw-500/70" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="28" cy="22" r="3.5" className="fill-claw-500" />
-                <path d="M 60 38 L 72 22" className="stroke-claw-500/70" strokeWidth="2" strokeLinecap="round" />
-                <circle cx="72" cy="22" r="3.5" className="fill-claw-500" />
-              </>
-            )}
-            
-            {/* Robot Body */}
-            <rect x="25" y="32" width="50" height="58" rx="24" className="fill-ink-900 stroke-claw-500/50" strokeWidth="2" />
-            
-            {/* Face Screen */}
-            <rect x="32" y="44" width="36" height="24" rx="6" className="fill-ink-950 stroke-ink-800" strokeWidth="1.5" />
-            
-            {/* Blinking Eyes */}
-            <g className="fallback-animate-blink" style={{ transformOrigin: 'center 56px' }}>
-              <ellipse cx="43" cy="56" rx="3" ry="3" className="fill-claw-400" />
-              <ellipse cx="57" cy="56" rx="3" ry="3" className="fill-claw-400" />
-            </g>
-
-            {/* Glowing cheeks based on stage */}
-            {stage >= 3 && (
-              <>
-                <circle cx="37" cy="63" r="1.5" className="fill-claw-500/50" />
-                <circle cx="63" cy="63" r="1.5" className="fill-claw-500/50" />
-              </>
-            )}
-          </svg>
-          <div className="w-14 h-1.5 bg-claw-500/20 rounded-full blur-[1.5px] fallback-animate-shadow mt-2" />
-        </div>
-
-        <p className="mt-3 font-display text-sm font-medium text-ink-100">Your companion rests in the Grove</p>
+      <div className="absolute inset-0 z-0">
+        <DenFallback2D />
+      </div>
+      
+      <div className="relative z-10 max-w-sm rounded-2xl border border-claw-500/30 bg-ink-950/80 p-6 text-center backdrop-blur-md shadow-[0_0_50px_rgba(0,0,0,0.6)]">
+        <p className="font-display text-sm font-medium text-ink-100">Your companion rests in the Grove</p>
         <p className="mt-1 text-xs text-ink-400">
           {STAGE_NAMES[stage] ?? "Companion"} · Level {level} · {Math.round(xpFrac * 100)}% to next
         </p>

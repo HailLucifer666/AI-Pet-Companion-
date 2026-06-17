@@ -2,20 +2,24 @@
  *  JPEG data-URL, so the companion can "look at" it. Browser-only (getDisplayMedia),
  *  feature-detected. The capture sheet is the OS's own picker (explicit consent),
  *  the call must run inside a user gesture, and the share track is stopped the
- *  instant the frame is grabbed â€” nothing keeps recording. Privacy beyond this
+ *  instant the frame is grabbed — nothing keeps recording. Privacy beyond this
  *  (does the frame leave the device?) depends on the vision model: see GET /api/vision.
  *
- *  Cannot be exercised headlessly (needs a real picker + gesture) â€” verify live. */
+ *  Cannot be exercised headlessly (needs a real picker + gesture) — verify live. */
 
 import { useCallback, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
-const MAX_W = 1600; // downscale wide screens â€” smaller payload, plenty for vision
+const MAX_W = 1600; // downscale wide screens — smaller payload, plenty for vision
 const JPEG_QUALITY = 0.85;
 
+const isTauri = typeof window !== "undefined" && !!(window as any).__TAURI_INTERNALS__;
 const supported =
-  typeof navigator !== "undefined" &&
-  !!navigator.mediaDevices &&
-  typeof navigator.mediaDevices.getDisplayMedia === "function";
+  isTauri || (
+    typeof navigator !== "undefined" &&
+    !!navigator.mediaDevices &&
+    typeof navigator.mediaDevices.getDisplayMedia === "function"
+  );
 
 export interface ScreenCapture {
   supported: boolean;
@@ -30,6 +34,19 @@ export function useScreenCapture(): ScreenCapture {
   const captureFrame = useCallback(async (): Promise<string | null> => {
     if (!supported) return null;
     setCapturing(true);
+
+    if (isTauri) {
+      try {
+        const base64Str = await invoke<string>("capture_screen");
+        setCapturing(false);
+        return base64Str;
+      } catch (e) {
+        console.error("Tauri screen capture failed", e);
+        setCapturing(false);
+        return null;
+      }
+    }
+
     let stream: MediaStream | null = null;
     try {
       stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });

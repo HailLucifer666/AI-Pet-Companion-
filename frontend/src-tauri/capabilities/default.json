@@ -3,9 +3,15 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": [
-    "main"
+    "main",
+    "pointer"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [{ "name": "neuraclaw-sidecar", "sidecar": true }]
+    }
   ]
 }

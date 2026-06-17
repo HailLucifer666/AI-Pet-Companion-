@@ -3,12 +3,14 @@
  *  Hover/focus brightens a ring and reveals the label; activating opens the surface
  *  as a diegetic overlay. Hidden + inert while an overlay is already open. */
 
-import { NAV_PLACES } from "../../world/places";
+import { getRealmPlaces } from "../../world3d/placeRegistry";
+import { useWorldStore } from "../../state/worldStore";
 import { useWorldNav } from "../../state/worldNavStore";
 import { cx } from "../../components/ui";
 
 export function PlaceHotspots({ hidden }: { hidden: boolean }) {
   const openSurface = useWorldNav((s) => s.openSurface);
+  const places = getRealmPlaces(useWorldStore((s) => s.activeRealm));
 
   return (
     <div
@@ -18,14 +20,14 @@ export function PlaceHotspots({ hidden }: { hidden: boolean }) {
       )}
       aria-hidden={hidden}
     >
-      {NAV_PLACES.map((p) => (
+      {places.map((p) => (
         <button
           key={p.id}
           data-place={p.id}
           onClick={() => openSurface(p.route)}
           aria-label={`${p.label} — ${p.sub}`}
           tabIndex={hidden ? -1 : 0}
-          style={{ left: `${p.nx * 100}%`, top: `${p.ny * 100}%` }}
+          style={{ left: `${(p.nx || 0.5) * 100}%`, top: `${(p.ny || 0.5) * 100}%` }}
           className={cx(
             "group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2",
             "rounded-full outline-none",

@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { useReducedMotion } from "motion/react";
-import { ACESFilmicToneMapping, MOUSE, Vector3 } from "three";
+import { ACESFilmicToneMapping, MOUSE, Vector3, type PerspectiveCamera } from "three";
 import { Island } from "./Island";
 import { Village3D } from "./Village3D";
 import { GlowMushrooms3D } from "./GlowMushrooms3D";
@@ -32,7 +32,7 @@ import { localHour } from "./daylight";
 import { petPos } from "./petPosition";
 import { cameraFocus } from "./cameraFocus";
 import { islandHeight, ISLAND_MAX_R } from "./terrain";
-import { detectGpuTier, qualityFlags } from "./quality";
+import { qualityFlags } from "./quality";
 import { stageReveal } from "./widening";
 import { useWorldStore } from "../state/worldStore";
 import { useSkills } from "./useSkills";
@@ -78,6 +78,9 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
   const elapsed = useRef(0);
   const interacting = useRef(false); // user is dragging (pan/orbit) right now
   const panHoldUntil = useRef(0); // hold the follow until this time after a drag
+
+  const lastBloom = useRef(0);
+  const fovPunch = useRef(0);
 
   // Own the wheel: ease zoom instead of OrbitControls' hard dolly steps. Zoom stays
   // centred on the pet (it does NOT release the follow — only dragging does).
@@ -172,10 +175,69 @@ function CameraRig({ reduced, maxDist }: { reduced: boolean; maxDist: number }) 
     const ground = islandHeight(camera.position.x, camera.position.z, ISLAND_MAX_R);
     if (camera.position.y < ground + CAM_CLEAR) camera.position.y = ground + CAM_CLEAR;
 
+    // FOV punch on level up (bloomAt)
+    const st = useWorldStore.getState();
+    if (st.bloomAt !== lastBloom.current && st.bloomAt > 0) {
+      lastBloom.current = st.bloomAt;
+      fovPunch.current = 4; // punch FOV by 4 degrees
+      targetDist.current = Math.min(targetDist.current, 8); // brief auto-zoom
+      lastInput.current = t; // hold drift
+      panHoldUntil.current = 0; // stop holding pan so it focuses pet
+    }
+    
+    const targetFov = 42 + fovPunch.current;
+    const pCam = camera as PerspectiveCamera;
+    if (Math.abs(pCam.fov - targetFov) > 0.05) {
+      pCam.fov += (targetFov - pCam.fov) * (1 - Math.exp(-8 * dt));
+      pCam.updateProjectionMatrix();
+    }
+    if (fovPunch.current > 0) {
+      fovPunch.current -= fovPunch.current * (1 - Math.exp(-4 * dt));
+    }
+
     controls.update();
   });
 
   return null;
+}
+
+function LevelUpFlash() {
+  const bloomAt = useWorldStore((s) => s.bloomAt);
+  const [op, setOp] = useState(0);
+
+  useEffect(() => {
+    if (bloomAt === 0) return;
+    let raf = 0;
+    const start = bloomAt;
+    const tick = () => {
+      const now = performance.now();
+      const since = now - start;
+      if (since < 0) { raf = requestAnimationFrame(tick); return; }
+      
+      let f = 0;
+      if (since < 50) f = since / 50;
+      else if (since < 800) f = 1 - (since - 50) / 750;
+      
+      setOp(f * 0.4);
+      if (since < 800) raf = requestAnimationFrame(tick);
+      else setOp(0);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [bloomAt]);
+
+  if (op <= 0) return null;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-40"
+      style={{
+        opacity: op,
+        background: "radial-gradient(circle at 50% 50%, var(--color-claw-500) 0%, transparent 80%)",
+        mixBlendMode: "screen"
+      }}
+    />
+  );
 }
 
 export function World3D() {
@@ -218,6 +280,7 @@ export function World3D() {
   }, []);
 
   return (
+    <>
     <Canvas
       shadows={q.shadows}
       dpr={q.dpr}
@@ -270,5 +333,7 @@ export function World3D() {
       <Postfx bloom={!reduced && q.bloom} msaa={q.msaa} />
       </Suspense>
     </Canvas>
+    <LevelUpFlash />
+    </>
   );
 }

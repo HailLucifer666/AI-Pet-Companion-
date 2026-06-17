@@ -5,6 +5,8 @@
  */
 
 import { islandHeight, ISLAND_MAX_R, WORLD_SCALE } from "./terrain";
+import { mulberry32, range } from "../world/engine/rng";
+import { REALMS, type RealmId } from "./realmData";
 
 const W = WORLD_SCALE;
 
@@ -12,12 +14,10 @@ function on(x: number, z: number): [number, number, number] {
   return [x, islandHeight(x, z, ISLAND_MAX_R), z];
 }
 
-export type Place = "home" | "workbench" | "garden" | "pool" | "wander" | "archives" | "tasks" | "calendar";
-export type PlaceKind = "hollow" | "garden" | "workbench" | "pool" | "archives" | "tasks" | "calendar";
+export type Place = "hollow" | "workbench" | "garden" | "pool" | "wander" | "archives" | "tasks" | "calendar";
 
 export interface PlaceEntry {
-  id: Place;
-  kind: PlaceKind;
+  id: Exclude<Place, "wander">;
   label: string;
   sub: string;
   route: string;
@@ -31,9 +31,8 @@ export interface PlaceEntry {
 export const PLAZA_POS: [number, number, number] = on(-1 * W, -1 * W);
 
 export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
-  home: {
-    id: "home",
-    kind: "hollow",
+  hollow: {
+    id: "hollow",
     label: "The Hollow",
     sub: "talk by the fire",
     route: "/chat",
@@ -45,7 +44,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   garden: {
     id: "garden",
-    kind: "garden",
     label: "Memory Garden",
     sub: "what it remembers",
     route: "/memory",
@@ -57,7 +55,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   workbench: {
     id: "workbench",
-    kind: "workbench",
     label: "The Workbench",
     sub: "notes & making",
     route: "/notes",
@@ -69,7 +66,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   archives: {
     id: "archives",
-    kind: "archives",
     label: "The Archives",
     sub: "formal documents",
     route: "/documents",
@@ -81,7 +77,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   tasks: {
     id: "tasks",
-    kind: "tasks",
     label: "The Wishing Well",
     sub: "chores & goals",
     route: "/tasks",
@@ -93,7 +88,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   calendar: {
     id: "calendar",
-    kind: "calendar",
     label: "The Standing Stone",
     sub: "schedule & time",
     route: "/calendar",
@@ -105,7 +99,6 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
   pool: {
     id: "pool",
-    kind: "pool",
     label: "Inland Pool",
     sub: "",
     route: "",
@@ -117,20 +110,44 @@ export const PLACES: Record<Exclude<Place, "wander">, PlaceEntry> = {
   },
 };
 
-export const NAV_PLACES: PlaceEntry[] = Object.values(PLACES).filter((p) => p.navigable);
-export const PLACES_3D: PlaceEntry[] = NAV_PLACES;
+export const ALL_PLACES: PlaceEntry[] = Object.values(PLACES);
+export const ALL_NAV_PLACES: PlaceEntry[] = ALL_PLACES.filter((p) => p.navigable);
+
+export function getRealmPlaces(realmId: RealmId): PlaceEntry[] {
+  const def = REALMS[realmId];
+  return ALL_NAV_PLACES.filter((p) => def.places.includes(p.id as Place));
+}
 
 /** Where a Mycelium pulse originates, by the kind of event that fired it. */
-export type PulseOrigin = "workbench" | "garden" | "home";
+export type PulseOrigin = "workbench" | "garden" | "hollow";
 
 export function originCoord(origin: PulseOrigin): [number, number, number] {
   return PLACES[origin].pos;
 }
 
-/** The Spore Gate â€” the luminous archway high in the Grove that fills with the
+export function originCoord2D(origin: PulseOrigin, w: number, h: number): { x: number; y: number } {
+  const p = PLACES[origin];
+  return { x: (p.nx || 0.5) * w, y: (p.ny || 0.5) * h };
+}
+
+/** The Spore Gate — the luminous archway high in the Grove that fills with the
  *  companion's XP and blooms open when it widens to a new stage (W-7). */
 export const SPORE_GATE = { x: 0, y: 15, z: -10 * W, nx: 0.5, ny: 0.3 };
 
 export function gateCoord(w: number, h: number): { x: number; y: number } {
   return { x: SPORE_GATE.nx * w, y: SPORE_GATE.ny * h };
+}
+
+export function resolvePlace(
+  place: Place,
+  w: number,
+  h: number,
+  wanderSeed = 1,
+): { x: number; y: number } {
+  if (place === "wander") {
+    const r = mulberry32(wanderSeed >>> 0);
+    return { x: range(r, 0.22, 0.78) * w, y: range(r, 0.66, 0.84) * h };
+  }
+  const p = PLACES[place];
+  return { x: (p.nx || 0.5) * w, y: (p.ny || 0.5) * h };
 }

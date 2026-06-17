@@ -18,9 +18,11 @@ export function DesktopPointerOverlay() {
     // from the user's underlying real desktop apps.
     const setup = async () => {
       try {
-        await getCurrentWindow().setIgnoreCursorEvents(true);
+        const win = getCurrentWindow();
+        await win.setIgnoreCursorEvents(true);
+        await win.show();
       } catch (e) {
-        console.warn("Could not set ignore cursor events:", e);
+        console.warn("Could not set ignore cursor events or show window:", e);
       }
     };
     setup();

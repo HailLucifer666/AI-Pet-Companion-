@@ -57,21 +57,40 @@ function WeatherLine({ weather }: { weather: Weather }) {
   return <span>{parts.join(" · ")}</span>;
 }
 
+import { audioEngine } from "../../lib/audioEngine";
+
 export function DenHud() {
   const weather = useWeather();
   const [now, setNow] = useState(() => new Date());
+  // The audio engine reads its own localStorage state on init, so we read it back directly.
+  const [muted, setMuted] = useState(audioEngine.getMuted());
 
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), HALF_MIN);
     return () => clearInterval(id);
   }, []);
 
+  const toggleMute = () => {
+    const newMuted = !muted;
+    audioEngine.setMuted(newMuted);
+    setMuted(newMuted);
+  };
+
   return (
-    <div className="pointer-events-none absolute right-5 top-4 select-none text-right">
-      <p className="glow-soft font-display text-2xl font-semibold leading-none tracking-wide text-ink-100/95 tabular-nums">
-        {clock(now)}
-      </p>
-      <p className="mt-1 text-xs text-ink-300/85">
+    <div className="pointer-events-auto absolute right-5 top-4 flex flex-col items-end gap-1 select-none text-right">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={toggleMute}
+          className="text-ink-400/80 hover:text-ink-200 transition-colors cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-claw-400 rounded-sm"
+          title={muted ? "Unmute Sound" : "Mute Sound"}
+        >
+          {muted ? "🔇" : "🔊"}
+        </button>
+        <p className="glow-soft font-display text-2xl font-semibold leading-none tracking-wide text-ink-100/95 tabular-nums pointer-events-none">
+          {clock(now)}
+        </p>
+      </div>
+      <p className="text-xs text-ink-300/85 pointer-events-none">
         <WeatherLine weather={weather} />
       </p>
     </div>

@@ -15,7 +15,6 @@ class AudioEngine {
   private lfos: OscillatorNode[] = [];
   
   // Rain noise node
-  private rainNode: AudioWorkletNode | ScriptProcessorNode | null = null;
 
   private isMuted: boolean = false;
   private volume: number = 0.5;
