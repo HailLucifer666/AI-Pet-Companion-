@@ -25,6 +25,7 @@ import { useUndoableDelete } from "../../lib/useUndoableDelete";
 import { useVoice } from "../../lib/useVoice";
 import { useScreenCapture } from "../../lib/useScreenCapture";
 import { useModelStore, modelOverride } from "../../state/useModelStore";
+import { useSightStore } from "../../state/useSightStore";
 import { ModelSelector } from "../../components/ModelSelector";
 import {
   Badge,
@@ -233,7 +234,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
   const voice = useVoice();
   const [muted, setMuted] = useState(false);
   const { supported: capSupported, capturing, captureFrame } = useScreenCapture();
-  const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const { capturedImage: attachedImage, setCapturedImage: setAttachedImage } = useSightStore();
 
   // A suggested prompt handed over from the hatch ritual lands here once.
   useEffect(() => {

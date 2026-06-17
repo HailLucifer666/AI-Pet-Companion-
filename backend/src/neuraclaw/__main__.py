@@ -1,7 +1,7 @@
 import uvicorn
 
-from .api import create_app
-from .config import load_config
+from neuraclaw.api import create_app
+from neuraclaw.config import load_config
 
 
 def main() -> None:

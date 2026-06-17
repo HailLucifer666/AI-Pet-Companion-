@@ -1,8 +1,13 @@
 import { useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { useNavigate } from "react-router";
+import { useSightStore } from "../state/useSightStore";
 
 export function useGlobalShortcut() {
+  const navigate = useNavigate();
+  const setCapturedImage = useSightStore((s) => s.setCapturedImage);
+
   useEffect(() => {
     // Check if we are running in Tauri
     if (!(window as any).__TAURI_INTERNALS__) return;
@@ -13,8 +18,8 @@ export function useGlobalShortcut() {
       console.log("Global shortcut triggered!");
       try {
         const imageBase64 = await invoke<string>("capture_screen");
-        console.log("Successfully captured screen! Image data starts with:", imageBase64.substring(0, 50));
-        // You can use this imageBase64 in an <img> tag src
+        setCapturedImage(imageBase64);
+        navigate("/chat");
       } catch (err) {
         console.error("Failed to capture screen:", err);
       }
@@ -23,5 +28,5 @@ export function useGlobalShortcut() {
     return () => {
       unlistenPromise.then((unlisten) => unlisten());
     };
-  }, []);
+  }, [navigate, setCapturedImage]);
 }

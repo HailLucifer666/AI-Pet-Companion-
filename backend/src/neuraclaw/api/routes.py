@@ -6,7 +6,7 @@ import logging
 import secrets
 import uuid
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, UploadFile, File
 from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -283,6 +283,18 @@ async def hatch(body: HatchRequest, request: Request):
     )
     return {"pet": pet}
 
+
+@api_router.post("/voice/transcribe")
+async def transcribe_voice(file: UploadFile = File(...)):
+    """Local fallback STT using faster-whisper. Used by Tauri shells where Web Speech API STT is unavailable."""
+    from ..voice import whisper
+    try:
+        content = await file.read()
+        text = await whisper.transcribe_audio(content)
+        return {"text": text}
+    except Exception as e:
+        log.error(f"STT error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ── Chat ──────────────────────────────────────────────────────────────
 

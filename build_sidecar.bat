@@ -23,6 +23,8 @@ pyinstaller --noconfirm ^
     --hidden-import "aiosqlite" ^
     --hidden-import "sqlite_vec" ^
     --collect-all "fastembed" ^
+    --collect-all "faster_whisper" ^
+    --collect-all "ctranslate2" ^
     --collect-all "neuraclaw" ^
     backend\src\neuraclaw\__main__.py
 
