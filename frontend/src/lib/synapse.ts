@@ -1,4 +1,5 @@
 import { SSEParser, type SSEEvent } from "./sse";
+import { apiUrl } from "./apiBase";
 
 export function connectSynapse(handler: (event: SSEEvent) => void): () => void {
   let dead = false;
@@ -13,7 +14,7 @@ export function connectSynapse(handler: (event: SSEEvent) => void): () => void {
     abortController = new AbortController();
     
     try {
-      const res = await fetch("/api/events", {
+      const res = await fetch(apiUrl("/api/events"), {
         signal: abortController.signal,
       });
       

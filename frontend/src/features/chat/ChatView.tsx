@@ -235,6 +235,11 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
   const [muted, setMuted] = useState(false);
   const { supported: capSupported, capturing, captureFrame } = useScreenCapture();
   const { capturedImage: attachedImage, setCapturedImage: setAttachedImage } = useSightStore();
+  // Can the companion actually SEE? Mirrors PetChat: a screenshot is only useful
+  // if a vision-capable model is configured (GET /api/vision). Without this gate
+  // a capture would be silently sent to a text-only model and answered blind.
+  const vision = useQuery({ queryKey: queryKeys.vision, queryFn: api.vision });
+  const canSee = capSupported && vision.data?.available === true;
 
   // A suggested prompt handed over from the hatch ritual lands here once.
   useEffect(() => {
@@ -276,7 +281,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
           session_id: sessionId ?? null, 
           role, 
           model: modelOverride(selectedModel),
-          image_b64: attachedImage || undefined 
+          image_b64: canSee ? (attachedImage || undefined) : undefined
         },
         { signal: controller.signal },
       )) {
@@ -476,7 +481,7 @@ export function ChatView({ embedded = false }: { embedded?: boolean } = {}) {
                 }}
               />
               <div className="flex items-center gap-1 shrink-0 mb-1 mr-1">
-                {capSupported && (
+                {canSee && (
                   <button
                     onClick={handleCapture}
                     disabled={capturing}

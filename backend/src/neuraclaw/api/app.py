@@ -4,6 +4,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -45,6 +46,19 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(title="NeuraClaw V3", lifespan=lifespan)
+    # The packaged Tauri WebView loads from tauri.localhost, so calls to the
+    # sidecar (127.0.0.1:8090) are cross-origin. Allow the desktop + dev origins.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://tauri.localhost",
+            "https://tauri.localhost",
+            "tauri://localhost",
+            "http://localhost:5173",
+        ],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.include_router(api_router, prefix="/api")
     if FRONTEND_DIST.exists():
         app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")

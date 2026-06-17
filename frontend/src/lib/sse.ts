@@ -6,6 +6,8 @@
  * tolerating events split across network chunks.
  */
 
+import { apiUrl } from "./apiBase";
+
 export interface SSEOptions {
   signal?: AbortSignal;
   headers?: Record<string, string>;
@@ -63,7 +65,7 @@ export async function* streamSSE(
   body: unknown,
   opts: SSEOptions = {},
 ): AsyncGenerator<SSEEvent> {
-  const res = await fetch(url, {
+  const res = await fetch(apiUrl(url), {
     method: "POST",
     headers: { "Content-Type": "application/json", ...opts.headers },
     body: JSON.stringify(body),

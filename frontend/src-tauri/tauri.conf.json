@@ -26,7 +26,8 @@
         "decorations": false,
         "alwaysOnTop": true,
         "skipTaskbar": true,
-        "maximized": true,
+        "fullscreen": true,
+        "focus": false,
         "visible": false
       }
     ],

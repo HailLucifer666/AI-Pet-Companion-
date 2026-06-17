@@ -7,6 +7,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { apiUrl } from "./apiBase";
 
 export function speechSnippet(text: string, max = 90): string {
   const t = text.replace(/\s+/g, " ").trim();
@@ -124,7 +125,7 @@ export function useVoice(): VoiceApi {
               const formData = new FormData();
               formData.append("file", blob, "voice.webm");
               try {
-                const res = await fetch("/api/voice/transcribe", {
+                const res = await fetch(apiUrl("/api/voice/transcribe"), {
                   method: "POST",
                   body: formData,
                 });
