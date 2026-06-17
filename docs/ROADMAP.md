@@ -12,6 +12,36 @@ An AI companion **pet that lives autonomously in a low-poly 3D game world** that
 - **Phase 3 â€” Deeper memory & multi-channel reach (hermes + vellum):** Richer memory (episodic, emotional, procedural), Telegram multi-channel gateway, actor identity tiers, subagents / MCP.
 - **Phase 4 â€” Tauri native desktop shell + clicky-style screen pointing:** Tauri wrapper, native notifications, global push-to-talk hotkey, screen pointing with `[POINT:x,y:label]` tool tags.
 
+---
+
+## ⚡ CURRENT STATUS (updated 2026-06-17) — supersedes the "V-2.x" table below
+
+**Now ≈ Mission Phase 4 shipped; pivoting to Phases 1–2.** The bioluminescent village IS the live world, the Tauri native desktop shell ships, and the native Sight & Voice layer is merged.
+
+| Track | Status |
+|---|---|
+| V-1 Living world | ✅ shipped |
+| V-2 Pet — screen-faced robot + `petAnim` wired + mood/energy drives | ✅ shipped |
+| V-3 World props — Quaternius nature, Draco-compressed | ✅ shipped |
+| World v2 — Bioluminescent Village (plaza + buildings + roads) | ✅ shipped — **this is the live world** |
+| V-2.5 Hardening — GPU-tier ladder · 2D fallback · audio · tool→place · camera feel | ✅ shipped (full track) |
+| V-4 Voice — STT in / TTS out | ✅ shipped (browser-native) |
+| Tauri native shell — Python sidecar · frameless controls · global hotkey | ✅ shipped |
+| Sight & Voice (native) — Ctrl+Alt+S capture · push-to-talk · `[POINT]` desktop overlay | 🔨 merged — **pending live verification** |
+| V-6 Realms / "The Widening" | 🔨 infra shipped; design spec → `docs/REALMS-DESIGN.md` |
+| Phase 1 Autonomy — scheduler · heartbeat · journal · mood | ⏳ NEXT — plan → `docs/AUTONOMY-PHASE1.md` |
+
+**Recently landed (2026-06-17):**
+- `feat(build)` — capstone Tauri installer + PyInstaller sidecar (`41a7642`).
+- `feat(sight-voice)` — screen-capture sight store + voice pipeline (`9250936`, WIP).
+- `fix(world)` — resolved the instant 3D-Grove crash (bare GLTFLoader on meshopt-compressed village GLBs + missing `Well.glb`) and the foreground fog haze (`0721822`).
+
+**Next two paths (both now specced in-repo for the build app):**
+- **Path A — World expansion (V-6 realms):** `docs/REALMS-DESIGN.md`.
+- **Path B — Autonomy (Mission Phase 1):** `docs/AUTONOMY-PHASE1.md`.
+
+**Build baselines (keep green):** pytest · vitest · `npm run build` passes · world chunk ≤ 350 kB gz (currently ~315 kB gz ✅).
+
 ## Where we are now (2026-06-14) â€” current â‰ˆ **V-2.x**
 **V-2 (pet) and V-3 (props) are both in active development; V-1 shipped.**
 
